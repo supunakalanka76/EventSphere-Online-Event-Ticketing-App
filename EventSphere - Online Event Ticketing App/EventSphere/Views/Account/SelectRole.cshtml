@@ -1,0 +1,342 @@
+﻿@{
+    ViewBag.Title = "Select Role";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style media="screen and (max-width: 768px)">
+    .role-selection-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: -20px -15px;
+        padding: 40px 15px;
+    }
+
+    .role-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px 30px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 3px solid transparent;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .role-card.customer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .role-card.organizer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #f093fb, #f5576c);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .role-card.admin::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #4facfe, #00f2fe);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .role-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .role-card:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        border-color: var(--card-color-1);
+    }
+
+    .role-card.customer {
+        --card-color-1: #667eea;
+        --card-color-2: #764ba2;
+    }
+
+    .role-card.organizer {
+        --card-color-1: #f093fb;
+        --card-color-2: #f5576c;
+    }
+
+    .role-card.admin {
+        --card-color-1: #4facfe;
+        --card-color-2: #00f2fe;
+    }
+
+    .role-icon-wrapper {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 25px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .role-card:hover .role-icon-wrapper {
+        transform: rotate(360deg) scale(1.1);
+    }
+
+    .role-icon {
+        font-size: 3.5rem;
+        color: white;
+    }
+
+    .role-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .role-description {
+        color: #6c757d;
+        font-size: 1rem;
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+
+    .role-features {
+        text-align: left;
+        margin-bottom: 30px;
+    }
+
+    .role-feature {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        color: #495057;
+    }
+
+    .role-feature i {
+        font-size: 1.2rem;
+        margin-right: 12px;
+        background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .role-btn {
+        background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
+        border: none;
+        color: white;
+        padding: 15px 35px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        width: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .role-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        color: white;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 50px;
+        color: white;
+    }
+
+    .page-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .page-header p {
+        font-size: 1.3rem;
+        opacity: 0.95;
+        text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 40px;
+        color: white;
+        font-size: 1.1rem;
+    }
+
+    .login-link a {
+        color: white;
+        font-weight: 700;
+        text-decoration: none;
+        border-bottom: 2px solid white;
+        padding-bottom: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .login-link a:hover {
+        border-bottom-width: 3px;
+        padding-bottom: 4px;
+    }
+</style>
+
+<div class="role-selection-container">
+    <div class="container">
+        <div class="page-header">
+            <h1>Choose Your Journey</h1>
+            <p>Select the account type that matches your needs</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Customer Role -->
+            <div class="col-lg-4 col-md-6">
+                <div class="role-card customer">
+                    <div class="role-icon-wrapper">
+                        <i class="bi bi-person-circle role-icon"></i>
+                    </div>
+                    <h3 class="role-title">Customer</h3>
+                    <p class="role-description">
+                        Discover amazing events and create unforgettable memories
+                    </p>
+                    <div class="role-features">
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Browse & book events</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Manage your tickets</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Earn loyalty rewards</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Track booking history</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Get event reminders</span>
+                        </div>
+                    </div>
+                    <a href="@Url.Action("Register", "Account", new { role = "Customer" })" class="role-btn">
+                        Join as Customer
+                    </a>
+                </div>
+            </div>
+
+            <!-- Organizer Role -->
+            <div class="col-lg-4 col-md-6">
+                <div class="role-card organizer">
+                    <div class="role-icon-wrapper">
+                        <i class="bi bi-calendar-event role-icon"></i>
+                    </div>
+                    <h3 class="role-title">Organizer</h3>
+                    <p class="role-description">
+                        Create spectacular events and manage them with ease
+                    </p>
+                    <div class="role-features">
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Create unlimited events</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Manage bookings & sales</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Real-time analytics</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Revenue tracking</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Attendee management</span>
+                        </div>
+                    </div>
+                    <a href="@Url.Action("Register", "Account", new { role = "Organizer" })" class="role-btn">
+                        Join as Organizer
+                    </a>
+                </div>
+            </div>
+
+            <!-- Admin Role -->
+            <div class="col-lg-4 col-md-6">
+                <div class="role-card admin">
+                    <div class="role-icon-wrapper">
+                        <i class="bi bi-shield-check role-icon"></i>
+                    </div>
+                    <h3 class="role-title">Administrator</h3>
+                    <p class="role-description">
+                        Complete control over the entire platform ecosystem
+                    </p>
+                    <div class="role-features">
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Full user management</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Event moderation</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>System configuration</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Platform analytics</span>
+                        </div>
+                        <div class="role-feature">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Security oversight</span>
+                        </div>
+                    </div>
+                    <a href="@Url.Action("Register", "Account", new { role = "Admin" })" class="role-btn">
+                        Join as Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-link">
+            <p>
+                Already have an account?
+                <a href="@Url.Action("Login", "Account")">Sign In</a>
+            </p>
+        </div>
+    </div>
+</div>

@@ -13,10 +13,10 @@ namespace EventSphere.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class EventSphereDBEntities1 : DbContext
+    public partial class EventSphereDBEntities : DbContext
     {
-        public EventSphereDBEntities1()
-            : base("name=EventSphereDBEntities1")
+        public EventSphereDBEntities()
+            : base("name=EventSphereDBEntities")
         {
         }
     

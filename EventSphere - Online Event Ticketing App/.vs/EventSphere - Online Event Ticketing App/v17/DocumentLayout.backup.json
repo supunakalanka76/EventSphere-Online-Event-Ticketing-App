@@ -3,8 +3,24 @@
   "WorkspaceRootPath": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|e:\\esoft\\top - up\\application development (ad)\\practicals\\web apps\\eventsphere - online event ticketing app\\eventsphere\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|solutionrelative:eventsphere\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|e:\\esoft\\top - up\\application development (ad)\\practicals\\web apps\\eventsphere - online event ticketing app\\eventsphere\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|solutionrelative:eventsphere\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|e:\\esoft\\top - up\\application development (ad)\\practicals\\web apps\\eventsphere - online event ticketing app\\eventsphere\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|solutionrelative:eventsphere\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\eventsphere\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|solutionrelative:eventsphere\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\eventsphere\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|solutionrelative:eventsphere\\views\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|e:\\esoft\\top - up\\application development (ad)\\practicals\\web apps\\eventsphere - online event ticketing app\\eventsphere\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|solutionrelative:eventsphere\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,24 +30,76 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "HomeController.cs",
-              "DocumentMoniker": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Controllers\\HomeController.cs",
-              "RelativeDocumentMoniker": "EventSphere\\Controllers\\HomeController.cs",
-              "ToolTip": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Controllers\\HomeController.cs",
-              "RelativeToolTip": "EventSphere\\Controllers\\HomeController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-10T08:21:14.909Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "EventSphere\\Views\\Home\\Index.cshtml",
+              "ToolTip": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "EventSphere\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-10T16:57:36.985Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "EventSphere\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "EventSphere\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHEAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-10T16:44:00.975Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "EventSphere\\Controllers\\AccountController.cs",
+              "ToolTip": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "EventSphere\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-10T15:15:43.342Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Login.cshtml",
+              "DocumentMoniker": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Views\\Account\\Login.cshtml",
+              "RelativeDocumentMoniker": "EventSphere\\Views\\Account\\Login.cshtml",
+              "ToolTip": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Views\\Account\\Login.cshtml",
+              "RelativeToolTip": "EventSphere\\Views\\Account\\Login.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC8AAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-10T15:34:46.138Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Register.cshtml",
+              "DocumentMoniker": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Views\\Account\\Register.cshtml",
+              "RelativeDocumentMoniker": "EventSphere\\Views\\Account\\Register.cshtml",
+              "ToolTip": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Views\\Account\\Register.cshtml",
+              "RelativeToolTip": "EventSphere\\Views\\Account\\Register.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEgAAACqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-10-10T15:35:46.983Z",
+              "EditorCaption": ""
             }
           ]
         }

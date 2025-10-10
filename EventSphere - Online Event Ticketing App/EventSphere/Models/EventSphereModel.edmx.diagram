@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="40ba5785bf57433cb6be9a8d85ee7478" Name="Diagram1" ZoomLevel="91">
+      <Diagram DiagramId="59e9b6a4184d4a929179b1b3703f495a" Name="Diagram1" ZoomLevel="91">
         <EntityTypeShape EntityType="EventSphereDBModel.Booking" Width="1.5" PointX="3" PointY="8.625" IsExpanded="true" />
         <EntityTypeShape EntityType="EventSphereDBModel.EventCategory" Width="1.5" PointX="3.75" PointY="5" IsExpanded="true" />
         <EntityTypeShape EntityType="EventSphereDBModel.Event" Width="1.5" PointX="6" PointY="8.625" IsExpanded="true" />

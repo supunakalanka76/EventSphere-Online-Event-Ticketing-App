@@ -1,0 +1,85 @@
+﻿@model EventSphere.Models.User
+
+@{
+    ViewBag.Title = "My Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5" style="max-width: 700px;">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
+            <h3 class="text-center mb-4 fw-bold">My Profile</h3>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">@TempData["Success"]</div>
+            }
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">@ViewBag.Error</div>
+            }
+
+            @using (Html.BeginForm("Profile", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(m => m.UserID)
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Full Name</label>
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter full name", required = "required" })
+                        @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter email", @readonly = "readonly" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Phone Number</label>
+                        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "Enter phone number" })
+                        @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Address</label>
+                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "Enter address" })
+                        @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="row align-items-center mb-4">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold">Profile Picture</label>
+                        <input type="file" name="ProfileImageFile" class="form-control" accept="image/*" />
+                        <small class="text-muted">Leave blank to keep existing image.</small>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        @if (!string.IsNullOrEmpty(Model.ProfileImage))
+                        {
+                            <img src="@Url.Content(Model.ProfileImage)" alt="Profile Image" class="img-thumbnail rounded-circle" style="width:100px; height:100px; object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <img src="~/Content/Images/default-user.png" alt="Profile Image" class="img-thumbnail rounded-circle" style="width:100px; height:100px; object-fit:cover;" />
+                        }
+                    </div>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary btn-block">Update Profile</button>
+                </div>
+            }
+
+            <div class="text-center mt-3">
+                <a href="@Url.Action("Index", "Home")" class="text-decoration-none fw-semibold">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
