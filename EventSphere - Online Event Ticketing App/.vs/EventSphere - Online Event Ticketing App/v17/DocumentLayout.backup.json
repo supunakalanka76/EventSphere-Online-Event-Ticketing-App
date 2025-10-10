@@ -1,0 +1,41 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|e:\\esoft\\top - up\\application development (ad)\\practicals\\web apps\\eventsphere - online event ticketing app\\eventsphere\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5F9696A5-C2F7-43D0-AF64-531391B9B621}|EventSphere\\EventSphere.csproj|solutionrelative:eventsphere\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "EventSphere\\Controllers\\HomeController.cs",
+              "ToolTip": "E:\\ESOFT\\TOP - UP\\Application Development (AD)\\Practicals\\Web Apps\\EventSphere - Online Event Ticketing App\\EventSphere\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "EventSphere\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-10T08:21:14.909Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

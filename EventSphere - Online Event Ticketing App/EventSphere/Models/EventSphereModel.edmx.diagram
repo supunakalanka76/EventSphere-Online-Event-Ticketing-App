@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="40ba5785bf57433cb6be9a8d85ee7478" Name="Diagram1" ZoomLevel="91">
+        <EntityTypeShape EntityType="EventSphereDBModel.Booking" Width="1.5" PointX="3" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="EventSphereDBModel.EventCategory" Width="1.5" PointX="3.75" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="EventSphereDBModel.Event" Width="1.5" PointX="6" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="EventSphereDBModel.LoyaltyTransaction" Width="1.5" PointX="8.25" PointY="9.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="EventSphereDBModel.Payment" Width="1.5" PointX="5.25" PointY="14.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="EventSphereDBModel.Promotion" Width="1.5" PointX="0.75" PointY="5.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="EventSphereDBModel.Ticket" Width="1.5" PointX="5.25" PointY="18" IsExpanded="true" />
+        <EntityTypeShape EntityType="EventSphereDBModel.User" Width="1.5" PointX="0.75" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="EventSphereDBModel.Venue" Width="1.5" PointX="3.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="EventSphereDBModel.FK__Bookings__EventI__534D60F1" ManuallyRouted="false" />
+        <AssociationConnector Association="EventSphereDBModel.FK__Bookings__Promot__5441852A" ManuallyRouted="false" />
+        <AssociationConnector Association="EventSphereDBModel.FK__Bookings__UserID__52593CB8" ManuallyRouted="false" />
+        <AssociationConnector Association="EventSphereDBModel.FK__LoyaltyTr__Booki__6477ECF3" ManuallyRouted="false" />
+        <AssociationConnector Association="EventSphereDBModel.FK__Payments__Bookin__60A75C0F" ManuallyRouted="false" />
+        <AssociationConnector Association="EventSphereDBModel.FK__Tickets__Booking__5BE2A6F2" ManuallyRouted="false" />
+        <AssociationConnector Association="EventSphereDBModel.FK__Events__Category__440B1D61" ManuallyRouted="false" />
+        <AssociationConnector Association="EventSphereDBModel.FK__Events__Organize__4316F928" ManuallyRouted="false" />
+        <AssociationConnector Association="EventSphereDBModel.FK__Events__VenueID__44FF419A" ManuallyRouted="false" />
+        <AssociationConnector Association="EventSphereDBModel.FK__LoyaltyTr__UserI__6383C8BA" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
