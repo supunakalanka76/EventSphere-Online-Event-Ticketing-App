@@ -1,0 +1,127 @@
+﻿@model EventSphere.Models.Booking
+@{
+    ViewBag.Title = "Booking Confirmation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Section -->
+<section class="bg-success text-white text-center py-5">
+    <div class="container">
+        <i class="bi bi-check-circle-fill display-3 mb-3"></i>
+        <h1 class="fw-bold">Booking Confirmed!</h1>
+        <p class="lead mb-0">Thank you for your booking. Your tickets are ready below 🎟️</p>
+    </div>
+</section>
+
+<!-- Confirmation Details -->
+<section class="container my-5">
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger text-center">@ViewBag.Error</div>
+    }
+    else
+    {
+        <!-- Booking Summary -->
+        <div class="card border-0 shadow-sm rounded-3 mb-5">
+            <div class="card-body">
+                <h4 class="fw-bold mb-3">Booking Summary</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Booking ID:</strong> @Model.BookingID</p>
+                        <p><strong>Event:</strong> @Model.Event.Title</p>
+                        <p><strong>Date:</strong> @Model.Event.StartDate.ToString("MMMM dd, yyyy")</p>
+                        <p><strong>Venue:</strong> @Model.Event.Venue.VenueName, @Model.Event.Venue.City</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Tickets:</strong> @Model.Quantity</p>
+                        <p><strong>Total Amount:</strong> LKR @Model.TotalAmount.ToString("N2")</p>
+                        <p>
+                            <strong>Booking Date:</strong>
+                            @(Model.BookingDate.HasValue
+                            ? Model.BookingDate.Value.ToString("MMMM dd, yyyy hh:mm tt")
+                            : "N/A")
+                        </p>
+                        <p><strong>Status:</strong> <span class="badge bg-success">Confirmed</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Info -->
+        <div class="card border-0 shadow-sm rounded-3 mb-5">
+            <div class="card-body">
+                <h4 class="fw-bold mb-3">Payment Details</h4>
+                <div class="row">
+                    @if (Model.Payment != null)
+                     {
+                        <div class="col-md-6">
+                            <p><strong>Transaction ID:</strong> @Model.Payment.TransactionID</p>
+                            <p><strong>Reference No:</strong> @Model.Payment.ReferenceNo</p>
+                            <p><strong>Payment Method:</strong> @Model.Payment.PaymentGateway</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>
+                                <strong>Payment Date:</strong>
+                                @(Model.Payment.PaymentDate.HasValue
+                                ? Model.Payment.PaymentDate.Value.ToString("MMMM dd, yyyy hh:mm tt")
+                                : "N/A")
+                            </p>
+                            <p>
+                                <strong>Amount Paid:</strong>
+                                LKR @(Model.Payment.Amount.HasValue
+                                ? Model.Payment.Amount.Value.ToString("N2")
+                                : "0.00")
+                            </p>
+                            <p><strong>Status:</strong> <span class="badge bg-success">@Model.Payment.Status</span></p>
+                        </div>
+                     }
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticket Section -->
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body">
+                <h4 class="fw-bold mb-4 text-center">Your Tickets</h4>
+                <div class="row justify-content-center">
+                    @if (Model.Tickets != null && Model.Tickets.Any())
+                    {
+                        foreach (var ticket in Model.Tickets)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <div class="card text-center border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <img src="@ticket.QRCodeImage" alt="QR Code" class="img-fluid mb-3" style="width: 160px; height: 160px;">
+                                        <h6 class="fw-bold">@ticket.TicketNumber</h6>
+                                        <p class="text-muted mb-0">
+                                            Issued: @(ticket.IssueDate.HasValue
+                                            ? ticket.IssueDate.Value.ToString("MMMM dd, yyyy")
+                                            : "N/A")
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-ticket-detailed display-3 text-muted"></i>
+                            <h5 class="text-muted mt-3">No tickets found for this booking.</h5>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center mt-5">
+            <a href="@Url.Action("MyBookings", "Booking")" class="btn btn-outline-primary me-2">
+                <i class="bi bi-list"></i> My Bookings
+            </a>
+            <a href="@Url.Action("Index", "Event")" class="btn btn-primary">
+                <i class="bi bi-calendar-event"></i> Browse More Events
+            </a>
+        </div>
+    }
+</section>

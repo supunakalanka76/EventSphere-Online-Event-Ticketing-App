@@ -14,8 +14,7 @@ namespace EventSphere.Models
     
     public partial class Payment
     {
-        public int PaymentID { get; set; }
-        public Nullable<int> BookingID { get; set; }
+        public int BookingID { get; set; }
         public string TransactionID { get; set; }
         public Nullable<decimal> Amount { get; set; }
         public Nullable<System.DateTime> PaymentDate { get; set; }
@@ -23,6 +22,7 @@ namespace EventSphere.Models
         public string PaymentGateway { get; set; }
         public string ReferenceNo { get; set; }
         public string Remarks { get; set; }
+        public string InvoiceNumber { get; set; }
     
         public virtual Booking Booking { get; set; }
     }

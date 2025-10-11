@@ -37,6 +37,9 @@ namespace EventSphere.Controllers
                     // Hash password
                     model.PasswordHash = PasswordHelper.HashPassword(model.PasswordHash);
                     model.Role = "Customer"; // Default role for self-registration
+                    model.AccountStatus = "Active";
+                    model.ProfileImage = "/Content/ProfileImages/default-profile.png"; // Default profile image
+                    model.LoyaltyPoints = 0;
                     model.CreatedAt = DateTime.Now;
 
                     db.Users.Add(model);

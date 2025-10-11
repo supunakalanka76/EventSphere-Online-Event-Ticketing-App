@@ -1,0 +1,79 @@
+﻿@model EventSphere.Models.Event
+@{
+    ViewBag.Title = "Book Tickets";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Section -->
+<section class="bg-primary text-white text-center py-5">
+    <div class="container">
+        <h1 class="fw-bold mb-3">Book Your Tickets</h1>
+        <p class="lead mb-0">Confirm your event booking and secure your spot now 🎟️</p>
+    </div>
+</section>
+
+<!-- Booking Section -->
+<section class="container my-5">
+    <div class="row">
+        <!-- Event Image -->
+        <div class="col-lg-6 mb-4">
+            <img src="@(!string.IsNullOrEmpty(Model.EventImage) ? Model.EventImage : "/Content/Images/default-event.jpg")"
+                 class="img-fluid rounded shadow-sm w-100"
+                 alt="@Model.Title"
+                 style="object-fit: cover; max-height: 400px;" />
+        </div>
+
+        <!-- Booking Form -->
+        <div class="col-lg-6">
+            <h2 class="fw-bold mb-3">@Model.Title</h2>
+            <p class="text-muted">@Model.Description</p>
+
+            <ul class="list-unstyled mb-4">
+                <li class="mb-2"><i class="bi bi-calendar-event text-primary me-2"></i><strong>Date:</strong> @Model.StartDate.ToString("MMMM dd, yyyy")</li>
+                <li class="mb-2"><i class="bi bi-clock text-primary me-2"></i><strong>Time:</strong> @Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")</li>
+                <li class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i><strong>Venue:</strong> @Model.Venue.VenueName, @Model.Venue.Address, @Model.Venue.City</li>
+                <li class="mb-2"><i class="bi bi-currency-dollar text-primary me-2"></i><strong>Price per Ticket:</strong> LKR @Model.TicketPrice.ToString("N2")</li>
+            </ul>
+
+            @using (Html.BeginForm("BookConfirmed", "Booking", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("eventId", Model.EventID)
+
+                <div class="mb-3">
+                    <label for="quantity" class="form-label fw-semibold">Select Quantity</label>
+                    <input type="number" id="quantity" name="quantity" class="form-control" min="1" max="10" value="1" required />
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    Total: <span id="totalAmount" class="fw-bold">@Model.TicketPrice.ToString("N2") USD</span>
+                </div>
+
+                <div class="d-flex gap-3 mt-4">
+                    <a href="@Url.Action("Details", "Event", new { id = Model.EventID })" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-ticket-perforated"></i> Confirm Booking
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Script for Dynamic Total Calculation -->
+@section scripts {
+    <script>
+        const pricePerTicket = @Model.TicketPrice;
+        const quantityInput = document.getElementById("quantity");
+        const totalElement = document.getElementById("totalAmount");
+
+        quantityInput.addEventListener("input", function () {
+            const qty = parseInt(quantityInput.value) || 1;
+            const total = pricePerTicket * qty;
+            totalElement.textContent = `USD ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        });
+    </script>
+}

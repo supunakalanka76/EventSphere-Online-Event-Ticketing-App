@@ -1,121 +1,112 @@
 ﻿@using EventSphere.Helpers
-@{
-    ViewBag.Title = "Home";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    @{
+        ViewBag.Title = "Home";
+        Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var isLoggedIn = SessionHelper.IsLoggedIn();
-    var userRole = SessionHelper.GetUserRole();
-}
+        var isLoggedIn = SessionHelper.IsLoggedIn();
+        var userRole = SessionHelper.GetUserRole();
+    }
 
-<!-- Hero Section -->
-<section class="bg-dark text-white text-center py-5" style="
-    background-image: url('../../content/images/hero-bg.jpg'); 
-    background-size: cover; 
-    background-repeat: no-repeat; 
-    background-position:center;"
-         >
-    <div class="container py-5">
-        <h1 class="display-4 fw-bold mb-3">Welcome to EventSphere 🎉</h1>
-        <p class="lead mb-4">
-            Discover, organize, and experience unforgettable events across Sri Lanka.
-        </p>
+    <!-- Hero Section -->
+    <section class="bg-dark text-white text-center py-5" style="
+    background-image: url('../../content/images/hero-bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position:center;">
+        <div class="container py-5">
+            <h1 class="display-4 fw-bold mb-3">Welcome to EventSphere 🎉</h1>
+            <p class="lead mb-4">
+                Discover, organize, and experience unforgettable events across Sri Lanka.
+            </p>
 
-        @if (!isLoggedIn)
-        {
-            <a href="@Url.Action("Register", "Account")" class="btn btn-primary btn-lg me-2">Join Now</a>
-            <a href="@Url.Action("Login", "Account")" class="btn btn-outline-light btn-lg">Login</a>
-        }
-        else if (userRole.ToLower() == "organizer")
-        {
-            <a href="@Url.Action("Dashboard", "Organizer")" class="btn btn-success btn-lg me-2">Manage My Events</a>
-        }
-        else if (userRole.ToLower() == "admin")
-        {
-            <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-warning btn-lg me-2">Admin Dashboard</a>
-        }
-        else
-        {
-            <a href="@Url.Action("Index", "Event")" class="btn btn-primary btn-lg me-2">Explore Events</a>
-            <a href="@Url.Action("Profile", "Account")" class="btn btn-outline-light btn-lg">My Profile</a>
-        }
-    </div>
-</section>
+            @if (!isLoggedIn)
+            {
+                <a href="@Url.Action("Register", "Account")" class="btn btn-primary btn-lg me-2">Join Now</a>
+                <a href="@Url.Action("Login", "Account")" class="btn btn-outline-light btn-lg">Login</a>
+            }
+            else if (userRole.ToLower() == "organizer")
+            {
+                <a href="@Url.Action("Dashboard", "Organizer")" class="btn btn-success btn-lg me-2">Manage My Events</a>
+            }
+            else if (userRole.ToLower() == "admin")
+            {
+                <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-warning btn-lg me-2">Admin Dashboard</a>
+            }
+            else
+            {
+                <a href="@Url.Action("Index", "Event")" class="btn btn-primary btn-lg me-2">Explore Events</a>
+                <a href="@Url.Action("Profile", "Account")" class="btn btn-outline-light btn-lg">My Profile</a>
+            }
+        </div>
+    </section>
 
-<!-- Upcoming Events Section -->
-<section class="container my-5">
-    <div class="text-center mb-4">
-        <h2 class="fw-bold">Upcoming Events</h2>
-        <p class="text-muted">Stay tuned for the latest happenings and unforgettable experiences!</p>
-    </div>
+    <!-- Upcoming Events Section -->
+    <section class="container my-5">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">Upcoming Events</h2>
+            <p class="text-muted">Stay tuned for the latest happenings and unforgettable experiences!</p>
+        </div>
 
-    <div class="row g-4">
-        <!-- Event Card 1 -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <img src="/Content/Images/concert.jpg" class="card-img-top" alt="Event Image">
-                <div class="card-body">
-                    <h5 class="card-title">Rock Night Colombo</h5>
-                    <p class="card-text text-muted mb-3">📍 Colombo | 📅 Jan 20, 2025</p>
-                    <p>Get ready for a night filled with electrifying performances and music!</p>
-                    <a href="@Url.Action("Details", "Event", new { id = 1 })" class="btn btn-primary">View Details</a>
+        <div class="row g-4">
+            @if (ViewBag.UpcomingEvents != null && ((IEnumerable<EventSphere.Models.Event>)ViewBag.UpcomingEvents).Any())
+            {
+                foreach (var ev in (IEnumerable<EventSphere.Models.Event>)ViewBag.UpcomingEvents)
+                {
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm border-0">
+                            <img src="@(!string.IsNullOrEmpty(ev.EventImage) ? ev.EventImage : "/Content/Images/default-event.jpg")"
+                                 class="card-img-top" alt="@ev.Title" style="height: 220px; object-fit: cover;" />
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold">@ev.Title</h5>
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-geo-alt"></i> @ev.Venue.VenueName, @ev.Venue.City <br />
+                                    <i class="bi bi-calendar-event"></i> @ev.StartDate.ToString("MMM dd, yyyy")
+                                </p>
+                                <p class="text-muted flex-grow-1">@ev.Description</p>
+                                <a href="@Url.Action("Details", "Event", new { id = ev.EventID })" class="btn btn-primary mt-auto">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-calendar-x display-4 text-muted"></i>
+                    <h5 class="mt-3 text-muted">No upcoming events available.</h5>
+                </div>
+            }
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="@Url.Action("Index", "Event")" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-grid"></i> View All Events
+            </a>
+        </div>
+    </section>
+
+    <!-- About Platform Section -->
+    <section class="bg-light py-5 mt-5">
+        <div class="container text-center">
+            <h2 class="fw-bold mb-3">Why Choose EventSphere?</h2>
+            <p class="text-muted mb-4">From concerts to conferences — plan, manage, and enjoy every event seamlessly.</p>
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <i class="bi bi-calendar-event display-4 text-primary mb-3"></i>
+                    <h5 class="fw-semibold">Easy Booking</h5>
+                    <p>Book tickets in just a few clicks and get instant e-tickets with QR codes.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <i class="bi bi-people display-4 text-success mb-3"></i>
+                    <h5 class="fw-semibold">For Organizers</h5>
+                    <p>Organize and manage your events with real-time tracking and reports.</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <i class="bi bi-shield-check display-4 text-warning mb-3"></i>
+                    <h5 class="fw-semibold">Secure Payments</h5>
+                    <p>Trusted by users with safe and reliable payment gateways.</p>
                 </div>
             </div>
         </div>
-
-        <!-- Event Card 2 -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <img src="/Content/Images/techfest.jpg" class="card-img-top" alt="Event Image">
-                <div class="card-body">
-                    <h5 class="card-title">Tech Innovators 2025</h5>
-                    <p class="card-text text-muted mb-3">📍 Kandy | 📅 Feb 12, 2025</p>
-                    <p>Join the biggest tech conference in Sri Lanka, featuring top innovators.</p>
-                    <a href="@Url.Action("Details", "Event", new { id = 2 })" class="btn btn-primary">View Details</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Event Card 3 -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <img src="/Content/Images/artfest.jpg" class="card-img-top" alt="Event Image">
-                <div class="card-body">
-                    <h5 class="card-title">Art & Culture Festival</h5>
-                    <p class="card-text text-muted mb-3">📍 Galle | 📅 Mar 5, 2025</p>
-                    <p>Celebrate creativity and culture with artists from all over the island.</p>
-                    <a href="@Url.Action("Details", "Event", new { id = 3 })" class="btn btn-primary">View Details</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="text-center mt-5">
-        <a href="@Url.Action("Index", "Event")" class="btn btn-outline-primary btn-lg">View All Events</a>
-    </div>
-</section>
-
-<!-- About Platform Section -->
-<section class="bg-light py-5 mt-5">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-3">Why Choose EventSphere?</h2>
-        <p class="text-muted mb-4">From concerts to conferences — plan, manage, and enjoy every event seamlessly.</p>
-
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <i class="bi bi-calendar-event display-4 text-primary mb-3"></i>
-                <h5 class="fw-semibold">Easy Booking</h5>
-                <p>Book tickets in just a few clicks and get instant e-tickets with QR codes.</p>
-            </div>
-            <div class="col-md-4 mb-4">
-                <i class="bi bi-people display-4 text-success mb-3"></i>
-                <h5 class="fw-semibold">For Organizers</h5>
-                <p>Organize and manage your events with real-time tracking and reports.</p>
-            </div>
-            <div class="col-md-4 mb-4">
-                <i class="bi bi-shield-check display-4 text-warning mb-3"></i>
-                <h5 class="fw-semibold">Secure Payments</h5>
-                <p>Trusted by users with safe and reliable payment gateways.</p>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>

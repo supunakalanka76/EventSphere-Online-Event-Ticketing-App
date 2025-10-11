@@ -18,13 +18,12 @@ namespace EventSphere.Models
         public Booking()
         {
             this.LoyaltyTransactions = new HashSet<LoyaltyTransaction>();
-            this.Payments = new HashSet<Payment>();
             this.Tickets = new HashSet<Ticket>();
         }
     
         public int BookingID { get; set; }
-        public Nullable<int> UserID { get; set; }
-        public Nullable<int> EventID { get; set; }
+        public int UserID { get; set; }
+        public int EventID { get; set; }
         public Nullable<int> PromotionID { get; set; }
         public int Quantity { get; set; }
         public decimal TotalAmount { get; set; }
@@ -42,8 +41,7 @@ namespace EventSphere.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<LoyaltyTransaction> LoyaltyTransactions { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Payment> Payments { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Ticket> Tickets { get; set; }
+        public virtual Payment Payment { get; set; }
     }
 }

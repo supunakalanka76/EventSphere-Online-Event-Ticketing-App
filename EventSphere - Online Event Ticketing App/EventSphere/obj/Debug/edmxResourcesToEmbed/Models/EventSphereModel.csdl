@@ -5,8 +5,8 @@
       <PropertyRef Name="BookingID" />
     </Key>
     <Property Name="BookingID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="UserID" Type="Int32" />
-    <Property Name="EventID" Type="Int32" />
+    <Property Name="UserID" Type="Int32" Nullable="false" />
+    <Property Name="EventID" Type="Int32" Nullable="false" />
     <Property Name="PromotionID" Type="Int32" />
     <Property Name="Quantity" Type="Int32" Nullable="false" />
     <Property Name="TotalAmount" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
@@ -17,12 +17,12 @@
     <Property Name="BookingDate" Type="DateTime" Precision="3" />
     <Property Name="CheckInStatus" Type="Boolean" />
     <Property Name="Notes" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-    <NavigationProperty Name="Event" Relationship="Self.FK__Bookings__EventI__534D60F1" FromRole="Bookings" ToRole="Events" />
-    <NavigationProperty Name="Promotion" Relationship="Self.FK__Bookings__Promot__5441852A" FromRole="Bookings" ToRole="Promotions" />
-    <NavigationProperty Name="User" Relationship="Self.FK__Bookings__UserID__52593CB8" FromRole="Bookings" ToRole="Users" />
-    <NavigationProperty Name="LoyaltyTransactions" Relationship="Self.FK__LoyaltyTr__Booki__6477ECF3" FromRole="Bookings" ToRole="LoyaltyTransactions" />
-    <NavigationProperty Name="Payments" Relationship="Self.FK__Payments__Bookin__60A75C0F" FromRole="Bookings" ToRole="Payments" />
-    <NavigationProperty Name="Tickets" Relationship="Self.FK__Tickets__Booking__5BE2A6F2" FromRole="Bookings" ToRole="Tickets" />
+    <NavigationProperty Name="Event" Relationship="Self.FK__Bookings__EventI__03F0984C" FromRole="Bookings" ToRole="Events" />
+    <NavigationProperty Name="Promotion" Relationship="Self.FK__Bookings__Promot__04E4BC85" FromRole="Bookings" ToRole="Promotions" />
+    <NavigationProperty Name="User" Relationship="Self.FK__Bookings__UserID__02FC7413" FromRole="Bookings" ToRole="Users" />
+    <NavigationProperty Name="LoyaltyTransactions" Relationship="Self.FK__LoyaltyTr__Booki__17036CC0" FromRole="Bookings" ToRole="LoyaltyTransactions" />
+    <NavigationProperty Name="Tickets" Relationship="Self.FK__Tickets__Booking__114A936A" FromRole="Bookings" ToRole="Tickets" />
+    <NavigationProperty Name="Payment" Relationship="Self.FK_Payments_Booking" FromRole="Bookings" ToRole="Payments" />
   </EntityType>
   <EntityType Name="EventCategory">
     <Key>
@@ -53,7 +53,9 @@
     <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
     <Property Name="CreatedAt" Type="DateTime" Precision="3" />
     <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
-    <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__EventI__534D60F1" FromRole="Events" ToRole="Bookings" />
+    <Property Name="StartTime" Type="Time" Nullable="false" Precision="7" />
+    <Property Name="EndTime" Type="Time" Nullable="false" Precision="7" />
+    <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__EventI__03F0984C" FromRole="Events" ToRole="Bookings" />
     <NavigationProperty Name="EventCategory" Relationship="Self.FK__Events__Category__440B1D61" FromRole="Events" ToRole="EventCategories" />
     <NavigationProperty Name="User" Relationship="Self.FK__Events__Organize__4316F928" FromRole="Events" ToRole="Users" />
     <NavigationProperty Name="Venue" Relationship="Self.FK__Events__VenueID__44FF419A" FromRole="Events" ToRole="Venues" />
@@ -69,15 +71,14 @@
     <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
     <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
     <Property Name="TransactionDate" Type="DateTime" Precision="3" />
-    <NavigationProperty Name="Booking" Relationship="Self.FK__LoyaltyTr__Booki__6477ECF3" FromRole="LoyaltyTransactions" ToRole="Bookings" />
-    <NavigationProperty Name="User" Relationship="Self.FK__LoyaltyTr__UserI__6383C8BA" FromRole="LoyaltyTransactions" ToRole="Users" />
+    <NavigationProperty Name="Booking" Relationship="Self.FK__LoyaltyTr__Booki__17036CC0" FromRole="LoyaltyTransactions" ToRole="Bookings" />
+    <NavigationProperty Name="User" Relationship="Self.FK__LoyaltyTr__UserI__160F4887" FromRole="LoyaltyTransactions" ToRole="Users" />
   </EntityType>
   <EntityType Name="Payment">
     <Key>
-      <PropertyRef Name="PaymentID" />
+      <PropertyRef Name="BookingID" />
     </Key>
-    <Property Name="PaymentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="BookingID" Type="Int32" />
+    <Property Name="BookingID" Type="Int32" Nullable="false" />
     <Property Name="TransactionID" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
     <Property Name="Amount" Type="Decimal" Precision="10" Scale="2" />
     <Property Name="PaymentDate" Type="DateTime" Precision="3" />
@@ -85,7 +86,8 @@
     <Property Name="PaymentGateway" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
     <Property Name="ReferenceNo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
     <Property Name="Remarks" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-    <NavigationProperty Name="Booking" Relationship="Self.FK__Payments__Bookin__60A75C0F" FromRole="Payments" ToRole="Bookings" />
+    <NavigationProperty Name="Booking" Relationship="Self.FK_Payments_Booking" FromRole="Payments" ToRole="Bookings" />
+    <Property Name="InvoiceNumber" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
   </EntityType>
   <EntityType Name="Promotion">
     <Key>
@@ -99,7 +101,7 @@
     <Property Name="EndDate" Type="DateTime" Precision="3" />
     <Property Name="UsageLimit" Type="Int32" />
     <Property Name="IsActive" Type="Boolean" />
-    <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__Promot__5441852A" FromRole="Promotions" ToRole="Bookings" />
+    <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__Promot__04E4BC85" FromRole="Promotions" ToRole="Bookings" />
   </EntityType>
   <EntityType Name="Ticket">
     <Key>
@@ -112,7 +114,7 @@
     <Property Name="IssueDate" Type="DateTime" Precision="3" />
     <Property Name="IsUsed" Type="Boolean" />
     <Property Name="UsedDate" Type="DateTime" Precision="3" />
-    <NavigationProperty Name="Booking" Relationship="Self.FK__Tickets__Booking__5BE2A6F2" FromRole="Tickets" ToRole="Bookings" />
+    <NavigationProperty Name="Booking" Relationship="Self.FK__Tickets__Booking__114A936A" FromRole="Tickets" ToRole="Bookings" />
   </EntityType>
   <EntityType Name="User">
     <Key>
@@ -132,9 +134,9 @@
     <Property Name="AccountStatus" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
     <Property Name="CreatedAt" Type="DateTime" Precision="3" />
     <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
-    <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__UserID__52593CB8" FromRole="Users" ToRole="Bookings" />
+    <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__UserID__02FC7413" FromRole="Users" ToRole="Bookings" />
     <NavigationProperty Name="Events" Relationship="Self.FK__Events__Organize__4316F928" FromRole="Users" ToRole="Events" />
-    <NavigationProperty Name="LoyaltyTransactions" Relationship="Self.FK__LoyaltyTr__UserI__6383C8BA" FromRole="Users" ToRole="LoyaltyTransactions" />
+    <NavigationProperty Name="LoyaltyTransactions" Relationship="Self.FK__LoyaltyTr__UserI__160F4887" FromRole="Users" ToRole="LoyaltyTransactions" />
   </EntityType>
   <EntityType Name="Venue">
     <Key>
@@ -152,8 +154,8 @@
     <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
     <NavigationProperty Name="Events" Relationship="Self.FK__Events__VenueID__44FF419A" FromRole="Venues" ToRole="Events" />
   </EntityType>
-  <Association Name="FK__Bookings__EventI__534D60F1">
-    <End Role="Events" Type="Self.Event" Multiplicity="0..1" />
+  <Association Name="FK__Bookings__EventI__03F0984C">
+    <End Role="Events" Type="Self.Event" Multiplicity="1" />
     <End Role="Bookings" Type="Self.Booking" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Events">
@@ -164,7 +166,7 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK__Bookings__Promot__5441852A">
+  <Association Name="FK__Bookings__Promot__04E4BC85">
     <End Role="Promotions" Type="Self.Promotion" Multiplicity="0..1" />
     <End Role="Bookings" Type="Self.Booking" Multiplicity="*" />
     <ReferentialConstraint>
@@ -176,8 +178,8 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK__Bookings__UserID__52593CB8">
-    <End Role="Users" Type="Self.User" Multiplicity="0..1" />
+  <Association Name="FK__Bookings__UserID__02FC7413">
+    <End Role="Users" Type="Self.User" Multiplicity="1" />
     <End Role="Bookings" Type="Self.Booking" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Users">
@@ -188,7 +190,7 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK__LoyaltyTr__Booki__6477ECF3">
+  <Association Name="FK__LoyaltyTr__Booki__17036CC0">
     <End Role="Bookings" Type="Self.Booking" Multiplicity="0..1" />
     <End Role="LoyaltyTransactions" Type="Self.LoyaltyTransaction" Multiplicity="*" />
     <ReferentialConstraint>
@@ -200,19 +202,7 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK__Payments__Bookin__60A75C0F">
-    <End Role="Bookings" Type="Self.Booking" Multiplicity="0..1" />
-    <End Role="Payments" Type="Self.Payment" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Bookings">
-        <PropertyRef Name="BookingID" />
-      </Principal>
-      <Dependent Role="Payments">
-        <PropertyRef Name="BookingID" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK__Tickets__Booking__5BE2A6F2">
+  <Association Name="FK__Tickets__Booking__114A936A">
     <End Role="Bookings" Type="Self.Booking" Multiplicity="0..1" />
     <End Role="Tickets" Type="Self.Ticket" Multiplicity="*" />
     <ReferentialConstraint>
@@ -220,6 +210,20 @@
         <PropertyRef Name="BookingID" />
       </Principal>
       <Dependent Role="Tickets">
+        <PropertyRef Name="BookingID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Payments_Booking">
+    <End Role="Bookings" Type="Self.Booking" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="Payments" Type="Self.Payment" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Bookings">
+        <PropertyRef Name="BookingID" />
+      </Principal>
+      <Dependent Role="Payments">
         <PropertyRef Name="BookingID" />
       </Dependent>
     </ReferentialConstraint>
@@ -260,7 +264,7 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK__LoyaltyTr__UserI__6383C8BA">
+  <Association Name="FK__LoyaltyTr__UserI__160F4887">
     <End Role="Users" Type="Self.User" Multiplicity="0..1" />
     <End Role="LoyaltyTransactions" Type="Self.LoyaltyTransaction" Multiplicity="*" />
     <ReferentialConstraint>
@@ -282,29 +286,29 @@
     <EntitySet Name="Tickets" EntityType="Self.Ticket" />
     <EntitySet Name="Users" EntityType="Self.User" />
     <EntitySet Name="Venues" EntityType="Self.Venue" />
-    <AssociationSet Name="FK__Bookings__EventI__534D60F1" Association="Self.FK__Bookings__EventI__534D60F1">
+    <AssociationSet Name="FK__Bookings__EventI__03F0984C" Association="Self.FK__Bookings__EventI__03F0984C">
       <End Role="Events" EntitySet="Events" />
       <End Role="Bookings" EntitySet="Bookings" />
     </AssociationSet>
-    <AssociationSet Name="FK__Bookings__Promot__5441852A" Association="Self.FK__Bookings__Promot__5441852A">
+    <AssociationSet Name="FK__Bookings__Promot__04E4BC85" Association="Self.FK__Bookings__Promot__04E4BC85">
       <End Role="Promotions" EntitySet="Promotions" />
       <End Role="Bookings" EntitySet="Bookings" />
     </AssociationSet>
-    <AssociationSet Name="FK__Bookings__UserID__52593CB8" Association="Self.FK__Bookings__UserID__52593CB8">
+    <AssociationSet Name="FK__Bookings__UserID__02FC7413" Association="Self.FK__Bookings__UserID__02FC7413">
       <End Role="Users" EntitySet="Users" />
       <End Role="Bookings" EntitySet="Bookings" />
     </AssociationSet>
-    <AssociationSet Name="FK__LoyaltyTr__Booki__6477ECF3" Association="Self.FK__LoyaltyTr__Booki__6477ECF3">
+    <AssociationSet Name="FK__LoyaltyTr__Booki__17036CC0" Association="Self.FK__LoyaltyTr__Booki__17036CC0">
       <End Role="Bookings" EntitySet="Bookings" />
       <End Role="LoyaltyTransactions" EntitySet="LoyaltyTransactions" />
     </AssociationSet>
-    <AssociationSet Name="FK__Payments__Bookin__60A75C0F" Association="Self.FK__Payments__Bookin__60A75C0F">
-      <End Role="Bookings" EntitySet="Bookings" />
-      <End Role="Payments" EntitySet="Payments" />
-    </AssociationSet>
-    <AssociationSet Name="FK__Tickets__Booking__5BE2A6F2" Association="Self.FK__Tickets__Booking__5BE2A6F2">
+    <AssociationSet Name="FK__Tickets__Booking__114A936A" Association="Self.FK__Tickets__Booking__114A936A">
       <End Role="Bookings" EntitySet="Bookings" />
       <End Role="Tickets" EntitySet="Tickets" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Payments_Booking" Association="Self.FK_Payments_Booking">
+      <End Role="Bookings" EntitySet="Bookings" />
+      <End Role="Payments" EntitySet="Payments" />
     </AssociationSet>
     <AssociationSet Name="FK__Events__Category__440B1D61" Association="Self.FK__Events__Category__440B1D61">
       <End Role="EventCategories" EntitySet="EventCategories" />
@@ -318,7 +322,7 @@
       <End Role="Venues" EntitySet="Venues" />
       <End Role="Events" EntitySet="Events" />
     </AssociationSet>
-    <AssociationSet Name="FK__LoyaltyTr__UserI__6383C8BA" Association="Self.FK__LoyaltyTr__UserI__6383C8BA">
+    <AssociationSet Name="FK__LoyaltyTr__UserI__160F4887" Association="Self.FK__LoyaltyTr__UserI__160F4887">
       <End Role="Users" EntitySet="Users" />
       <End Role="LoyaltyTransactions" EntitySet="LoyaltyTransactions" />
     </AssociationSet>

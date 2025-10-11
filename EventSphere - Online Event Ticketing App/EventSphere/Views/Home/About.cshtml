@@ -1,9 +1,107 @@
 ﻿@{
     ViewBag.Title = "About";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
-    <h3>@ViewBag.Message</h3>
 
-    <p>Use this area to provide additional information.</p>
-</main>
+<!-- Hero Section -->
+<section class="bg-primary text-white text-center py-5">
+    <div class="container">
+        <h1 class="fw-bold mb-3">About EventSphere</h1>
+        <p class="lead mb-0">Connecting people through unforgettable experiences across Sri Lanka 🇱🇰</p>
+    </div>
+</section>
+
+<!-- Our Story -->
+<section class="container my-5">
+    <div class="row align-items-center">
+        <div class="col-md-6 mb-4 mb-md-0">
+            <img src="/Content/Images/about-team.jpg" alt="Our Story" class="img-fluid rounded shadow-sm" />
+        </div>
+        <div class="col-md-6">
+            <h2 class="fw-bold mb-3">Our Story</h2>
+            <p class="text-muted">
+                EventSphere was founded with a simple mission — to make event discovery, booking, and management effortless.
+                From local concerts to large-scale conferences, we empower event organizers and participants through
+                technology and innovation.
+            </p>
+            <p class="text-muted">
+                Our platform provides an integrated solution for managing events, tickets, payments, and reports,
+                helping organizers focus on what truly matters — creating remarkable experiences.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Mission & Vision -->
+<section class="bg-light py-5">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-4">Our Mission & Vision</h2>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="p-4 bg-white shadow-sm rounded">
+                    <i class="bi bi-bullseye display-4 text-primary mb-3"></i>
+                    <h5 class="fw-semibold mb-2">Our Mission</h5>
+                    <p class="text-muted">
+                        To simplify event management by connecting organizers and audiences
+                        through an intelligent, user-friendly, and secure platform.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="p-4 bg-white shadow-sm rounded">
+                    <i class="bi bi-eye display-4 text-success mb-3"></i>
+                    <h5 class="fw-semibold mb-2">Our Vision</h5>
+                    <p class="text-muted">
+                        To become Sri Lanka’s most trusted and innovative event management ecosystem,
+                        enabling people to discover, book, and create experiences that inspire.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Values -->
+<section class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Our Core Values</h2>
+        <p class="text-muted">We believe in innovation, reliability, and excellence in everything we do.</p>
+    </div>
+
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <i class="bi bi-lightning-charge-fill text-warning display-5 mb-3"></i>
+            <h5 class="fw-semibold">Innovation</h5>
+            <p class="text-muted">We constantly evolve our platform to make event experiences smarter and more efficient.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+            <i class="bi bi-heart-fill text-danger display-5 mb-3"></i>
+            <h5 class="fw-semibold">Passion</h5>
+            <p class="text-muted">Our team is driven by a shared love for technology, creativity, and people.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+            <i class="bi bi-shield-lock-fill text-primary display-5 mb-3"></i>
+            <h5 class="fw-semibold">Trust</h5>
+            <p class="text-muted">We prioritize safety, security, and transparency in every user interaction.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="bg-light py-5">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-4">Meet the Team</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-3 mb-4">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <img src="~/Content/Images/supun.jpg" class="card-img-top rounded-top" alt="Team Member">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-1">Supun Akalanka</h5>
+                        <p class="text-muted mb-2">Lead Developer</p>
+                        <p class="small text-muted">Passionate about building meaningful web experiences and intelligent systems.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

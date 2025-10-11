@@ -1,0 +1,98 @@
+﻿@model EventSphere.Models.Event
+@{
+    ViewBag.Title = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Banner -->
+<section class="bg-primary text-white text-center py-5">
+    <div class="container">
+        <h1 class="fw-bold mb-3">@Model.Title</h1>
+        <p class="lead mb-0">Experience the best events organized for you by EventSphere</p>
+    </div>
+</section>
+
+<!-- Event Details Section -->
+<section class="container my-5">
+    <div class="row">
+        <!-- Event Image -->
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <img src="@(!string.IsNullOrEmpty(Model.EventImage) ? Model.EventImage : "/Content/Images/default-event.jpg")"
+                 class="img-fluid rounded shadow-sm w-100"
+                 alt="@Model.Title"
+                 style="object-fit: cover; max-height: 400px;" />
+        </div>
+
+        <!-- Event Info -->
+        <div class="col-lg-6">
+            <h2 class="fw-bold mb-3">@Model.Title</h2>
+            <p class="text-muted mb-4">@Model.Description</p>
+
+            <ul class="list-unstyled mb-4">
+                <li class="mb-2">
+                    <i class="bi bi-calendar-event text-primary me-2"></i>
+                    <strong>Date:</strong> @Model.StartDate.ToString("MMMM dd, yyyy") to @Model.EndDate.ToString("MMMM dd, yyyy")
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-clock text-primary me-2"></i>
+                    <strong>Time:</strong> @Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-geo-alt text-primary me-2"></i>
+                    <strong>Venue:</strong> @Model.Venue.VenueName, @Model.Venue.Address, @Model.Venue.City
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-tag text-primary me-2"></i>
+                    <strong>Category:</strong> @Model.EventCategory.CategoryName
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-person-circle text-primary me-2"></i>
+                    <strong>Organizer:</strong>
+                    @if (Model.User != null && Model.User.Role == "Organizer")
+                    {
+                        @Model.User.FullName
+                    }
+                    else
+                    {
+                        <span class="text-muted">Not specified</span>
+                    }
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-currency-dollar text-primary me-2"></i>
+                    <strong>Price:</strong> LKR @Model.TicketPrice.ToString("N2")
+                </li>
+            </ul>
+
+            <div class="d-flex gap-3 mt-4">
+                <a href="@Url.Action("Index", "Event")" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Events
+                </a>
+
+                @if (Session["UserRole"] != null && Session["UserRole"].ToString().ToLower() == "customer")
+                {
+                    <a href="@Url.Action("Book", "Booking", new { eventId = Model.EventID })" class="btn btn-primary">
+                        <i class="bi bi-ticket-perforated"></i> Book Ticket
+                    </a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-primary">
+                        <i class="bi bi-person"></i> Login to Book
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Venue Map -->
+<section class="mt-5 bg-light py-4">
+    <div class="container">
+        <h4 class="fw-bold mb-4 text-center">Venue Location</h4>
+        <div class="ratio ratio-16x9 shadow-sm rounded overflow-hidden">
+            <iframe src="https://www.google.com/maps?q=@Uri.EscapeDataString(Model.Venue.MapLink)&output=embed"
+                    style="border:0;" allowfullscreen loading="lazy">
+            </iframe>
+        </div>
+    </div>
+</section>

@@ -66,5 +66,10 @@ namespace EventSphere.Helpers
 
             return $"/Content/QRCodes/{fileName}";
         }
+
+        internal static string GenerateQRCode(string ticketCode, string v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

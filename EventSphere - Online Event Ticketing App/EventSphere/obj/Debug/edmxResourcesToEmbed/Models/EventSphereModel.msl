@@ -48,6 +48,8 @@
           <ScalarProperty Name="Status" ColumnName="Status" />
           <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
           <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+          <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+          <ScalarProperty Name="EndTime" ColumnName="EndTime" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -67,7 +69,7 @@
     <EntitySetMapping Name="Payments">
       <EntityTypeMapping TypeName="EventSphereDBModel.Payment">
         <MappingFragment StoreEntitySet="Payments">
-          <ScalarProperty Name="PaymentID" ColumnName="PaymentID" />
+          <ScalarProperty Name="InvoiceNumber" ColumnName="InvoiceNumber" />
           <ScalarProperty Name="BookingID" ColumnName="BookingID" />
           <ScalarProperty Name="TransactionID" ColumnName="TransactionID" />
           <ScalarProperty Name="Amount" ColumnName="Amount" />

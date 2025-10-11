@@ -143,6 +143,8 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BookingController.cs" />
+    <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -213,6 +215,8 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\Images\hero-bg.jpg" />
+    <Content Include="Content\Images\supun.jpg" />
+    <Content Include="Content\ProfileImages\default-profile.png" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -292,10 +296,15 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\Profile.cshtml" />
     <Content Include="Views\Account\SelectRole.cshtml" />
+    <Content Include="Views\Event\Index.cshtml" />
+    <Content Include="Views\Event\Details.cshtml" />
+    <Content Include="Views\Booking\Book.cshtml" />
+    <Content Include="Views\Booking\Confirmation.cshtml" />
+    <Content Include="Views\Booking\MyBookings.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Content\ProfileImages\" />
+    <Folder Include="Content\Events\" />
     <Folder Include="Content\QRCodes\" />
   </ItemGroup>
   <ItemGroup>
