@@ -1,0 +1,72 @@
+﻿@{
+    ViewBag.Title = "Reports";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Page Header -->
+<section class="bg-primary text-white py-4 mb-4 shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold mb-0"><i class="bi bi-bar-chart-line"></i> Reports</h2>
+        <span class="text-light">Manage and view event analytics</span>
+    </div>
+</section>
+
+<!-- Reports Content -->
+<div class="container my-5">
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body">
+            <h4 class="fw-bold mb-3"><i class="bi bi-graph-up"></i> Generate Reports</h4>
+            <p class="text-muted">Use the filters below to generate Crystal Reports for bookings, payments, and events.</p>
+
+            <form method="get" action="@Url.Action("GenerateReport", "Admin")" class="row g-3 mt-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Report Type</label>
+                    <select name="reportType" class="form-select" required>
+                        <option value="">-- Select Report --</option>
+                        <option value="Bookings">Bookings Report</option>
+                        <option value="Payments">Payments Report</option>
+                        <option value="Events">Events Report</option>
+                        <option value="Users">Users Report</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Start Date</label>
+                    <input type="date" name="startDate" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">End Date</label>
+                    <input type="date" name="endDate" class="form-control" />
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-file-earmark-bar-graph"></i> Generate
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Report Viewer -->
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body">
+            <h4 class="fw-bold mb-3"><i class="bi bi-eye"></i> Report Viewer</h4>
+            <p class="text-muted mb-3">View the generated Crystal Report below:</p>
+
+            @if (ViewBag.ReportPath != null)
+            {
+                <iframe src="@Url.Content(ViewBag.ReportPath)" width="100%" height="800px" frameborder="0" class="rounded border"></iframe>
+            }
+            else
+            {
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-file-earmark-bar-graph display-4 mb-3"></i>
+                    <h5>No report generated yet</h5>
+                    <p>Select filters above and click “Generate” to view a report.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

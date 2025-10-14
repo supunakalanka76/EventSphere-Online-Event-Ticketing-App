@@ -1,0 +1,169 @@
+﻿@model IEnumerable<EventSphere.Models.Booking>
+@{
+    ViewBag.Title = "Manage Bookings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Header -->
+<section class="bg-primary text-white text-center py-5 mb-4">
+    <div class="container">
+        <h1 class="fw-bold mb-2">Manage Bookings</h1>
+        <p class="lead mb-0">View, search, and monitor all event bookings and payments</p>
+    </div>
+</section>
+
+<!-- Filters -->
+<section class="container mb-4">
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <input type="text" id="searchBooking" class="form-control" placeholder="Search by event or customer...">
+                </div>
+                <div class="col-md-4">
+                    <select id="statusFilter" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Failed">Failed</option>
+                        <option value="Refunded">Refunded</option>
+                    </select>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Booking List -->
+<section class="container mb-5">
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header bg-light py-3">
+            <h5 class="mb-0"><i class="bi bi-ticket-detailed text-primary me-2"></i>All Bookings</h5>
+        </div>
+
+        <div class="card-body p-0">
+            @if (Model != null && Model.Any())
+             {
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle mb-0" id="bookingsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Event</th>
+                                <th>Customer</th>
+                                <th>Tickets</th>
+                                <th>Total (LKR)</th>
+                                <th>Payment Status</th>
+                                <th>Check-In</th>
+                                <th>Booking Date</th>
+                                <th>Payment Method</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in Model)
+                             {
+                                <tr data-status="@booking.PaymentStatus.ToLower()"
+                                    data-event="@booking.Event.Title.ToLower()"
+                                    data-user="@booking.User.FullName.ToLower()">
+                                    <td>@booking.BookingID</td>
+                                    <td>@booking.Event.Title</td>
+                                    <td>@booking.User.FullName</td>
+                                    <td>@booking.Quantity</td>
+                                    <td>@booking.TotalAmount.ToString("N2")</td>
+                                    <td>
+                                        @switch (booking.PaymentStatus)
+                                         {
+                                            case "Paid":
+                                                <span class="badge bg-success">Paid</span>
+                                                break;
+                                            case "Pending":
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                                break;
+                                            case "Failed":
+                                                <span class="badge bg-danger">Failed</span>
+                                                break;
+                                            case "Refunded":
+                                                <span class="badge bg-secondary">Refunded</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-light text-dark">Unknown</span>
+                                                break;
+                                         }
+                                    </td>
+                                    <td>
+                                        @if (booking.CheckInStatus ?? false)
+                                         {
+                                            <span class="badge bg-success">Checked In</span>
+                                         }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Not Checked In</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @(booking.BookingDate.HasValue
+                                            ? booking.BookingDate.Value.ToString("dd MMM yyyy")
+                                            : "N/A")
+                                    </td>
+                                    <td>@booking.PaymentMethod</td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("Confirmation", "Booking", new { bookingId = booking.BookingID })"
+                                           class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="@Url.Action("DeleteBooking", "Admin", new { id = booking.BookingID })"
+                                           class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('Are you sure you want to delete this booking?');">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                             }
+                        </tbody>
+                    </table>
+                </div>
+             }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-x display-4 text-muted"></i>
+                    <p class="text-muted mt-3 mb-0">No bookings found.</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Scripts -->
+@section scripts {
+    <script>
+        const searchBooking = document.getElementById("searchBooking");
+        const statusFilter = document.getElementById("statusFilter");
+        const rows = document.querySelectorAll("#bookingsTable tbody tr");
+
+        function filterBookings() {
+            const searchValue = searchBooking.value.toLowerCase();
+            const selectedStatus = statusFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const eventName = row.getAttribute("data-event");
+                const userName = row.getAttribute("data-user");
+                const status = row.getAttribute("data-status");
+
+                const matchSearch = eventName.includes(searchValue) || userName.includes(searchValue);
+                const matchStatus = !selectedStatus || status === selectedStatus;
+
+                row.style.display = (matchSearch && matchStatus) ? "" : "none";
+            });
+        }
+
+        searchBooking.addEventListener("input", filterBookings);
+        statusFilter.addEventListener("change", filterBookings);
+    </script>
+}

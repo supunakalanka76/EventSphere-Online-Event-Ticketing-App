@@ -1,0 +1,138 @@
+﻿@model IEnumerable<EventSphere.Models.Event>
+@{
+    ViewBag.Title = "Manage Events";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Header -->
+<section class="bg-primary text-white text-center py-5 mb-4">
+    <div class="container">
+        <h1 class="fw-bold mb-2">Manage Events</h1>
+        <p class="lead mb-0">View, filter, and manage all events in the system</p>
+    </div>
+</section>
+
+<!-- Filters -->
+<section class="container mb-4">
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by title or location...">
+                </div>
+                <div class="col-md-4">
+                    <select id="categoryFilter" class="form-select">
+                        <option value="">All Categories</option>
+                        @foreach (var category in ViewBag.Categories as List<EventSphere.Models.EventCategory>)
+                        {
+                            <option value="@category.CategoryName">@category.CategoryName</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="@Url.Action("Create", "Event")" class="btn btn-success">
+                        <i class="bi bi-plus-circle me-2"></i>Add New Event
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Event List -->
+<section class="container mb-5">
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header bg-light py-3">
+            <h5 class="mb-0"><i class="bi bi-calendar-event me-2 text-primary"></i>All Events</h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle mb-0" id="eventsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Event ID</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Location</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Ticket Price (LKR)</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ev in Model)
+                            {
+                                <tr data-category="@ev.CategoryID" data-title="@ev.Title.ToLower()">
+                                    <td>@ev.EventID</td>
+                                    <td>@ev.Title</td>
+                                    <td>@(ev.EventCategory != null ? ev.EventCategory.CategoryName : "Uncategorized")</td>
+                                    <td>@ev.Venue.City</td>
+                                    <td>@ev.StartDate.ToString("dd MMM yyyy")</td>
+                                    <td>@ev.EndDate.ToString("dd MMM yyyy")</td>
+                                    <td>@ev.TicketPrice.ToString("N2")</td>
+                                    <td>
+                                        @if (ev.Status == "Approved")
+                                        {
+                                            <span class="badge bg-success">Approved</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Pending</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("Edit", "Event", new { id = ev.EventID })" class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a href="@Url.Action("Delete", "Event", new { id = ev.EventID })"
+                                           class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('Are you sure you want to delete this event?');">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-x display-4 text-muted"></i>
+                    <p class="text-muted mt-3 mb-0">No events found.</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Scripts -->
+@section scripts {
+    <script>
+        const searchInput = document.getElementById("searchInput");
+        const categoryFilter = document.getElementById("categoryFilter");
+        const rows = document.querySelectorAll("#eventsTable tbody tr");
+
+        function filterEvents() {
+            const searchValue = searchInput.value.toLowerCase();
+            const selectedCategory = categoryFilter.value;
+
+            rows.forEach(row => {
+                const title = row.getAttribute("data-title");
+                const category = row.getAttribute("data-category");
+                const matchSearch = title.includes(searchValue);
+                const matchCategory = !selectedCategory || category === selectedCategory;
+
+                row.style.display = (matchSearch && matchCategory) ? "" : "none";
+            });
+        }
+
+        searchInput.addEventListener("input", filterEvents);
+        categoryFilter.addEventListener("change", filterEvents);
+    </script>
+}

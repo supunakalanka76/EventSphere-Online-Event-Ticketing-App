@@ -1,0 +1,107 @@
+﻿@model IEnumerable<EventSphere.Models.Booking>
+@{
+    ViewBag.Title = "Organizer Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Section -->
+<section class="bg-primary text-white text-center py-5">
+    <div class="container">
+        <h1 class="fw-bold">Organizer Dashboard</h1>
+        <p class="lead mb-0">Manage your events, track bookings, and monitor revenue 📊</p>
+    </div>
+</section>
+
+<!-- Summary Cards -->
+<section class="container my-5">
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 py-4">
+                <i class="bi bi-calendar-event display-5 text-primary mb-3"></i>
+                <h5>Total Events</h5>
+                <h2 class="fw-bold">@ViewBag.TotalEvents</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 py-4">
+                <i class="bi bi-ticket-perforated display-5 text-success mb-3"></i>
+                <h5>Total Bookings</h5>
+                <h2 class="fw-bold">@ViewBag.TotalBookings</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 py-4">
+                <i class="bi bi-currency-dollar display-5 text-warning mb-3"></i>
+                <h5>Total Revenue</h5>
+                <h2 class="fw-bold">LKR @ViewBag.TotalRevenue.ToString("N2")</h2>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Bookings Table -->
+<section class="container my-5">
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0">Recent Bookings</h4>
+                <a href="@Url.Action("ManageBookings", "Organizer")" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-list"></i> View All
+                </a>
+            </div>
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Event</th>
+                                <th>Customer</th>
+                                <th>Tickets</th>
+                                <th>Total (LKR)</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in Model)
+                            {
+                                <tr>
+                                    <td>@booking.Event.Title</td>
+                                    <td>@booking.User.FullName</td>
+                                    <td>@booking.Quantity</td>
+                                    <td>@booking.TotalAmount.ToString("N2")</td>
+                                    <td>
+                                        @(booking.BookingDate.HasValue
+                                        ? booking.BookingDate.Value.ToString("dd MMM yyyy")
+                                        : "N/A")
+                                    </td>
+                                    <td>
+                                        @if (booking.CheckInStatus == true)
+                                        {
+                                            <span class="badge bg-success">Checked In</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Pending</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar2-x display-4 text-muted"></i>
+                    <h5 class="text-muted mt-3">No recent bookings found.</h5>
+                </div>
+            }
+        </div>
+    </div>
+</section>

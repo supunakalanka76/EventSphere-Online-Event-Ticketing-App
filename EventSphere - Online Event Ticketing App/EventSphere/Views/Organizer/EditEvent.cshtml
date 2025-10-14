@@ -1,0 +1,140 @@
+﻿@model EventSphere.Models.Event
+@{
+    ViewBag.Title = "Edit Event";
+    Layout = "~/Views/Shared/_LayoutOrganizer.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">
+        <i class="bi bi-pencil-square"></i> Edit Event
+    </h2>
+
+    @using (Html.BeginForm("EditEvent", "Organizer", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.EventID)
+        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Title -->
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Title, "Event Title", new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.Title, new { @class = "form-control", required = "required" })
+                        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+                    </div>
+
+                    <!-- Category -->
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.CategoryID, "Category", new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.CategoryID,
+                            new SelectList(ViewBag.Categories, "CategoryID", "CategoryName", Model.CategoryID),
+                            "Select Category",
+                            new { @class = "form-select", required = "required" })
+                        @Html.ValidationMessageFor(m => m.CategoryID, "", new { @class = "text-danger" })
+                    </div>
+
+                    <!-- Venue -->
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.VenueID, "Venue", new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.VenueID,
+                            new SelectList(ViewBag.Venues, "VenueID", "VenueName", Model.VenueID),
+                            "Select Venue",
+                            new { @class = "form-select", required = "required" })
+                        @Html.ValidationMessageFor(m => m.VenueID, "", new { @class = "text-danger" })
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.StartDate, "Start Date", new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
+                        @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.EndDate, "End Date", new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.EndDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
+                        @Html.ValidationMessageFor(m => m.EndDate, "", new { @class = "text-danger" })
+                    </div>
+
+                    <!-- Ticket Info -->
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.TicketPrice, "Ticket Price (LKR)", new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.TicketPrice, new { @class = "form-control", type = "number", step = "0.01", required = "required" })
+                        @Html.ValidationMessageFor(m => m.TicketPrice, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.TotalTickets, "Total Tickets", new { @class = "form-label fw-semibold" })
+                        @Html.TextBoxFor(m => m.TotalTickets, new { @class = "form-control", type = "number", min = "1", required = "required" })
+                        @Html.ValidationMessageFor(m => m.TotalTickets, "", new { @class = "text-danger" })
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Event Image</label>
+                        <input type="file" name="eventImage" id="eventImage" class="form-control" accept="image/*" />
+                        <small class="text-muted">Upload a new image to replace the current one.</small>
+
+                        @if (!string.IsNullOrEmpty(Model.EventImage))
+                        {
+                            <div class="mt-3">
+                                <p class="text-muted mb-1">Current Image:</p>
+                                <img src="@Model.EventImage" alt="Current Image" class="img-thumbnail" style="max-width:180px; max-height:150px;" />
+                            </div>
+                        }
+
+                        <div class="mt-2">
+                            <img id="previewImage" src="#" alt="Preview" class="img-thumbnail d-none" style="max-height: 150px;" />
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-12">
+                        @Html.LabelFor(m => m.Description, "Event Description", new { @class = "form-label fw-semibold" })
+                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = "4", placeholder = "Enter event details..." })
+                        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Status, "Status", new { @class = "form-label fw-semibold" })
+                        @Html.DropDownListFor(m => m.Status,
+                            new SelectList(new[] { "Active", "Pending", "Inactive" }, Model.Status),
+                            "Select Status",
+                            new { @class = "form-select", required = "required" })
+                        @Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a href="@Url.Action("ManageEvents", "Organizer")" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Update Event
+            </button>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        // Live Image Preview
+        document.getElementById("eventImage").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById("previewImage");
+                    preview.src = e.target.result;
+                    preview.classList.remove("d-none");
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}

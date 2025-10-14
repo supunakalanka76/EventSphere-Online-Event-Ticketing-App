@@ -1,7 +1,121 @@
-﻿
+﻿@model IEnumerable<EventSphere.Models.Booking>
 @{
-    ViewBag.Title = "MyBookings";
+    ViewBag.Title = "My Bookings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>MyBookings</h2>
+<!-- Hero Section -->
+<section class="bg-primary text-white text-center py-5">
+    <div class="container">
+        <i class="bi bi-ticket-perforated-fill display-3 mb-3"></i>
+        <h1 class="fw-bold">My Bookings</h1>
+        <p class="lead mb-0">View all your past and upcoming event bookings 🎟️</p>
+    </div>
+</section>
 
+<!-- Filter Section -->
+<section class="container my-5">
+    <div class="text-center mb-4">
+        <div class="btn-group" role="group" aria-label="Filter Bookings">
+            <button class="btn btn-outline-primary active" id="filterAll">All</button>
+            <button class="btn btn-outline-primary" id="filterUpcoming">Upcoming</button>
+            <button class="btn btn-outline-primary" id="filterPast">Past</button>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4" id="bookingsContainer">
+            @foreach (var booking in Model)
+            {
+                var isUpcoming = booking.Event.StartDate > DateTime.Now;
+                var statusBadge = booking.PaymentStatus == "Paid"
+                    ? "bg-success"
+                    : booking.PaymentStatus == "Pending"
+                        ? "bg-warning text-dark"
+                        : "bg-secondary";
+
+                <div class="col-md-6 col-lg-4 booking-card" data-upcoming="@isUpcoming.ToString().ToLower()">
+                    <div class="card border-0 shadow-sm h-100">
+                        <img src="@(!string.IsNullOrEmpty(booking.Event.EventImage) ? booking.Event.EventImage : "/Content/Images/default-event.jpg")"
+                             class="card-img-top"
+                             alt="@booking.Event.Title"
+                             style="height: 180px; object-fit: cover;" />
+
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">@booking.Event.Title</h5>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-geo-alt"></i> @booking.Event.Venue.VenueName, @booking.Event.Venue.City
+                            </p>
+                            <p class="text-muted mb-3">
+                                <i class="bi bi-calendar-event"></i> @booking.Event.StartDate.ToString("MMMM dd, yyyy")
+                            </p>
+                            <p><strong>Tickets:</strong> @booking.Quantity</p>
+                            <p><strong>Total:</strong> LKR @booking.TotalAmount.ToString("N2")</p>
+                            <p><strong>Status:</strong> <span class="badge @statusBadge">@booking.PaymentStatus</span></p>
+                        </div>
+
+                        <!-- Ticket Preview -->
+                        @if (booking.Tickets != null && booking.Tickets.Any())
+                        {
+                            <div class="card-footer bg-light text-center">
+                                <div class="d-flex flex-wrap justify-content-center gap-2">
+                                    @foreach (var t in booking.Tickets.Take(2))
+                                    {
+                                        <img src="@t.QRCodeImage" alt="QR" class="img-thumbnail" style="width:80px; height:80px;">
+                                    }
+                                    @if (booking.Tickets.Count > 2)
+                                    {
+                                        <span class="text-muted">+@((booking.Tickets.Count - 2)) more</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="card-footer bg-white border-0 text-center">
+                            <a href="@Url.Action("Confirmation", "Booking", new { bookingId = booking.BookingID })"
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-calendar-x display-3 text-muted"></i>
+            <h5 class="text-muted mt-3">You don’t have any bookings yet.</h5>
+            <a href="@Url.Action("Index", "Event")" class="btn btn-primary mt-3">
+                <i class="bi bi-calendar-event"></i> Browse Events
+            </a>
+        </div>
+    }
+</section>
+
+@section scripts {
+    <script>
+        const filterButtons = document.querySelectorAll('[id^="filter"]');
+        const cards = document.querySelectorAll('.booking-card');
+
+        filterButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                filterButtons.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+
+                const filter = btn.id.replace("filter", "").toLowerCase();
+
+                cards.forEach(card => {
+                    const isUpcoming = card.dataset.upcoming === "true";
+                    card.style.display = (
+                        filter === "all" ||
+                        (filter === "upcoming" && isUpcoming) ||
+                        (filter === "past" && !isUpcoming)
+                    ) ? "block" : "none";
+                });
+            });
+        });
+    </script>
+}

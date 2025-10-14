@@ -1,0 +1,131 @@
+﻿@{
+    Layout = null;
+    var organizerName = Session["UserName"] ?? "Organizer";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewBag.Title - EventSphere Organizer</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Site.css" rel="stylesheet" />
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background-color: #198754; /* green accent for organizers */
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+        }
+
+        .nav-link, .dropdown-item {
+            color: #fff !important;
+        }
+
+            .nav-link:hover, .dropdown-item:hover {
+                background-color: rgba(255,255,255,0.1);
+            }
+
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: #ccc;
+            padding-top: 1rem;
+        }
+
+            .sidebar a {
+                color: #adb5bd;
+                text-decoration: none;
+                display: block;
+                padding: 10px 15px;
+                border-radius: 6px;
+                margin: 2px 0;
+            }
+
+                .sidebar a:hover, .sidebar a.active {
+                    background-color: #343a40;
+                    color: #fff;
+                }
+
+        main {
+            padding: 25px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="@Url.Action("Dashboard", "Organizer")">
+                <i class="bi bi-calendar-check"></i> EventSphere Organizer
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarMenu">
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="organizerMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> @organizerName
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="organizerMenu">
+                            <li><a class="dropdown-item" href="@Url.Action("OrganizerProfile", "Organizer")"><i class="bi bi-person-lines-fill"></i> Profile</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar + Content -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <h5 class="text-light px-3 mb-3">Menu</h5>
+                <a href="@Url.Action("Dashboard", "Organizer")" class="@(ViewBag.Title == "Dashboard" ? "active" : "")"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                <a href="@Url.Action("ManageEvents", "Organizer")" class="@(ViewBag.Title == "Manage Events" ? "active" : "")"><i class="bi bi-calendar-event"></i> Manage Events</a>
+                <a href="@Url.Action("ManageBookings", "Organizer")" class="@(ViewBag.Title == "Manage Bookings" ? "active" : "")"><i class="bi bi-ticket-detailed"></i> Manage Bookings</a>
+                <a href="@Url.Action("OrganizerProfile", "Organizer")" class="@(ViewBag.Title == "Profile" ? "active" : "")"><i class="bi bi-person-lines-fill"></i> Profile</a>
+            </div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 col-lg-10">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <small>&copy; @DateTime.Now.Year EventSphere | Organizer Portal</small>
+    </footer>
+
+    <!-- JS -->
+    <script src="~/Scripts/jquery-3.7.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
