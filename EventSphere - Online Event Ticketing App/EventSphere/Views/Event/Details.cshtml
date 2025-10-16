@@ -1,7 +1,7 @@
 ﻿@model EventSphere.Models.Event
 @{
     ViewBag.Title = Model.Title;
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = ViewBag.LayoutPath;
 }
 
 <!-- Hero Banner -->
@@ -69,11 +69,18 @@
                 </a>
 
                 @if (Session["UserRole"] != null && Session["UserRole"].ToString().ToLower() == "customer")
-                {
-                    <a href="@Url.Action("Book", "Booking", new { eventId = Model.EventID })" class="btn btn-primary">
-                        <i class="bi bi-ticket-perforated"></i> Book Ticket
-                    </a>
-                }
+                 {
+                    if (Model.EndDate < DateTime.Now)
+                    {
+                        <button class="btn btn-secondary" disabled>Event Ended</button>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Book", "Booking", new { eventId = Model.EventID })" class="btn btn-primary">
+                            Book Now
+                        </a>
+                    }
+                 }
                 else
                 {
                     <a href="@Url.Action("Login", "Account")" class="btn btn-primary">

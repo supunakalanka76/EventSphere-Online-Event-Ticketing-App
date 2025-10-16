@@ -1,7 +1,7 @@
 ﻿@using EventSphere.Helpers
     @{
         ViewBag.Title = "Home";
-        Layout = "~/Views/Shared/_Layout.cshtml";
+        Layout = ViewBag.LayoutPath;
 
         var isLoggedIn = SessionHelper.IsLoggedIn();
         var userRole = SessionHelper.GetUserRole();

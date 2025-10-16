@@ -1,13 +1,29 @@
 ﻿@model EventSphere.Models.Event
 @{
     ViewBag.Title = "Create Event";
-    Layout = "~/Views/Shared/_LayoutOrganizer.cshtml";
+    Layout = ViewBag.LayoutPath;
 }
 
 <div class="container mt-4">
     <h2 class="fw-bold mb-4">
         <i class="bi bi-plus-circle"></i> Create New Event
     </h2>
+
+    <!-- Alerts -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
     @using (Html.BeginForm("AddEvent", "Organizer", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
@@ -72,8 +88,8 @@
 
                     <!-- Image Upload -->
                     <div class="col-md-4">
-                        @Html.Label("Event Image", new { @class = "form-label fw-semibold" })
-                        <input type="file" name="eventImage" id="eventImage" class="form-control" accept="image/*" required />
+                        <label class="form-label fw-semibold">Event Image</label>
+                        <input type="file" name="EventImageFile" id="EventImageFile" class="form-control" accept="image/*" required />
                         <small class="text-muted">Accepted formats: JPG, PNG, JPEG</small>
                         <div class="mt-2">
                             <img id="previewImage" src="#" alt="Preview" class="img-thumbnail d-none" style="max-height: 180px;" />
@@ -94,6 +110,7 @@
                             new SelectList(new[] { "Active", "Pending", "Inactive" }),
                             "Select Status",
                             new { @class = "form-select", required = "required" })
+                        @Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
@@ -113,16 +130,20 @@
 @section scripts {
     <script>
         // Image Preview
-        document.getElementById("eventImage").addEventListener("change", function (event) {
+        document.getElementById("EventImageFile").addEventListener("change", function (event) {
             const file = event.target.files[0];
+            const preview = document.getElementById("previewImage");
+
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    const preview = document.getElementById("previewImage");
                     preview.src = e.target.result;
                     preview.classList.remove("d-none");
                 };
                 reader.readAsDataURL(file);
+            } else {
+                preview.src = "#";
+                preview.classList.add("d-none");
             }
         });
     </script>

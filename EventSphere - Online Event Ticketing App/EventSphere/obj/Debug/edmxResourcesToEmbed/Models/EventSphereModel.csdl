@@ -86,8 +86,8 @@
     <Property Name="PaymentGateway" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
     <Property Name="ReferenceNo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
     <Property Name="Remarks" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Name="InvoiceNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
     <NavigationProperty Name="Booking" Relationship="Self.FK_Payments_Booking" FromRole="Payments" ToRole="Bookings" />
-    <Property Name="InvoiceNumber" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
   </EntityType>
   <EntityType Name="Promotion">
     <Key>
@@ -110,7 +110,7 @@
     <Property Name="TicketID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="BookingID" Type="Int32" />
     <Property Name="TicketNumber" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-    <Property Name="QRCodeImage" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Name="QRCodeImage" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="IssueDate" Type="DateTime" Precision="3" />
     <Property Name="IsUsed" Type="Boolean" />
     <Property Name="UsedDate" Type="DateTime" Precision="3" />

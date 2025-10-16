@@ -7,7 +7,7 @@ using EventSphere.Models;
 
 namespace EventSphere.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private EventSphereDBEntities db = new EventSphereDBEntities();
 

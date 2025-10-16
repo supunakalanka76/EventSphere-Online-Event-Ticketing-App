@@ -1,0 +1,178 @@
+﻿@model EventSphere.Models.Booking
+@{
+    ViewBag.Title = "Payment";
+    Layout = ViewBag.LayoutPath ?? "~/Views/Shared/_LayoutCustomer.cshtml";
+    var loyaltyPoints = ViewBag.LoyaltyPoints ?? 0;
+    var promotions = ViewBag.Promotions as List<EventSphere.Models.Promotion>;
+}
+
+<!-- Hero Section -->
+<section class="bg-primary text-white text-center py-5">
+    <div class="container">
+        <h1 class="fw-bold">Complete Your Payment</h1>
+        <p class="lead mb-0">Finalize your booking for <strong>@Model.Event.Title</strong></p>
+    </div>
+</section>
+
+<!-- Payment Section -->
+<section class="container my-5">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center">@TempData["Error"]</div>
+    }
+    else if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["Success"]</div>
+    }
+
+    <div class="row">
+        <!-- Left: Booking Summary -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h4 class="fw-bold mb-3">Booking Summary</h4>
+                    <p><strong>Event:</strong> @Model.Event.Title</p>
+                    <p><strong>Date:</strong> @Model.Event.StartDate.ToString("MMMM dd, yyyy")</p>
+                    <p><strong>Venue:</strong> @Model.Event.Venue.VenueName, @Model.Event.Venue.City</p>
+                    <p><strong>Tickets:</strong> @Model.Quantity</p>
+                    <p><strong>Total Amount:</strong> LKR <span id="totalAmount">@Model.TotalAmount.ToString("N2")</span></p>
+
+                    <div id="discountSection" style="display:none;">
+                        <p><strong>Discount:</strong> -LKR <span id="discountAmount">0.00</span></p>
+                    </div>
+                    <div id="pointsSection" style="display:none;">
+                        <p><strong>Loyalty Points Used:</strong> -LKR <span id="pointsUsed">0.00</span></p>
+                    </div>
+                    <hr />
+                    <h5 class="fw-bold">Final Amount: LKR <span id="finalAmount">@Model.TotalAmount.ToString("N2")</span></h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Payment Form -->
+        <div class="col-lg-6">
+            @if (Model.PaymentStatus == "Completed")
+            {
+                <div class="card border-success shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-check-circle-fill text-success display-4"></i>
+                        <h4 class="fw-bold mt-3">Payment Already Completed</h4>
+                        <p>Your booking is confirmed. You can download your invoice below.</p>
+                        <a href="@Url.Action("DownloadInvoice", "Booking", new { bookingId = Model.BookingID })"
+                           class="btn btn-outline-success">
+                            <i class="bi bi-file-earmark-pdf"></i> Download Invoice (PDF)
+                        </a>
+                        <a href="@Url.Action("Confirmation", "Booking", new { bookingId = Model.BookingID })"
+                           class="btn btn-primary ms-2">
+                            <i class="bi bi-arrow-right-circle"></i> View Confirmation
+                        </a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                using (Html.BeginForm("PaymentConfirmed", "Booking", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("bookingId", Model.BookingID)
+
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <h4 class="fw-bold mb-3">Payment Options</h4>
+
+                            <!-- Promotion Code -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Promotion Code</label>
+                                <select name="promoCode" class="form-select" id="promoCode">
+                                    <option value="">-- Select Promotion (if available) --</option>
+                                    @if (promotions != null && promotions.Any())
+                                    {
+                                        foreach (var promo in promotions)
+                                        {
+                                            <option value="@promo.Code" data-discount="@promo.DiscountPercentage">
+                                                @promo.Code - @promo.DiscountPercentage% off
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Loyalty Points -->
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="usePoints" name="usePoints" />
+                                <label class="form-check-label" for="usePoints">
+                                    Use Loyalty Points (<strong>@loyaltyPoints</strong> available)
+                                </label>
+                            </div>
+
+                            <!-- Payment Method -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Payment Method</label>
+                                <select name="paymentMethod" class="form-select" required>
+                                    <option value="">-- Select Payment Method --</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Card">Credit / Debit Card</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Mobile Payment">Mobile Payment</option>
+                                </select>
+                            </div>
+
+                            <!-- Confirm Button -->
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-check-circle"></i> Confirm Payment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Dynamic Calculation Script -->
+@section scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const total = parseFloat("@Model.TotalAmount");
+            const promoSelect = document.getElementById("promoCode");
+            const pointsCheckbox = document.getElementById("usePoints");
+            const loyaltyPoints = parseFloat("@loyaltyPoints");
+
+            const discountSection = document.getElementById("discountSection");
+            const discountAmount = document.getElementById("discountAmount");
+            const pointsSection = document.getElementById("pointsSection");
+            const pointsUsed = document.getElementById("pointsUsed");
+            const finalAmount = document.getElementById("finalAmount");
+
+            function updateFinalAmount() {
+                let discount = 0;
+                let points = 0;
+
+                const selected = promoSelect.options[promoSelect.selectedIndex];
+                if (selected && selected.dataset.discount) {
+                    discount = (total * parseFloat(selected.dataset.discount)) / 100;
+                    discountSection.style.display = "block";
+                    discountAmount.innerText = discount.toFixed(2);
+                } else {
+                    discountSection.style.display = "none";
+                }
+
+                if (pointsCheckbox.checked && loyaltyPoints > 0) {
+                    points = Math.min(loyaltyPoints, total - discount);
+                    pointsSection.style.display = "block";
+                    pointsUsed.innerText = points.toFixed(2);
+                } else {
+                    pointsSection.style.display = "none";
+                }
+
+                const final = total - discount - points;
+                finalAmount.innerText = final.toFixed(2);
+            }
+
+            promoSelect.addEventListener("change", updateFinalAmount);
+            pointsCheckbox.addEventListener("change", updateFinalAmount);
+        });
+    </script>
+}

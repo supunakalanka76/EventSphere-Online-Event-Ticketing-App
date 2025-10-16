@@ -1,0 +1,106 @@
+﻿@model EventSphere.Models.User
+@{
+    ViewBag.Title = "Loyalty Points";
+    Layout = ViewBag.LayoutPath ?? "~/Views/Shared/_LayoutCustomer.cshtml";
+    var transactions = ViewBag.Transactions as List<EventSphere.Models.LoyaltyTransaction>;
+    int totalEarned = transactions?.Where(t => t.Type == "Earn").Sum(t => t.Points) ?? 0;
+    int totalRedeemed = transactions?.Where(t => t.Type == "Redeem").Sum(t => t.Points) ?? 0;
+}
+
+<!-- Hero Section -->
+<section class="bg-warning bg-gradient text-dark text-center py-5 shadow-sm">
+    <div class="container">
+        <i class="bi bi-stars display-3 mb-3"></i>
+        <h1 class="fw-bold">My Loyalty Points</h1>
+        <p class="lead mb-0">Earn, Redeem, and Enjoy Exclusive Rewards!</p>
+    </div>
+</section>
+
+<!-- Loyalty Summary -->
+<section class="container my-5">
+    <div class="row text-center mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm p-4">
+                <i class="bi bi-trophy-fill text-warning display-5 mb-2"></i>
+                <h5 class="fw-bold text-muted mb-1">Total Earned</h5>
+                <h3 class="fw-bold text-success">@totalEarned</h3>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm p-4">
+                <i class="bi bi-arrow-repeat text-danger display-5 mb-2"></i>
+                <h5 class="fw-bold text-muted mb-1">Total Redeemed</h5>
+                <h3 class="fw-bold text-danger">@totalRedeemed</h3>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm p-4">
+                <i class="bi bi-stars text-primary display-5 mb-2"></i>
+                <h5 class="fw-bold text-muted mb-1">Current Balance</h5>
+                <h3 class="fw-bold text-primary">@Model.LoyaltyPoints</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history"></i> Loyalty Transaction History</h5>
+            <span class="badge bg-light text-primary fw-semibold">@((transactions?.Count ?? 0)) Transactions</span>
+        </div>
+
+        <div class="card-body table-responsive">
+            <table class="table align-middle table-striped mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th class="text-center">Points</th>
+                        <th class="text-center">Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (transactions != null && transactions.Any())
+                    {
+                        foreach (var t in transactions)
+                        {
+                            <tr>
+                                <td>
+                                    @(t.TransactionDate.HasValue
+                                        ? t.TransactionDate.Value.ToString("MMM dd, yyyy hh:mm tt")
+                                        : "N/A")
+                                </td>
+                                <td>@t.Description</td>
+                                <td class="text-center fw-bold">@t.Points</td>
+                                <td class="text-center">
+                                    <span class="badge @(t.Type == "Earn" ? "bg-success" : "bg-danger") px-3 py-2">
+                                        <i class="bi @(t.Type == "Earn" ? "bi-plus-circle" : "bi-dash-circle")"></i> @t.Type
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <i class="bi bi-emoji-neutral display-6 d-block mb-2"></i>
+                                No loyalty transactions yet.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+        <a href="@Url.Action("MyProfile", "Account")" class="btn btn-outline-primary">
+            <i class="bi bi-person-circle"></i> Back to Profile
+        </a>
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary ms-2">
+            <i class="bi bi-house-door"></i> Home
+        </a>
+    </div>
+</section>

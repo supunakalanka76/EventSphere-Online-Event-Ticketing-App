@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<EventSphere.Models.Booking>
 @{
     ViewBag.Title = "Manage Bookings";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = ViewBag.LayoutPath;
 }
 
 <!-- Header -->
@@ -68,7 +68,7 @@
                         <tbody>
                             @foreach (var booking in Model)
                              {
-                                <tr data-status="@booking.PaymentStatus.ToLower()"
+                                <tr data-status="@(booking.PaymentStatus?.ToLower() ?? "unknown")"
                                     data-event="@booking.Event.Title.ToLower()"
                                     data-user="@booking.User.FullName.ToLower()">
                                     <td>@booking.BookingID</td>
@@ -79,8 +79,8 @@
                                     <td>
                                         @switch (booking.PaymentStatus)
                                          {
-                                            case "Paid":
-                                                <span class="badge bg-success">Paid</span>
+                                            case "Completed":
+                                                <span class="badge bg-success">Completed</span>
                                                 break;
                                             case "Pending":
                                                 <span class="badge bg-warning text-dark">Pending</span>

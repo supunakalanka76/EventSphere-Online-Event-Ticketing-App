@@ -12,7 +12,7 @@ using CrystalDecisions.Shared;
 
 namespace EventSphere.Controllers
 {
-    public class AdminController : Controller
+    public class AdminController : BaseController
     {
         private EventSphereDBEntities db = new EventSphereDBEntities();
 

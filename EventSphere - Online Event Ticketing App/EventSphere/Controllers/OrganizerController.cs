@@ -10,9 +10,9 @@ using EventSphere.Helpers;
 
 namespace EventSphere.Controllers
 {
-    public class OrganizerController : Controller
+    public class OrganizerController : BaseController
     {
-        private EventSphereDBEntities db = new EventSphereDBEntities();
+        private readonly EventSphereDBEntities db = new EventSphereDBEntities();
 
         // DASHBOARD
         [HttpGet]
@@ -23,15 +23,11 @@ namespace EventSphere.Controllers
 
             int organizerId = SessionHelper.GetUserId().Value;
 
-            var totalEvents = db.Events.Count(e => e.OrganizerID == organizerId);
-            var totalBookings = db.Bookings.Count(b => b.Event.OrganizerID == organizerId);
-            var totalRevenue = db.Payments
+            ViewBag.TotalEvents = db.Events.Count(e => e.OrganizerID == organizerId);
+            ViewBag.TotalBookings = db.Bookings.Count(b => b.Event.OrganizerID == organizerId);
+            ViewBag.TotalRevenue = db.Payments
                 .Where(p => p.Booking.Event.OrganizerID == organizerId)
                 .Sum(p => (decimal?)p.Amount) ?? 0;
-
-            ViewBag.TotalEvents = totalEvents;
-            ViewBag.TotalBookings = totalBookings;
-            ViewBag.TotalRevenue = totalRevenue;
 
             var recentBookings = db.Bookings
                 .Include("Event")
@@ -78,30 +74,45 @@ namespace EventSphere.Controllers
         // CREATE EVENT (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateEvent(Event model, HttpPostedFileBase ImageFile)
+        public ActionResult CreateEvent(Event model, HttpPostedFileBase EventImageFile)
         {
+            if (!SessionHelper.IsOrganizer())
+                return RedirectToAction("Login", "Account");
+
             try
             {
-                if (!SessionHelper.IsOrganizer())
-                    return RedirectToAction("Login", "Account");
-
                 if (ModelState.IsValid)
                 {
                     int organizerId = SessionHelper.GetUserId().Value;
 
-                    // Handle image upload
-                    if (ImageFile != null && ImageFile.ContentLength > 0)
+                    // Handle Image Upload
+                    if (EventImageFile != null && EventImageFile.ContentLength > 0)
                     {
                         string folderPath = Server.MapPath("~/Content/Events/");
                         if (!Directory.Exists(folderPath))
                             Directory.CreateDirectory(folderPath);
 
-                        string fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + Path.GetFileName(ImageFile.FileName);
-                        string fullPath = Path.Combine(folderPath, fileName);
-                        ImageFile.SaveAs(fullPath);
-                        model.EventImage = "/Content/Events/" + fileName;
+                        string extension = Path.GetExtension(EventImageFile.FileName);
+                        if (extension != null && (extension.ToLower() == ".jpg" || extension.ToLower() == ".jpeg" || extension.ToLower() == ".png"))
+                        {
+                            string fileName = $"{Guid.NewGuid()}{extension}";
+                            string fullPath = Path.Combine(folderPath, fileName);
+                            EventImageFile.SaveAs(fullPath);
+                            model.EventImage = "/Content/Events/" + fileName;
+                        }
+                        else
+                        {
+                            TempData["Error"] = "Invalid image format. Please upload a JPG or PNG file.";
+                            return RedirectToAction("CreateEvent");
+                        }
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Please upload an event image.";
+                        return RedirectToAction("CreateEvent");
                     }
 
+                    // Set event details
                     model.OrganizerID = organizerId;
                     model.CreatedAt = DateTime.Now;
                     model.Status = model.Status ?? "Pending";
@@ -115,7 +126,7 @@ namespace EventSphere.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Failed to create event: " + ex.Message;
+                TempData["Error"] = "Failed to create event: " + ex.Message;
             }
 
             ViewBag.Categories = db.EventCategories.ToList();
@@ -142,20 +153,20 @@ namespace EventSphere.Controllers
         // EDIT EVENT (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult EditEvent(Event model, HttpPostedFileBase ImageFile)
+        public ActionResult EditEvent(Event model, HttpPostedFileBase EventImageFile)
         {
+            if (!SessionHelper.IsOrganizer())
+                return RedirectToAction("Login", "Account");
+
             try
             {
-                if (!SessionHelper.IsOrganizer())
-                    return RedirectToAction("Login", "Account");
-
                 var ev = db.Events.Find(model.EventID);
                 if (ev == null)
                     return HttpNotFound("Event not found.");
 
                 if (ModelState.IsValid)
                 {
-                    // Update basic fields
+                    // Update main fields
                     ev.Title = model.Title;
                     ev.Description = model.Description;
                     ev.CategoryID = model.CategoryID;
@@ -167,17 +178,35 @@ namespace EventSphere.Controllers
                     ev.Status = model.Status;
                     ev.UpdatedAt = DateTime.Now;
 
-                    // Image upload
-                    if (ImageFile != null && ImageFile.ContentLength > 0)
+                    // Handle new image upload
+                    if (EventImageFile != null && EventImageFile.ContentLength > 0)
                     {
                         string folderPath = Server.MapPath("~/Content/Events/");
                         if (!Directory.Exists(folderPath))
                             Directory.CreateDirectory(folderPath);
 
-                        string fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + Path.GetFileName(ImageFile.FileName);
-                        string fullPath = Path.Combine(folderPath, fileName);
-                        ImageFile.SaveAs(fullPath);
-                        ev.EventImage = "/Content/Events/" + fileName;
+                        string extension = Path.GetExtension(EventImageFile.FileName);
+                        if (extension != null && (extension.ToLower() == ".jpg" || extension.ToLower() == ".jpeg" || extension.ToLower() == ".png"))
+                        {
+                            string fileName = $"{Guid.NewGuid()}{extension}";
+                            string fullPath = Path.Combine(folderPath, fileName);
+                            EventImageFile.SaveAs(fullPath);
+
+                            // Delete old image if exists
+                            if (!string.IsNullOrEmpty(ev.EventImage))
+                            {
+                                string oldPath = Server.MapPath(ev.EventImage);
+                                if (System.IO.File.Exists(oldPath))
+                                    System.IO.File.Delete(oldPath);
+                            }
+
+                            ev.EventImage = "/Content/Events/" + fileName;
+                        }
+                        else
+                        {
+                            TempData["Error"] = "Invalid image format. Please upload JPG or PNG only.";
+                            return RedirectToAction("EditEvent", new { id = ev.EventID });
+                        }
                     }
 
                     db.Entry(ev).State = EntityState.Modified;
@@ -189,7 +218,7 @@ namespace EventSphere.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Failed to update event: " + ex.Message;
+                TempData["Error"] = "Failed to update event: " + ex.Message;
             }
 
             ViewBag.Categories = db.EventCategories.ToList();
@@ -210,6 +239,14 @@ namespace EventSphere.Controllers
 
             try
             {
+                // Delete image file from disk
+                if (!string.IsNullOrEmpty(ev.EventImage))
+                {
+                    string path = Server.MapPath(ev.EventImage);
+                    if (System.IO.File.Exists(path))
+                        System.IO.File.Delete(path);
+                }
+
                 db.Events.Remove(ev);
                 db.SaveChanges();
                 TempData["Success"] = "Event deleted successfully!";
@@ -222,7 +259,7 @@ namespace EventSphere.Controllers
             return RedirectToAction("ManageEvents");
         }
 
-        // MANAGE BOOKINGS (ORGANIZER)
+        // MANAGE BOOKINGS
         [HttpGet]
         public ActionResult ManageBookings()
         {

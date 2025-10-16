@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<EventSphere.Models.Booking>
 @{
     ViewBag.Title = "Admin Dashboard";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = ViewBag.LayoutPath;
 }
 
 <!-- Hero Section -->
@@ -91,9 +91,9 @@
                                         : "N/A")
                                     </td>
                                     <td>
-                                        @if (booking.PaymentStatus == "Paid")
+                                        @if (booking.PaymentStatus == "Completed")
                                          {
-                                            <span class="badge bg-success">Paid</span>
+                                            <span class="badge bg-success">Completed</span>
                                          }
                                         else if (booking.PaymentStatus == "Pending")
                                         {

@@ -4,14 +4,14 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="dd6e6d1efe474f479dce3107fac94381" Name="Diagram1" ZoomLevel="60">
+      <Diagram DiagramId="a2836e81175b44f1ad1542a46322fd2b" Name="Diagram1">
         <EntityTypeShape EntityType="EventSphereDBModel.Booking" Width="1.5" PointX="3" PointY="8.625" IsExpanded="true" />
         <EntityTypeShape EntityType="EventSphereDBModel.EventCategory" Width="1.5" PointX="3.75" PointY="5" IsExpanded="true" />
         <EntityTypeShape EntityType="EventSphereDBModel.Event" Width="1.5" PointX="6" PointY="8.375" IsExpanded="true" />
         <EntityTypeShape EntityType="EventSphereDBModel.LoyaltyTransaction" Width="1.5" PointX="8.25" PointY="9.625" IsExpanded="true" />
         <EntityTypeShape EntityType="EventSphereDBModel.Payment" Width="1.5" PointX="5.25" PointY="14.375" IsExpanded="true" />
         <EntityTypeShape EntityType="EventSphereDBModel.Promotion" Width="1.5" PointX="0.75" PointY="5.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="EventSphereDBModel.Ticket" Width="1.5" PointX="5.25" PointY="17.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="EventSphereDBModel.Ticket" Width="1.5" PointX="5.25" PointY="18" IsExpanded="true" />
         <EntityTypeShape EntityType="EventSphereDBModel.User" Width="1.5" PointX="0.75" PointY="8.75" IsExpanded="true" />
         <EntityTypeShape EntityType="EventSphereDBModel.Venue" Width="1.5" PointX="3.75" PointY="0.75" IsExpanded="true" />
         <AssociationConnector Association="EventSphereDBModel.FK__Bookings__EventI__03F0984C" ManuallyRouted="false" />

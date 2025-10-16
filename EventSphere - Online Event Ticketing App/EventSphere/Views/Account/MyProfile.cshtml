@@ -1,0 +1,114 @@
+﻿@model EventSphere.Models.User
+@{
+    ViewBag.Title = "My Profile";
+    Layout = ViewBag.LayoutPath ?? "~/Views/Shared/_LayoutCustomer.cshtml";
+}
+
+<!-- Hero Section -->
+<section class="bg-primary text-white text-center py-5">
+    <div class="container">
+        <h1 class="fw-bold"><i class="bi bi-person-circle"></i> My Profile</h1>
+        <p class="lead mb-0">Manage your personal details and stay up to date.</p>
+    </div>
+</section>
+
+<!-- Profile Form -->
+<div class="container my-5" style="max-width: 750px;">
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-body p-4">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success text-center"><i class="bi bi-check-circle-fill"></i> @TempData["Success"]</div>
+            }
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger text-center"><i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error</div>
+            }
+
+            @using (Html.BeginForm("MyProfile", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(m => m.UserID)
+
+                <div class="text-center mb-4">
+                    <div class="position-relative d-inline-block">
+                        <img src="@Url.Content(Model.ProfileImage ?? "~/Content/ProfileImages/default-profile.png")"
+                             id="profilePreview"
+                             alt="Profile"
+                             class="rounded-circle shadow-sm border"
+                             style="width:130px; height:130px; object-fit:cover;" />
+                        <label for="ProfileImageFile" class="btn btn-sm btn-light position-absolute bottom-0 end-0 border">
+                            <i class="bi bi-camera"></i>
+                        </label>
+                    </div>
+                    <input type="file" name="ProfileImageFile" id="ProfileImageFile" class="d-none" accept="image/*" />
+                    <h4 class="fw-bold mt-3">@Model.FullName</h4>
+                    <p class="text-muted">@Model.Role</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Full Name</label>
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter full name", required = "required" })
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @readonly = "readonly" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Phone</label>
+                        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "Enter phone number" })
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Address</label>
+                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "Enter address" })
+                    </div>
+                </div>
+
+                <!-- Loyalty Points -->
+                <div class="card bg-light border-0 mt-4 mb-3 p-3 text-center">
+                    @if (Model.Role == "Customer")
+                     {
+                        <h5 class="fw-bold mb-1"><i class="bi bi-stars text-warning"></i> Loyalty Points</h5>
+                        <p class="fs-4 fw-semibold text-primary">@Model.LoyaltyPoints</p>
+                        <a href="@Url.Action("Loyalty", "Account")" class="btn btn-outline-primary btn-sm">
+                            View Loyalty History
+                        </a>
+                     }
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-success btn-lg fw-semibold">
+                        <i class="bi bi-save"></i> Update Profile
+                    </button>
+                </div>
+            }
+
+            <div class="text-center mt-4">
+                <a href="@Url.Action("Index", "Home")" class="text-decoration-none fw-semibold">
+                    <i class="bi bi-arrow-left-circle"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        // Profile image preview
+        document.getElementById('ProfileImageFile').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (ev) {
+                    document.getElementById('profilePreview').src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}

@@ -69,7 +69,6 @@
     <EntitySetMapping Name="Payments">
       <EntityTypeMapping TypeName="EventSphereDBModel.Payment">
         <MappingFragment StoreEntitySet="Payments">
-          <ScalarProperty Name="InvoiceNumber" ColumnName="InvoiceNumber" />
           <ScalarProperty Name="BookingID" ColumnName="BookingID" />
           <ScalarProperty Name="TransactionID" ColumnName="TransactionID" />
           <ScalarProperty Name="Amount" ColumnName="Amount" />
@@ -78,6 +77,7 @@
           <ScalarProperty Name="PaymentGateway" ColumnName="PaymentGateway" />
           <ScalarProperty Name="ReferenceNo" ColumnName="ReferenceNo" />
           <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+          <ScalarProperty Name="InvoiceNumber" ColumnName="InvoiceNumber" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

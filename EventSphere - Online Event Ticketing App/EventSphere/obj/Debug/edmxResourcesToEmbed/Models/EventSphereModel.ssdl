@@ -95,7 +95,7 @@
     <Property Name="TicketID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="BookingID" Type="int" />
     <Property Name="TicketNumber" Type="nvarchar" MaxLength="100" />
-    <Property Name="QRCodeImage" Type="nvarchar" MaxLength="255" />
+    <Property Name="QRCodeImage" Type="nvarchar(max)" />
     <Property Name="IssueDate" Type="datetime" />
     <Property Name="IsUsed" Type="bit" />
     <Property Name="UsedDate" Type="datetime" />

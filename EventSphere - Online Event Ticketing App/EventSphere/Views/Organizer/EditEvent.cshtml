@@ -1,7 +1,7 @@
 ﻿@model EventSphere.Models.Event
 @{
     ViewBag.Title = "Edit Event";
-    Layout = "~/Views/Shared/_LayoutOrganizer.cshtml";
+    Layout = ViewBag.LayoutPath;
 }
 
 <div class="container mt-4">
@@ -9,7 +9,23 @@
         <i class="bi bi-pencil-square"></i> Edit Event
     </h2>
 
-    @using (Html.BeginForm("EditEvent", "Organizer", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    <!-- Success/Error Alerts -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @using (Html.BeginForm("Edit", "Event", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         @Html.AntiForgeryToken()
         @Html.HiddenFor(m => m.EventID)
@@ -74,14 +90,14 @@
                     <!-- Image Upload -->
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Event Image</label>
-                        <input type="file" name="eventImage" id="eventImage" class="form-control" accept="image/*" />
+                        <input type="file" name="EventImageFile" id="EventImageFile" class="form-control" accept="image/*" />
                         <small class="text-muted">Upload a new image to replace the current one.</small>
 
                         @if (!string.IsNullOrEmpty(Model.EventImage))
                         {
                             <div class="mt-3">
                                 <p class="text-muted mb-1">Current Image:</p>
-                                <img src="@Model.EventImage" alt="Current Image" class="img-thumbnail" style="max-width:180px; max-height:150px;" />
+                                <img src="@Url.Content(Model.EventImage)" alt="Current Image" class="img-thumbnail" style="max-width:180px; max-height:150px;" />
                             </div>
                         }
 
@@ -124,16 +140,20 @@
 @section scripts {
     <script>
         // Live Image Preview
-        document.getElementById("eventImage").addEventListener("change", function (event) {
+        document.getElementById("EventImageFile").addEventListener("change", function (event) {
             const file = event.target.files[0];
+            const preview = document.getElementById("previewImage");
+
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    const preview = document.getElementById("previewImage");
                     preview.src = e.target.result;
                     preview.classList.remove("d-none");
                 };
                 reader.readAsDataURL(file);
+            } else {
+                preview.src = "#";
+                preview.classList.add("d-none");
             }
         });
     </script>

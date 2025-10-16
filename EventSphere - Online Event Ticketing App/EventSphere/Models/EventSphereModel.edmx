@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="EventSphereDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="EventSphereDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Bookings">
           <Key>
             <PropertyRef Name="BookingID" />
@@ -100,7 +100,7 @@
           <Property Name="TicketID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="BookingID" Type="int" />
           <Property Name="TicketNumber" Type="nvarchar" MaxLength="100" />
-          <Property Name="QRCodeImage" Type="nvarchar" MaxLength="255" />
+          <Property Name="QRCodeImage" Type="nvarchar(max)" />
           <Property Name="IssueDate" Type="datetime" />
           <Property Name="IsUsed" Type="bit" />
           <Property Name="UsedDate" Type="datetime" />
@@ -312,7 +312,8 @@
             <End Role="Payments" EntitySet="Payments" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="EventSphereDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -402,8 +403,8 @@
           <Property Name="PaymentGateway" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="ReferenceNo" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="Remarks" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="InvoiceNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="Booking" Relationship="Self.FK_Payments_Booking" FromRole="Payments" ToRole="Bookings" />
-          <Property Name="InvoiceNumber" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Promotion">
           <Key>
@@ -426,7 +427,7 @@
           <Property Name="TicketID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="BookingID" Type="Int32" />
           <Property Name="TicketNumber" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="QRCodeImage" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="QRCodeImage" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="IssueDate" Type="DateTime" Precision="3" />
           <Property Name="IsUsed" Type="Boolean" />
           <Property Name="UsedDate" Type="DateTime" Precision="3" />
@@ -717,7 +718,6 @@
           <EntitySetMapping Name="Payments">
             <EntityTypeMapping TypeName="EventSphereDBModel.Payment">
               <MappingFragment StoreEntitySet="Payments">
-                <ScalarProperty Name="InvoiceNumber" ColumnName="InvoiceNumber" />
                 <ScalarProperty Name="BookingID" ColumnName="BookingID" />
                 <ScalarProperty Name="TransactionID" ColumnName="TransactionID" />
                 <ScalarProperty Name="Amount" ColumnName="Amount" />
@@ -726,6 +726,7 @@
                 <ScalarProperty Name="PaymentGateway" ColumnName="PaymentGateway" />
                 <ScalarProperty Name="ReferenceNo" ColumnName="ReferenceNo" />
                 <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+                <ScalarProperty Name="InvoiceNumber" ColumnName="InvoiceNumber" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

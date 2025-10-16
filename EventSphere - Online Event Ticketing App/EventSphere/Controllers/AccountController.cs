@@ -8,11 +8,11 @@ using EventSphere.Helpers;
 
 namespace EventSphere.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
-        private EventSphereDBEntities db = new EventSphereDBEntities();
+        private readonly EventSphereDBEntities db = new EventSphereDBEntities();
 
-        // REGISTER (CUSTOMER)
+        // REGISTER (Customer)
         [HttpGet]
         public ActionResult Register()
         {
@@ -27,18 +27,16 @@ namespace EventSphere.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Check if email already exists
                     if (db.Users.Any(u => u.Email == model.Email))
                     {
                         ViewBag.Error = "Email already exists.";
                         return View(model);
                     }
 
-                    // Hash password
                     model.PasswordHash = PasswordHelper.HashPassword(model.PasswordHash);
-                    model.Role = "Customer"; // Default role for self-registration
+                    model.Role = "Customer"; // default self-registration role
                     model.AccountStatus = "Active";
-                    model.ProfileImage = "/Content/ProfileImages/default-profile.png"; // Default profile image
+                    model.ProfileImage = "/Content/ProfileImages/default-profile.png";
                     model.LoyaltyPoints = 0;
                     model.CreatedAt = DateTime.Now;
 
@@ -70,27 +68,30 @@ namespace EventSphere.Controllers
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                {
+                    ViewBag.Error = "Please enter your email and password.";
+                    return View();
+                }
+
                 var user = db.Users.FirstOrDefault(u => u.Email == email);
-
-                if (user == null)
+                if (user == null || !PasswordHelper.VerifyPassword(password, user.PasswordHash))
                 {
                     ViewBag.Error = "Invalid email or password.";
                     return View();
                 }
 
-                bool isValid = PasswordHelper.VerifyPassword(password, user.PasswordHash);
-
-                if (!isValid)
+                if (user.AccountStatus?.ToLower() == "inactive")
                 {
-                    ViewBag.Error = "Invalid email or password.";
+                    ViewBag.Error = "Your account is inactive. Please contact support.";
                     return View();
                 }
 
-                // Set session
                 SessionHelper.SetUserSession(user.UserID, user.FullName, user.Role);
 
-                // Redirect based on role
-                switch (user.Role.ToLower())
+                // Redirect by role
+                string role = user.Role?.ToLower() ?? "customer";
+                switch (role)
                 {
                     case "admin":
                         return RedirectToAction("Dashboard", "Admin");
@@ -115,6 +116,29 @@ namespace EventSphere.Controllers
             return RedirectToAction("Login");
         }
 
+        // LOYALTY POINTS PAGE
+        [HttpGet]
+        public ActionResult Loyalty()
+        {
+            if (!SessionHelper.IsLoggedIn())
+                return RedirectToAction("Login");
+
+            int userId = SessionHelper.GetUserId().Value;
+            var user = db.Users.Find(userId);
+            if (user == null)
+                return RedirectToAction("Login");
+
+            var transactions = db.LoyaltyTransactions
+                .Where(t => t.UserID == userId)
+                .OrderByDescending(t => t.TransactionDate)
+                .ToList();
+
+            ViewBag.Transactions = transactions;
+            ViewBag.LayoutPath = GetLayoutForRole(user.Role);
+
+            return View(user);
+        }
+
         // PROFILE (GET)
         [HttpGet]
         public ActionResult MyProfile()
@@ -124,14 +148,14 @@ namespace EventSphere.Controllers
 
             int userId = SessionHelper.GetUserId().Value;
             var user = db.Users.Find(userId);
-
             if (user == null)
                 return RedirectToAction("Login");
 
+            ViewBag.LayoutPath = GetLayoutForRole(user.Role);
             return View(user);
         }
 
-        // PROFILE (POST) - Update Profile
+        // PROFILE (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult MyProfile(User updatedUser, HttpPostedFileBase ProfileImageFile)
@@ -141,18 +165,16 @@ namespace EventSphere.Controllers
 
             int userId = SessionHelper.GetUserId().Value;
             var user = db.Users.Find(userId);
-
             if (user == null)
                 return RedirectToAction("Login");
 
             try
             {
-                // Update basic profile fields
                 user.FullName = updatedUser.FullName;
                 user.Phone = updatedUser.Phone;
                 user.Address = updatedUser.Address;
 
-                // Handle profile image upload
+                // Handle image upload
                 if (ProfileImageFile != null && ProfileImageFile.ContentLength > 0)
                 {
                     string uploadDir = Server.MapPath("~/Content/ProfileImages/");
@@ -162,19 +184,35 @@ namespace EventSphere.Controllers
                     string fileName = $"{Guid.NewGuid()}{Path.GetExtension(ProfileImageFile.FileName)}";
                     string filePath = Path.Combine(uploadDir, fileName);
                     ProfileImageFile.SaveAs(filePath);
-
                     user.ProfileImage = "/Content/ProfileImages/" + fileName;
                 }
 
+                user.UpdatedAt = DateTime.Now;
                 db.SaveChanges();
+
                 TempData["Success"] = "Profile updated successfully!";
+                return RedirectToAction("MyProfile");
             }
             catch (Exception ex)
             {
                 ViewBag.Error = "Error updating profile: " + ex.Message;
+                ViewBag.LayoutPath = GetLayoutForRole(user.Role);
+                return View(user);
             }
+        }
 
-            return View(user);
+        // PRIVATE HELPER
+        private string GetLayoutForRole(string role)
+        {
+            switch (role)
+            {
+                case "Admin":
+                    return "~/Views/Shared/_LayoutAdmin.cshtml";
+                case "Organizer":
+                    return "~/Views/Shared/_LayoutOrganizer.cshtml";
+                default:
+                    return "~/Views/Shared/_LayoutCustomer.cshtml";
+            }
         }
     }
 }

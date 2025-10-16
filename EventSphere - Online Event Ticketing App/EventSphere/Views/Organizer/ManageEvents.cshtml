@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<EventSphere.Models.Event>
 @{
     ViewBag.Title = "Manage Events";
-    Layout = "~/Views/Shared/_LayoutOrganizer.cshtml";
+    Layout = ViewBag.LayoutPath;
 }
 
 <div class="container mt-4">
@@ -9,10 +9,26 @@
         <h2 class="fw-bold">
             <i class="bi bi-calendar-event"></i> Manage My Events
         </h2>
-        <a href="@Url.Action("AddEvent", "Organizer")" class="btn btn-primary">
+        <a href="@Url.Action("CreateEvent", "Organizer")" class="btn btn-primary">
             <i class="bi bi-plus-lg"></i> Add New Event
         </a>
     </div>
+
+    <!-- Alerts -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    else if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
     <!-- Optional Filter Section -->
     <div class="mb-3">
@@ -21,12 +37,15 @@
                 <select name="categoryId" class="form-select">
                     <option value="">All Categories</option>
                     @if (ViewBag.Categories != null)
-                     {
+                    {
                         foreach (var cat in ViewBag.Categories)
                         {
-                            <option value="@cat.CategoryID">@cat.CategoryName</option>
+                            <option value="@cat.CategoryID"
+                                    @(Request["categoryId"] == cat.CategoryID.ToString() ? "selected" : "")>
+                                @cat.CategoryName
+                            </option>
                         }
-                     }
+                    }
                 </select>
             </div>
             <div class="col-md-2">
@@ -37,17 +56,19 @@
         </form>
     </div>
 
+    <!-- Events Table -->
     <div class="card shadow-sm border-0 rounded-3">
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
+                            <th>Image</th>
                             <th>Event Title</th>
                             <th>Category</th>
                             <th>Venue</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
+                            <th>Start</th>
+                            <th>End</th>
                             <th>Tickets</th>
                             <th>Status</th>
                             <th class="text-center">Actions</th>
@@ -55,30 +76,62 @@
                     </thead>
                     <tbody>
                         @if (Model != null && Model.Any())
-                         {
+                        {
                             foreach (var evt in Model)
                             {
                                 <tr>
-                                    <td>@evt.Title</td>
-                                    <td>@evt.EventCategory.CategoryName</td>
-                                    <td>@evt.Venue.VenueName</td>
-                                    <td>@(evt.StartDate != null ? evt.StartDate.ToString("dd MMM yyyy") : "N/A")</td>
-                                    <td>@(evt.EndDate != null ? evt.EndDate.ToString("dd MMM yyyy") : "N/A")</td>
-                                    <td>@evt.AvailableTickets / @evt.TotalTickets</td>
+                                    <!-- Thumbnail -->
                                     <td>
-                                        @if (evt.Status != null && evt.Status.Equals("Active", StringComparison.OrdinalIgnoreCase))
-                                         {
-                                            <span class="badge bg-success">Active</span>
-                                         }
-                                        else if (evt.Status != null && evt.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+                                        @if (!string.IsNullOrEmpty(evt.EventImage))
                                         {
-                                            <span class="badge bg-warning text-dark">Pending</span>
+                                            <img src="@Url.Content(evt.EventImage)" alt="Event Image"
+                                                 class="img-thumbnail" style="width: 70px; height: 70px; object-fit: cover;" />
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary">Inactive</span>
+                                            <img src="~/Content/Images/default-event.png" alt="No Image"
+                                                 class="img-thumbnail" style="width: 70px; height: 70px; object-fit: cover;" />
                                         }
                                     </td>
+
+                                    <!-- Title -->
+                                    <td class="fw-semibold">@evt.Title</td>
+                                    <td>@evt.EventCategory.CategoryName</td>
+                                    <td>@evt.Venue.VenueName</td>
+                                    <td>@(evt.StartDate.ToString("dd MMM yyyy") ?? "N/A")</td>
+                                    <td>@(evt.EndDate.ToString("dd MMM yyyy") ?? "N/A")</td>
+
+                                    <!-- Tickets -->
+                                    <td>
+                                        <span class="badge bg-info text-dark">
+                                            @evt.AvailableTickets / @evt.TotalTickets
+                                        </span>
+                                    </td>
+
+                                    <!-- Status -->
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(evt.Status))
+                                        {
+                                            if (evt.Status.Equals("Active", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge bg-success">Active</span>
+                                            }
+                                            else if (evt.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-muted">Unknown</span>
+                                        }
+                                    </td>
+
+                                    <!-- Actions -->
                                     <td class="text-center">
                                         <a href="@Url.Action("EditEvent", "Organizer", new { id = evt.EventID })"
                                            class="btn btn-sm btn-outline-primary me-1" title="Edit Event">
@@ -93,11 +146,11 @@
                                     </td>
                                 </tr>
                             }
-                         }
+                        }
                         else
                         {
                             <tr>
-                                <td colspan="8" class="text-center text-muted py-4">
+                                <td colspan="9" class="text-center text-muted py-4">
                                     <i class="bi bi-info-circle"></i> No events found.
                                     Click <strong>"Add New Event"</strong> to create one.
                                 </td>
@@ -109,3 +162,11 @@
         </div>
     </div>
 </div>
+
+@section scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("ManageEvents page loaded.");
+        });
+    </script>
+}

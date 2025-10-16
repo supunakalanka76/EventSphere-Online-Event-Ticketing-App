@@ -1,7 +1,7 @@
 ﻿@model EventSphere.Models.Event
 @{
     ViewBag.Title = "Book Tickets";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = ViewBag.LayoutPath;
 }
 
 <!-- Hero Section -->
@@ -11,6 +11,12 @@
         <p class="lead mb-0">Confirm your event booking and secure your spot now 🎟️</p>
     </div>
 </section>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger text-center mt-3">
+        @TempData["Error"]
+    </div>
+}
 
 <!-- Booking Section -->
 <section class="container my-5">
@@ -32,7 +38,7 @@
                 <li class="mb-2"><i class="bi bi-calendar-event text-primary me-2"></i><strong>Date:</strong> @Model.StartDate.ToString("MMMM dd, yyyy")</li>
                 <li class="mb-2"><i class="bi bi-clock text-primary me-2"></i><strong>Time:</strong> @Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")</li>
                 <li class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i><strong>Venue:</strong> @Model.Venue.VenueName, @Model.Venue.Address, @Model.Venue.City</li>
-                <li class="mb-2"><i class="bi bi-currency-dollar text-primary me-2"></i><strong>Price per Ticket:</strong> LKR @Model.TicketPrice.ToString("N2")</li>
+                <li class="mb-2"><i class="bi bi-currency-dollar text-primary me-2"></i><strong>Price per Ticket:</strong>@Model.TicketPrice.ToString("N2") LKR</li>
             </ul>
 
             @using (Html.BeginForm("BookConfirmed", "Booking", FormMethod.Post))
@@ -73,7 +79,7 @@
         quantityInput.addEventListener("input", function () {
             const qty = parseInt(quantityInput.value) || 1;
             const total = pricePerTicket * qty;
-            totalElement.textContent = `USD ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            totalElement.textContent = `${total.toLocaleString(undefined, { minimumFractionDigits: 2 })} LKR`;
         });
     </script>
 }
