@@ -123,7 +123,7 @@ namespace EventSphere.Controllers
                 // Handle new image safely
                 if (EventImageFile != null && EventImageFile.ContentLength > 0)
                 {
-                    string folderPath = Server.MapPath("~/Content/EventImages/");
+                    string folderPath = Server.MapPath("/Content/Events/");
                     if (!Directory.Exists(folderPath))
                         Directory.CreateDirectory(folderPath);
 
@@ -132,7 +132,7 @@ namespace EventSphere.Controllers
 
                     EventImageFile.SaveAs(filePath);
 
-                    ev.EventImage = "/Content/EventImages/" + fileName;
+                    ev.EventImage = "/Content/Events/" + fileName;
                 }
 
                 db.SaveChanges();
@@ -172,7 +172,7 @@ namespace EventSphere.Controllers
 
                 if (EventImageFile != null && EventImageFile.ContentLength > 0)
                 {
-                    string folderPath = Server.MapPath("~/Content/EventImages/");
+                    string folderPath = Server.MapPath("/Content/Events/");
                     if (!Directory.Exists(folderPath))
                         Directory.CreateDirectory(folderPath);
 
@@ -180,11 +180,11 @@ namespace EventSphere.Controllers
                     string filePath = Path.Combine(folderPath, fileName);
                     EventImageFile.SaveAs(filePath);
 
-                    model.EventImage = "/Content/EventImages/" + fileName;
+                    model.EventImage = "/Content/Events/" + fileName;
                 }
                 else
                 {
-                    model.EventImage = "/Content/EventImages/default-event.png";
+                    model.EventImage = "/Content/Events/default-event.png";
                 }
 
                 db.Events.Add(model);

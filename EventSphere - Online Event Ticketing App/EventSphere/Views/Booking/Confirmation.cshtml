@@ -4,18 +4,500 @@
     Layout = ViewBag.LayoutPath ?? "~/Views/Shared/_LayoutCustomer.cshtml";
 }
 
-<!-- Hero Section -->
-<section class="bg-success text-white text-center py-5">
-    <div class="container">
-        <i class="bi bi-check-circle-fill display-3 mb-3"></i>
-        <h1 class="fw-bold">Booking Confirmed!</h1>
-        <p class="lead mb-2">Your payment was successful, and your tickets are ready 🎟️</p>
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    }
 
-        <!-- Invoice Button -->
-        <a href="@Url.Action("DownloadInvoice", "Booking", new { bookingId = Model.BookingID })"
-           class="btn btn-light btn-lg mt-3">
-            <i class="bi bi-file-earmark-pdf"></i> Download Invoice (PDF)
-        </a>
+    .confirmation-hero {
+        background: var(--success-gradient);
+        color: white;
+        padding: 4rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .confirmation-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 1000,100 1000,0"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .confetti {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .confetti-piece {
+        position: absolute;
+        width: 10px;
+        height: 30px;
+        background: #ffd700;
+        top: 0;
+        opacity: 0;
+    }
+
+        .confetti-piece:nth-child(1) {
+            left: 7%;
+            transform: rotate(-40deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 182ms;
+            animation-duration: 1116ms;
+        }
+
+        .confetti-piece:nth-child(2) {
+            left: 14%;
+            transform: rotate(4deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 161ms;
+            animation-duration: 1076ms;
+        }
+
+        .confetti-piece:nth-child(3) {
+            left: 21%;
+            transform: rotate(-51deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 481ms;
+            animation-duration: 1103ms;
+        }
+
+        .confetti-piece:nth-child(4) {
+            left: 28%;
+            transform: rotate(61deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 334ms;
+            animation-duration: 708ms;
+        }
+
+        .confetti-piece:nth-child(5) {
+            left: 35%;
+            transform: rotate(-52deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 302ms;
+            animation-duration: 789ms;
+        }
+
+        .confetti-piece:nth-child(6) {
+            left: 42%;
+            transform: rotate(38deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 180ms;
+            animation-duration: 1168ms;
+        }
+
+        .confetti-piece:nth-child(7) {
+            left: 49%;
+            transform: rotate(11deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 395ms;
+            animation-duration: 1200ms;
+        }
+
+        .confetti-piece:nth-child(8) {
+            left: 56%;
+            transform: rotate(49deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 14ms;
+            animation-duration: 887ms;
+        }
+
+        .confetti-piece:nth-child(9) {
+            left: 63%;
+            transform: rotate(-72deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 149ms;
+            animation-duration: 805ms;
+        }
+
+        .confetti-piece:nth-child(10) {
+            left: 70%;
+            transform: rotate(10deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 351ms;
+            animation-duration: 1059ms;
+        }
+
+        .confetti-piece:nth-child(11) {
+            left: 77%;
+            transform: rotate(4deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 307ms;
+            animation-duration: 1132ms;
+        }
+
+        .confetti-piece:nth-child(12) {
+            left: 84%;
+            transform: rotate(-42deg);
+            animation: makeItRain 1000ms infinite ease-out;
+            animation-delay: 464ms;
+            animation-duration: 776ms;
+        }
+
+    @@keyframes makeItRain {
+        from {
+            opacity: 0;
+        }
+
+        50% {
+            opacity: 1;
+        }
+
+        to {
+            transform: translateY(350px) rotate(180deg);
+            opacity: 0;
+        }
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        margin-bottom: 2rem;
+    }
+
+    .card-header-custom {
+        background: transparent;
+        border: none;
+        padding: 0 0 1.5rem 0;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #f1f3f4;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        padding: 1rem;
+        border-radius: 12px;
+        background: rgba(102, 126, 234, 0.05);
+        transition: all 0.3s ease;
+    }
+
+        .info-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+    }
+
+    .info-value {
+        color: #6c757d;
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+
+    .amount-highlight {
+        background: var(--success-gradient);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        text-align: center;
+        margin: 1.5rem 0;
+        box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+    }
+
+    .amount-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+    }
+
+    .amount-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0;
+    }
+
+    .ticket-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        background: white;
+    }
+
+        .ticket-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+    .ticket-qr {
+        padding: 1.5rem;
+        background: #f8f9fa;
+        text-align: center;
+        border-bottom: 2px dashed #dee2e6;
+    }
+
+    .ticket-info {
+        padding: 1.5rem;
+    }
+
+    .ticket-number {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        color: #495057;
+        font-size: 1.1rem;
+    }
+
+    .loyalty-card {
+        background: var(--gold-gradient);
+        color: #2c3e50;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+    }
+
+    .loyalty-points {
+        font-size: 3rem;
+        font-weight: 800;
+        margin: 1rem 0;
+    }
+
+    .btn-custom {
+        border-radius: 12px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary-custom {
+        background: var(--primary-gradient);
+        border-color: transparent;
+        color: white;
+    }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+    .btn-outline-custom {
+        background: transparent;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+        .btn-outline-custom:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .btn-success-custom {
+        background: var(--success-gradient);
+        border-color: transparent;
+        color: white;
+    }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+            color: white;
+        }
+
+    .alert-custom {
+        border: none;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border-left: 4px solid #dc3545;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .badge-custom {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .summary-card {
+            padding: 1.5rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .amount-value {
+            font-size: 2rem;
+        }
+
+        .loyalty-points {
+            font-size: 2.5rem;
+        }
+
+        .confetti-piece {
+            display: none;
+        }
+    }
+
+    .share-section {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+
+    .share-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 5px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .share-facebook {
+        background: #3b5998;
+        color: white;
+    }
+
+    .share-twitter {
+        background: #1da1f2;
+        color: white;
+    }
+
+    .share-whatsapp {
+        background: #25d366;
+        color: white;
+    }
+
+    .share-instagram {
+        background: #e4405f;
+        color: white;
+    }
+
+    .share-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+</style>
+
+<!-- Hero Section with Confetti -->
+<section class="confirmation-hero">
+    <div class="confetti">
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+        <div class="confetti-piece"></div>
+    </div>
+
+    <div class="container hero-content">
+        <div class="text-center">
+            <i class="bi bi-check-circle-fill display-1 mb-3 floating"></i>
+            <h1 class="fw-bold display-4 mb-3">Booking Confirmed!</h1>
+            <p class="lead mb-4 fs-4">Your payment was successful, and your tickets are ready 🎟️</p>
+
+            <!-- Invoice Button -->
+            <a href="@Url.Action("DownloadInvoice", "Booking", new { bookingId = Model.BookingID })"
+               class="btn btn-light btn-lg mt-3 btn-custom pulse">
+                <i class="bi bi-file-earmark-pdf me-2"></i> Download Invoice (PDF)
+            </a>
+        </div>
     </div>
 </section>
 
@@ -23,154 +505,329 @@
 <section class="container my-5">
     @if (ViewBag.Error != null)
     {
-        <div class="alert alert-danger text-center">@ViewBag.Error</div>
+        <div class="alert alert-custom alert-danger animate__animated animate__shakeX">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@ViewBag.Error
+        </div>
     }
     else
     {
         <!-- Booking Summary -->
-        <div class="card border-0 shadow-sm rounded-3 mb-5">
-            <div class="card-body">
-                <h4 class="fw-bold mb-3 text-success"><i class="bi bi-receipt"></i> Booking Summary</h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Booking ID:</strong> @Model.BookingID</p>
-                        <p><strong>Event:</strong> @Model.Event.Title</p>
-                        <p><strong>Date:</strong> @Model.Event.StartDate.ToString("MMMM dd, yyyy")</p>
-                        <p><strong>Venue:</strong> @Model.Event.Venue.VenueName, @Model.Event.Venue.City</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Tickets:</strong> @Model.Quantity</p>
-                        <p><strong>Total Amount:</strong> LKR @Model.TotalAmount.ToString("N2")</p>
-                        <p>
-                            <strong>Booking Date:</strong>
-                            @(Model.BookingDate.HasValue
-                                ? Model.BookingDate.Value.ToString("MMMM dd, yyyy hh:mm tt")
-                                : "N/A")
-                        </p>
-                        <p><strong>Status:</strong> <span class="badge bg-success">Confirmed</span></p>
+        <div class="summary-card">
+            <div class="card-header-custom">
+                <h4 class="fw-bold mb-0 text-success">
+                    <i class="bi bi-receipt me-2"></i>Booking Summary
+                </h4>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Booking ID</div>
+                    <div class="info-value">@Model.BookingID</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Event</div>
+                    <div class="info-value">@Model.Event.Title</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Date</div>
+                    <div class="info-value">@Model.Event.StartDate.ToString("MMMM dd, yyyy")</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Venue</div>
+                    <div class="info-value">@Model.Event.Venue.VenueName, @Model.Event.Venue.City</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tickets</div>
+                    <div class="info-value">@Model.Quantity</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Booking Date</div>
+                    <div class="info-value">
+                        @(Model.BookingDate.HasValue
+                            ? Model.BookingDate.Value.ToString("MMMM dd, yyyy hh:mm tt")
+                            : "N/A")
                     </div>
                 </div>
-
-                <!-- Promotion & Final Amount -->
-                <hr />
-                <div class="row">
-                    @if (Model.PromotionID != null && Model.Promotion != null)
-                    {
-                        <div class="col-md-4">
-                            <p><strong>Promotion Applied:</strong> @Model.Promotion.Code</p>
-                            <p><strong>Discount:</strong> LKR @(Model.DiscountApplied?.ToString("N2") ?? "0.00")</p>
-                        </div>
-                    }
-                    <div class="col-md-4">
-                        <p><strong>Final Amount Paid:</strong> LKR @Model.FinalAmount.ToString("N2")</p>
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-value">
+                        <span class="badge-custom bg-success">Confirmed</span>
                     </div>
                 </div>
             </div>
+
+            <!-- Amount Summary -->
+            <div class="amount-highlight">
+                <div class="amount-label">Final Amount Paid</div>
+                <div class="amount-value">LKR @Model.FinalAmount.ToString("N2")</div>
+            </div>
+
+            @if (Model.PromotionID != null && Model.Promotion != null)
+            {
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="info-item text-center">
+                            <div class="info-label text-success">
+                                <i class="bi bi-tag-fill me-2"></i>Promotion Applied
+                            </div>
+                            <div class="info-value">@Model.Promotion.Code</div>
+                            <div class="info-label text-success mt-2">Discount</div>
+                            <div class="info-value">LKR @(Model.DiscountApplied?.ToString("N2") ?? "0.00")</div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
 
         <!-- Payment Info -->
-        <div class="card border-0 shadow-sm rounded-3 mb-5">
-            <div class="card-body">
-                <h4 class="fw-bold mb-3 text-primary"><i class="bi bi-credit-card-2-front"></i> Payment Details</h4>
-                <div class="row">
-                    @if (Model.Payment != null)
-                    {
-                        <div class="col-md-6">
-                            <p><strong>Invoice Number:</strong> @Model.Payment.InvoiceNumber</p>
-                            <p><strong>Reference No:</strong> @Model.Payment.ReferenceNo</p>
-                            <p><strong>Payment Method:</strong> @Model.Payment.PaymentGateway</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p>
-                                <strong>Payment Date:</strong>
-                                @(Model.Payment.PaymentDate.HasValue
-                                    ? Model.Payment.PaymentDate.Value.ToString("MMMM dd, yyyy hh:mm tt")
-                                    : "N/A")
-                            </p>
-                            <p><strong>Amount Paid:</strong> LKR @(Model.Payment.Amount?.ToString("N2") ?? "0.00")</p>
-                            <p><strong>Status:</strong> <span class="badge bg-success">@Model.Payment.Status</span></p>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="col-12 text-center text-muted">
-                            <p>No payment record found.</p>
-                        </div>
-                    }
-                </div>
+        <div class="summary-card">
+            <div class="card-header-custom">
+                <h4 class="fw-bold mb-0 text-primary">
+                    <i class="bi bi-credit-card-2-front me-2"></i>Payment Details
+                </h4>
             </div>
+
+            @if (Model.Payment != null)
+            {
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Invoice Number</div>
+                        <div class="info-value">@Model.Payment.InvoiceNumber</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Reference No</div>
+                        <div class="info-value">@Model.Payment.ReferenceNo</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Payment Method</div>
+                        <div class="info-value">@Model.Payment.PaymentGateway</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Payment Date</div>
+                        <div class="info-value">
+                            @(Model.Payment.PaymentDate.HasValue
+                                ? Model.Payment.PaymentDate.Value.ToString("MMMM dd, yyyy hh:mm tt")
+                                : "N/A")
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Amount Paid</div>
+                        <div class="info-value">LKR @(Model.Payment.Amount?.ToString("N2") ?? "0.00")</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <div class="info-value">
+                            <span class="badge-custom bg-success">@Model.Payment.Status</span>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="bi bi-credit-card display-4 text-muted mb-3"></i>
+                    <p class="text-muted">No payment record found.</p>
+                </div>
+            }
         </div>
 
         <!-- Loyalty Info -->
-        <div class="card border-0 shadow-sm rounded-3 mb-5">
-            @if (Model.User != null && Model.User.LoyaltyPoints.HasValue)
-             {
-                <div class="card-body">
-                    <h4 class="fw-bold mb-3 text-warning"><i class="bi bi-stars"></i> Loyalty Points Summary</h4>
-                    <p><strong>Current Loyalty Points:</strong> @Model.User.LoyaltyPoints</p>
-                    <p class="text-muted mb-0">
-                        You earned points for this booking! Use them for future discounts 🎁
-                    </p>
-                </div>
+        <div class="loyalty-card">
+            @if (Model.User != null && Model.User.LoyaltyPoints.HasValue) 
+             { 
+                <i class="bi bi-stars display-4 mb-3"></i>
+                <h4 class="fw-bold mb-3">Loyalty Points Earned!</h4>
+                <div class="loyalty-points pulse">+@Model.User.LoyaltyPoints</div>
+                <p class="mb-3 opacity-75">You earned points for this booking! Use them for future discounts 🎁</p>
+                <a href="@Url.Action("Loyalty", "Account")" class="btn btn-dark btn-custom">
+                    <i class="bi bi-gift me-2"></i>View Rewards
+                </a>
              }
         </div>
 
+        <!-- Share Section -->
+        <div class="share-section">
+            <h5 class="fw-bold mb-3"><i class="bi bi-share me-2"></i>Share Your Experience</h5>
+            <div class="text-center">
+                <a href="#" class="share-btn share-facebook">
+                    <i class="bi bi-facebook"></i>
+                </a>
+                <a href="#" class="share-btn share-twitter">
+                    <i class="bi bi-twitter"></i>
+                </a>
+                <a href="#" class="share-btn share-whatsapp">
+                    <i class="bi bi-whatsapp"></i>
+                </a>
+                <a href="#" class="share-btn share-instagram">
+                    <i class="bi bi-instagram"></i>
+                </a>
+            </div>
+        </div>
 
         <!-- Ticket Section -->
-        <div class="card border-0 shadow-sm rounded-3 mb-5">
-            <div class="card-body">
-                <h4 class="fw-bold mb-4 text-center text-danger"><i class="bi bi-ticket-detailed"></i> Your Tickets</h4>
-                <div class="row justify-content-center">
-                    @if (Model.Tickets != null && Model.Tickets.Any())
+        <div class="summary-card">
+            <div class="card-header-custom">
+                <h4 class="fw-bold mb-0 text-danger text-center">
+                    <i class="bi bi-ticket-detailed me-2"></i>Your Tickets
+                </h4>
+            </div>
+
+            <div class="row justify-content-center">
+                @if (Model.Tickets != null && Model.Tickets.Any())
+                {
+                    foreach (var ticket in Model.Tickets)
                     {
-                        foreach (var ticket in Model.Tickets)
-                        {
-                            <div class="col-md-4 mb-4">
-                                <div class="card text-center border-0 shadow-sm h-100">
-                                    <div class="card-body">
-                                        @if (!string.IsNullOrEmpty(ticket.QRCodeImage))
-                                        {
-                                            <img src="@ticket.QRCodeImage" alt="QR Code"
-                                                 class="img-fluid mb-3" style="width: 160px; height: 160px;">
-                                        }
-                                        else
-                                        {
-                                            <div class="text-muted py-4">QR Code Missing</div>
-                                        }
-                                        <h6 class="fw-bold">@ticket.TicketNumber</h6>
-                                        <p class="text-muted mb-0">
-                                            Issued: @(ticket.IssueDate.HasValue
-                                                ? ticket.IssueDate.Value.ToString("MMMM dd, yyyy")
-                                                : "N/A")
-                                        </p>
-                                    </div>
+                        <div class="col-xl-4 col-lg-6 mb-4">
+                            <div class="ticket-card">
+                                <div class="ticket-qr">
+                                    @if (!string.IsNullOrEmpty(ticket.QRCodeImage))
+                                    {
+                                        <img src="@ticket.QRCodeImage" alt="QR Code"
+                                             class="img-fluid" style="width: 160px; height: 160px;">
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted py-4">
+                                            <i class="bi bi-qr-code display-4"></i>
+                                            <p class="mt-2">QR Code Missing</p>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="ticket-info text-center">
+                                    <div class="ticket-number mb-2">@ticket.TicketNumber</div>
+                                    <p class="text-muted small mb-0">
+                                        Issued: @(ticket.IssueDate.HasValue
+                                            ? ticket.IssueDate.Value.ToString("MMMM dd, yyyy")
+                                            : "N/A")
+                                    </p>
                                 </div>
                             </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="col-12 text-center py-5">
-                            <i class="bi bi-ticket-detailed display-3 text-muted"></i>
-                            <h5 class="text-muted mt-3">No tickets found for this booking.</h5>
                         </div>
                     }
-                </div>
+                }
+                else
+                {
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-ticket-detailed display-1 text-muted"></i>
+                        <h5 class="text-muted mt-3">No tickets found for this booking.</h5>
+                    </div>
+                }
             </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="text-center mt-5">
-            <a href="@Url.Action("MyBookings", "Booking")" class="btn btn-outline-primary me-2">
-                <i class="bi bi-list"></i> My Bookings
-            </a>
-            <a href="@Url.Action("Index", "Event")" class="btn btn-primary me-2">
-                <i class="bi bi-calendar-event"></i> Browse More Events
-            </a>
-            <a href="@Url.Action("DownloadInvoice", "Booking", new { bookingId = Model.BookingID })"
-               class="btn btn-success">
-                <i class="bi bi-file-earmark-pdf"></i> Download Invoice (PDF)
-            </a>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="@Url.Action("MyBookings", "Booking")" class="btn btn-outline-custom btn-custom">
+                    <i class="bi bi-list me-2"></i>My Bookings
+                </a>
+                <a href="@Url.Action("Index", "Event")" class="btn btn-primary-custom btn-custom">
+                    <i class="bi bi-calendar-event me-2"></i>Browse More Events
+                </a>
+                <a href="@Url.Action("DownloadInvoice", "Booking", new { bookingId = Model.BookingID })"
+                   class="btn btn-success-custom btn-custom">
+                    <i class="bi bi-file-earmark-pdf me-2"></i>Download Invoice
+                </a>
+            </div>
         </div>
     }
 </section>
+
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show success celebration
+        setTimeout(() => {
+            Swal.fire({
+                title: 'Booking Successful! 🎉',
+                html: `
+                    <div class="text-center">
+                        <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i>
+                        <p class="mb-2">Your tickets have been confirmed</p>
+                        <p class="text-muted small">Check your email for the booking confirmation</p>
+                    </div>
+                `,
+                confirmButtonText: 'View Tickets',
+                confirmButtonColor: '#667eea',
+                background: '#fff',
+                color: '#333',
+                timer: 5000,
+                timerProgressBar: true
+            });
+        }, 1000);
+
+        // Add hover effects to cards
+        const cards = document.querySelectorAll('.summary-card, .ticket-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Share functionality
+        const shareButtons = document.querySelectorAll('.share-btn');
+        shareButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const eventTitle = '@Model.Event.Title';
+                const bookingId = '@Model.BookingID';
+
+                let shareUrl = '';
+                const platform = this.classList[1].replace('share-', '');
+                const shareText = `I just booked tickets for ${eventTitle} (Booking: ${bookingId})! 🎟️`;
+
+                switch(platform) {
+                    case 'facebook':
+                        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+                        break;
+                    case 'twitter':
+                        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+                        break;
+                    case 'whatsapp':
+                        shareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+                        break;
+                    case 'instagram':
+                        // Instagram doesn't support direct sharing, open app
+                        shareUrl = `instagram://`;
+                        break;
+                }
+
+                if (platform !== 'instagram') {
+                    window.open(shareUrl, '_blank', 'width=600,height=400');
+                } else {
+                    Swal.fire({
+                        title: 'Share on Instagram',
+                        text: 'Open Instagram app to share your booking experience!',
+                        icon: 'info',
+                        confirmButtonColor: '#667eea'
+                    });
+                }
+            });
+        });
+
+        // Button click animations
+        const buttons = document.querySelectorAll('.btn-custom');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+
+        // Auto-stop confetti after 5 seconds
+        setTimeout(() => {
+            const confettiPieces = document.querySelectorAll('.confetti-piece');
+            confettiPieces.forEach(piece => {
+                piece.style.animation = 'none';
+            });
+        }, 5000);
+    });
+</script>

@@ -4,7 +4,7 @@
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,13 +12,468 @@
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Content/Site.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Add Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --organizer-gradient: linear-gradient(135deg, #198754 0%, #20c997 100%);
+            --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        }
+
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        /* Enhanced Navbar Styles */
+        .navbar {
+            background: var(--organizer-gradient) !important;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 0;
+            transition: all 0.3s ease;
+        }
+
+            .navbar.scrolled {
+                padding: 0.5rem 0;
+                backdrop-filter: blur(10px);
+                background: rgba(25, 135, 84, 0.95) !important;
+            }
+
+        .navbar-brand {
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, #fff, #e3f2fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+            .navbar-brand:hover {
+                transform: scale(1.05);
+            }
+
+            .navbar-brand::after {
+                content: '📊';
+                margin-left: 5px;
+                font-size: 1.2rem;
+            }
+
+        .nav-link {
+            font-weight: 500;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 8px 16px !important;
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+            .nav-link:not(.active):hover {
+                background: rgba(255, 255, 255, 0.15);
+                transform: translateY(-2px);
+                color: white !important;
+            }
+
+            .nav-link.active {
+                background: rgba(255, 255, 255, 0.2);
+                font-weight: 600;
+                color: white !important;
+                box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+            }
+
+                .nav-link.active::before {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 30px;
+                    height: 3px;
+                    background: rgba(255, 255, 255, 0.8);
+                    border-radius: 2px;
+                }
+
+        /* Enhanced Dropdown Styles */
+        .dropdown-menu {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            margin-top: 10px;
+            animation: dropdownFadeIn 0.3s ease;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        @@keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #495057;
+        }
+
+            .dropdown-item:hover {
+                background: var(--organizer-gradient);
+                color: white !important;
+                transform: translateX(5px);
+            }
+
+            .dropdown-item i {
+                width: 20px;
+                text-align: center;
+            }
+
+        .dropdown-divider {
+            margin: 8px 0;
+        }
+
+        /* User badge in navbar */
+        .user-badge {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 5px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            color: white !important;
+        }
+
+            .user-badge:hover {
+                background: rgba(255, 255, 255, 0.25);
+                transform: translateY(-2px);
+            }
+
+        /* Enhanced Footer */
+        footer {
+            background: var(--dark-gradient);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: auto;
+            position: relative;
+        }
+
+            footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #198754, #20c997, #4facfe);
+            }
+
+        .footer-content {
+            padding: 30px 0;
+        }
+
+        .footer-developers {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+            .footer-developers strong {
+                color: #4facfe;
+            }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--organizer-gradient);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(25, 135, 84, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+            .back-to-top.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .back-to-top:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 25px rgba(25, 135, 84, 0.6);
+            }
+
+        /* Loading animation */
+        .loading-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: var(--organizer-gradient);
+            z-index: 9999;
+            transition: width 0.3s ease;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--organizer-gradient);
+            border-radius: 10px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #198754;
+            }
+
+        /* Notification badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--success-gradient);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Login button styles */
+        .btn-login {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 20px;
+            padding: 6px 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+            .btn-login:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                color: white;
+            }
+
+        /* Quick Stats in Navbar */
+        .nav-stats {
+            display: flex;
+            gap: 15px;
+            margin-right: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Mobile optimizations */
+        @@media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+
+            .nav-link {
+                padding: 10px 15px !important;
+                margin: 2px 0;
+            }
+
+            .dropdown-menu {
+                margin-top: 5px;
+                border-radius: 8px;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .user-badge {
+                padding: 8px 12px;
+            }
+
+            .nav-stats {
+                display: none;
+            }
+        }
+
+        /* Main content animation */
+        .main-content {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Floating elements for visual interest */
+        .floating-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(25, 135, 84, 0.05);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+            .floating-element:nth-child(1) {
+                width: 100px;
+                height: 100px;
+                top: 10%;
+                left: 5%;
+                animation-delay: 0s;
+            }
+
+            .floating-element:nth-child(2) {
+                width: 70px;
+                height: 70px;
+                top: 70%;
+                left: 85%;
+                animation-delay: 2s;
+            }
+
+            .floating-element:nth-child(3) {
+                width: 50px;
+                height: 50px;
+                top: 40%;
+                left: 90%;
+                animation-delay: 4s;
+            }
+
+        @@keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+
+        /* Create Event Button */
+        .btn-create-event {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 20px;
+            padding: 6px 15px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+            .btn-create-event:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                color: white;
+            }
+    </style>
 </head>
 <body>
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <!-- Loading Bar -->
+    <div class="loading-bar" id="loadingBar"></div>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNavbar">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="@Url.Action("Dashboard", "Organizer")">
-                <i class="bi bi-lightning-charge"></i> EventSphere
+            <a class="navbar-brand animate__animated animate__fadeIn" href="@Url.Action("Dashboard", "Organizer")">
+                <i class="bi bi-lightning-charge me-2"></i>EventSphere
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#organizerNavbar" aria-controls="organizerNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,40 +484,59 @@
                 <!-- Left: Main Links -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("ManageEvents", "Organizer")">
-                            <i class="bi bi-calendar-event"></i> My Events
+                        <a class="nav-link @(ViewBag.Title == "Dashboard" ? "active" : "")" href="@Url.Action("Dashboard", "Organizer")">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("ManageBookings", "Organizer")">
-                            <i class="bi bi-ticket-detailed"></i> Bookings
+                        <a class="nav-link @(ViewBag.Title == "My Events" ? "active" : "")" href="@Url.Action("ManageEvents", "Organizer")">
+                            <i class="bi bi-calendar-event me-1"></i>My Events
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Reports", "Organizer")">
-                            <i class="bi bi-bar-chart-line"></i> Reports
+                        <a class="nav-link @(ViewBag.Title == "Bookings" ? "active" : "")" href="@Url.Action("ManageBookings", "Organizer")">
+                            <i class="bi bi-ticket-detailed me-1"></i>Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.Title == "Reports" ? "active" : "")" href="@Url.Action("Reports", "Organizer")">
+                            <i class="bi bi-bar-chart-line me-1"></i>Reports
                         </a>
                     </li>
                 </ul>
+
 
                 <!-- Right: User Dropdown -->
                 <ul class="navbar-nav">
                     @if (user != null)
                     {
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="organizerAccountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle me-1"></i> @user
+                            <a class="nav-link dropdown-toggle user-badge d-flex align-items-center" href="#" id="organizerAccountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-2"></i>
+                                <span class="d-none d-md-inline">@user</span>
+                                <span class="notification-badge">3</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="organizerAccountDropdown">
                                 <li>
                                     <a class="dropdown-item" href="@Url.Action("MyProfile", "Account")">
-                                        <i class="bi bi-person-lines-fill me-2"></i> My Profile
+                                        <i class="bi bi-person-lines-fill me-2"></i>My Profile
+                                        <span class="badge bg-primary ms-2">New</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="@Url.Action("Settings", "Organizer")">
+                                        <i class="bi bi-gear me-2"></i>Settings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="@Url.Action("Help", "Organizer")">
+                                        <i class="bi bi-question-circle me-2"></i>Help & Support
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li>
                                     <a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")">
-                                        <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
                                     </a>
                                 </li>
                             </ul>
@@ -71,8 +545,8 @@
                     else
                     {
                         <li class="nav-item">
-                            <a class="btn btn-light btn-sm" href="@Url.Action("Login", "Account")">
-                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            <a class="btn btn-login" href="@Url.Action("Login", "Account")">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>Login
                             </a>
                         </li>
                     }
@@ -82,22 +556,167 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="container mt-4 mb-5">
+    <main class="container mt-5 mb-5 main-content" style="padding-top: 80px;">
         @RenderBody()
     </main>
 
     <!-- Footer -->
-    <footer class="bg-light text-center py-3 border-top">
+    <footer>
         <div class="container">
-            <p class="mb-0 text-muted">
-                &copy; @DateTime.Now.Year - <strong>EventSphere</strong> | Developed by <strong>Supun Akalanka</strong>
-            </p>
+            <div class="footer-content text-center">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <h5 class="mb-3">EventSphere Organizer Platform</h5>
+                        <p class="mb-4 opacity-75">Powerful tools for event organizers to create, manage, and grow successful events</p>
+
+                        <div class="social-links mb-4">
+                            <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-5"></i></a>
+                            <a href="#" class="text-white me-3"><i class="bi bi-twitter fs-5"></i></a>
+                            <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-5"></i></a>
+                            <a href="#" class="text-white me-3"><i class="bi bi-linkedin fs-5"></i></a>
+                            <a href="#" class="text-white"><i class="bi bi-youtube fs-5"></i></a>
+                        </div>
+
+                        <div class="footer-developers">
+                            &copy; @DateTime.Now.Year - <strong>EventSphere</strong> | <strong>All rights Reserved.</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="bi bi-chevron-up"></i>
+    </a>
 
     <!-- Scripts -->
     <script src="~/Scripts/jquery-3.7.1.min.js"></script>
     <script src="~/Scripts/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('mainNavbar');
+            const backToTop = document.getElementById('backToTop');
+
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+                backToTop.classList.add('show');
+            } else {
+                navbar.classList.remove('scrolled');
+                backToTop.classList.remove('show');
+            }
+        });
+
+        // Back to top functionality
+        document.getElementById('backToTop').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Loading bar simulation
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingBar = document.getElementById('loadingBar');
+            let width = 0;
+
+            const loadingInterval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(loadingInterval);
+                    loadingBar.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingBar.style.display = 'none';
+                    }, 300);
+                } else {
+                    width += 10;
+                    loadingBar.style.width = width + '%';
+                }
+            }, 50);
+        });
+
+        // Dropdown animation
+        document.querySelectorAll('.dropdown').forEach(dropdown => {
+            dropdown.addEventListener('show.bs.dropdown', function() {
+                const menu = this.querySelector('.dropdown-menu');
+                menu.style.opacity = '0';
+                menu.style.transform = 'translateY(-10px)';
+
+                setTimeout(() => {
+                    menu.style.opacity = '1';
+                    menu.style.transform = 'translateY(0)';
+                    menu.style.transition = 'all 0.3s ease';
+                }, 10);
+            });
+        });
+
+        // Active link highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = '@ViewBag.Title';
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                if (link.textContent.trim().toLowerCase().includes(currentPage.toLowerCase())) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Add hover effects to buttons
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Page transition animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainContent = document.querySelector('.main-content');
+            mainContent.style.opacity = '0';
+            mainContent.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                mainContent.style.opacity = '1';
+                mainContent.style.transform = 'translateY(0)';
+                mainContent.style.transition = 'all 0.6s ease';
+            }, 100);
+        });
+
+        // Quick stats update simulation
+        function updateQuickStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const currentValue = parseInt(stat.textContent.replace(/[^0-9]/g, ''));
+                const newValue = currentValue + Math.floor(Math.random() * 5);
+                stat.textContent = stat.textContent.replace(currentValue, newValue);
+            });
+        }
+
+        // Update stats every 30 seconds (simulation)
+        setInterval(updateQuickStats, 30000);
+    </script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>

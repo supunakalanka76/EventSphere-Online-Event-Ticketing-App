@@ -15,40 +15,335 @@
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Content/Site.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Add Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        }
+
         body {
             background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        footer {
-            background-color: #212529;
-            color: white;
-            padding: 20px 0;
-            margin-top: 40px;
+        main {
+            flex: 1;
         }
+
+        /* Enhanced Navbar Styles */
+        .navbar {
+            background: var(--dark-gradient) !important;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 0;
+            transition: all 0.3s ease;
+        }
+
+            .navbar.scrolled {
+                padding: 0.5rem 0;
+                backdrop-filter: blur(10px);
+                background: rgba(44, 62, 80, 0.95) !important;
+            }
 
         .navbar-brand {
-            font-weight: bold;
-            letter-spacing: 1px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, #fff, #e3f2fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
         }
 
-        .nav-link.active {
-            font-weight: 600;
-            color: #0d6efd !important;
+            .navbar-brand::after {
+                content: '🎉';
+                margin-left: 5px;
+                font-size: 1.2rem;
+            }
+
+        .nav-link {
+            font-weight: 500;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 8px 16px !important;
         }
 
-        .dropdown-menu a:hover {
-            background-color: #f1f1f1;
+            .nav-link:not(.active):hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateY(-2px);
+            }
+
+            .nav-link.active {
+                background: rgba(255, 255, 255, 0.15);
+                font-weight: 600;
+                color: #fff !important;
+                box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+            }
+
+                .nav-link.active::before {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 30px;
+                    height: 3px;
+                    background: linear-gradient(45deg, #4facfe, #00f2fe);
+                    border-radius: 2px;
+                }
+
+        /* Enhanced Dropdown Styles */
+        .dropdown-menu {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            margin-top: 10px;
+            animation: dropdownFadeIn 0.3s ease;
+        }
+
+        @@keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+            .dropdown-item:hover {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white !important;
+                transform: translateX(5px);
+            }
+
+            .dropdown-item i {
+                width: 20px;
+                text-align: center;
+            }
+
+        .dropdown-divider {
+            margin: 8px 0;
+        }
+
+        /* User badge in navbar */
+        .user-badge {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 5px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+            .user-badge:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: translateY(-2px);
+            }
+
+        /* Enhanced Footer */
+        footer {
+            background: var(--dark-gradient);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+            position: relative;
+        }
+
+            footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            }
+
+        .footer-content {
+            padding: 30px 0;
+        }
+
+        .footer-developers {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+            .footer-developers strong {
+                color: #4facfe;
+            }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+            .back-to-top.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .back-to-top:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+            }
+
+        /* Loading animation */
+        .loading-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: var(--primary-gradient);
+            z-index: 9999;
+            transition: width 0.3s ease;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 10px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--secondary-gradient);
+            }
+
+        /* Role-specific badges */
+        .role-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+
+        .role-admin {
+            background: linear-gradient(45deg, #dc3545, #e74c3c);
+            color: white;
+        }
+
+        .role-organizer {
+            background: linear-gradient(45deg, #198754, #27ae60);
+            color: white;
+        }
+
+        .role-customer {
+            background: linear-gradient(45deg, #6c757d, #95a5a6);
+            color: white;
+        }
+
+        /* Notification badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--secondary-gradient);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Mobile optimizations */
+        @@media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+
+            .nav-link {
+                padding: 10px 15px !important;
+                margin: 2px 0;
+            }
+
+            .dropdown-menu {
+                margin-top: 5px;
+                border-radius: 8px;
+            }
+
+            .back-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- Loading Bar -->
+    <div class="loading-bar" id="loadingBar"></div>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNavbar">
         <div class="container">
-            <a class="navbar-brand" href="@Url.Action("Index", "Home")">EventSphere</a>
+            <a class="navbar-brand animate__animated animate__fadeIn" href="@Url.Action("Index", "Home")">
+                EventSphere
+            </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -57,13 +352,24 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link @(ViewBag.Title == "Home" ? "active" : "")" href="@Url.Action("Index", "Home")">Home</a>
+                        <a class="nav-link @(ViewBag.Title == "Home" ? "active" : "")" href="@Url.Action("Index", "Home")">
+                            <i class="bi bi-house me-1"></i>Home
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(ViewBag.Title == "About" ? "active" : "")" href="@Url.Action("About", "Home")">About</a>
+                        <a class="nav-link @(ViewBag.Title == "Events" ? "active" : "")" href="@Url.Action("Index", "Event")">
+                            <i class="bi bi-calendar-event me-1"></i>Events
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @(ViewBag.Title == "Contact" ? "active" : "")" href="@Url.Action("Contact", "Home")">Contact</a>
+                        <a class="nav-link @(ViewBag.Title == "About" ? "active" : "")" href="@Url.Action("About", "Home")">
+                            <i class="bi bi-info-circle me-1"></i>About
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewBag.Title == "Contact" ? "active" : "")" href="@Url.Action("Contact", "Home")">
+                            <i class="bi bi-telephone me-1"></i>Contact
+                        </a>
                     </li>
                 </ul>
 
@@ -71,37 +377,84 @@
                     @if (!isLoggedIn)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Login", "Account")">Login</a>
+                            <a class="nav-link btn btn-outline-light btn-sm me-2" href="@Url.Action("Login", "Account")">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Register", "Account")">Register</a>
+                            <a class="nav-link btn btn-primary btn-sm" href="@Url.Action("Register", "Account")">
+                                <i class="bi bi-person-plus me-1"></i>Register
+                            </a>
                         </li>
                     }
                     else
                     {
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle"></i> @userName (@userRole)
+                            <a class="nav-link dropdown-toggle user-badge" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                <span class="d-none d-md-inline">@userName</span>
+                                <span class="role-badge @("role-" + userRole.ToLower())">@userRole</span>
+                                <span class="notification-badge">3</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="@Url.Action("MyProfile", "Account")"><i class="bi bi-person-lines-fill me-2"></i>My Profile</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="@Url.Action("MyProfile", "Account")">
+                                        <i class="bi bi-person-lines-fill me-2"></i>My Profile
+                                        <span class="badge bg-primary ms-2">New</span>
+                                    </a>
+                                </li>
 
                                 @if (userRole.ToLower() == "admin")
                                 {
-                                    <li><a class="dropdown-item" href="@Url.Action("Dashboard", "Admin")"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Dashboard", "Admin")">
+                                            <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("UserManagement", "Admin")">
+                                            <i class="bi bi-people me-2"></i>Manage Users
+                                        </a>
+                                    </li>
                                 }
                                 else if (userRole.ToLower() == "organizer")
                                 {
-                                    <li><a class="dropdown-item" href="@Url.Action("Dashboard", "Organizer")"><i class="bi bi-speedometer2 me-2"></i>Organizer Dashboard</a></li>
-                                    <li><a class="dropdown-item" href="@Url.Action("MyEvents", "Organizer")"><i class="bi bi-calendar-event me-2"></i>My Events</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Dashboard", "Organizer")">
+                                            <i class="bi bi-speedometer2 me-2"></i>Organizer Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("MyEvents", "Organizer")">
+                                            <i class="bi bi-calendar-event me-2"></i>My Events
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Create", "Event")">
+                                            <i class="bi bi-plus-circle me-2"></i>Create Event
+                                        </a>
+                                    </li>
                                 }
                                 else if (userRole.ToLower() == "customer")
                                 {
-                                    <li><a class="dropdown-item" href="@Url.Action("MyBookings", "Customer")"><i class="bi bi-ticket-perforated me-2"></i>My Bookings</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("MyBookings", "Customer")">
+                                            <i class="bi bi-ticket-perforated me-2"></i>My Bookings
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="@Url.Action("Wishlist", "Customer")">
+                                            <i class="bi bi-heart me-2"></i>Wishlist
+                                        </a>
+                                    </li>
                                 }
 
                                 <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     }
@@ -111,20 +464,140 @@
     </nav>
 
     <!-- Main Page Content -->
-    <main class="container py-4">
+    <main class="container py-4" style="margin-top: 80px;">
         @RenderBody()
     </main>
 
     <!-- Footer -->
-    <footer class="text-center">
+    <footer>
         <div class="container">
-            <p class="mb-0">&copy; @DateTime.Now.Year - EventSphere | Developed by Supun Akalanka</p>
+            <div class="footer-content text-center">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <h5 class="mb-3">EventSphere - Your Ultimate Event Management Platform</h5>
+                        <p class="mb-4 opacity-75">Connecting people through unforgettable experiences across Sri Lanka</p>
+
+                        <div class="social-links mb-4">
+                            <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-5"></i></a>
+                            <a href="#" class="text-white me-3"><i class="bi bi-twitter fs-5"></i></a>
+                            <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-5"></i></a>
+                            <a href="#" class="text-white me-3"><i class="bi bi-linkedin fs-5"></i></a>
+                            <a href="#" class="text-white"><i class="bi bi-youtube fs-5"></i></a>
+                        </div>
+
+                        <div class="footer-developers">
+                            &copy; @DateTime.Now.Year - <strong>EventSphere</strong> | <strong>All rights Reserved.</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="bi bi-chevron-up"></i>
+    </a>
 
     <!-- Scripts -->
     <script src="~/Scripts/jquery-3.7.1.min.js"></script>
     <script src="~/Scripts/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('mainNavbar');
+            const backToTop = document.getElementById('backToTop');
+
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+                backToTop.classList.add('show');
+            } else {
+                navbar.classList.remove('scrolled');
+                backToTop.classList.remove('show');
+            }
+        });
+
+        // Back to top functionality
+        document.getElementById('backToTop').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Loading bar simulation
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingBar = document.getElementById('loadingBar');
+            let width = 0;
+
+            const loadingInterval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(loadingInterval);
+                    loadingBar.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingBar.style.display = 'none';
+                    }, 300);
+                } else {
+                    width += 10;
+                    loadingBar.style.width = width + '%';
+                }
+            }, 50);
+        });
+
+        // Dropdown animation
+        document.querySelectorAll('.dropdown').forEach(dropdown => {
+            dropdown.addEventListener('show.bs.dropdown', function() {
+                const menu = this.querySelector('.dropdown-menu');
+                menu.style.opacity = '0';
+                menu.style.transform = 'translateY(-10px)';
+
+                setTimeout(() => {
+                    menu.style.opacity = '1';
+                    menu.style.transform = 'translateY(0)';
+                    menu.style.transition = 'all 0.3s ease';
+                }, 10);
+            });
+        });
+
+        // Active link highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = '@ViewBag.Title';
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                if (link.textContent.trim().toLowerCase().includes(currentPage.toLowerCase())) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Add hover effects to buttons
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 
     @RenderSection("Scripts", required: false)
 </body>

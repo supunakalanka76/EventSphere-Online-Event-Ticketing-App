@@ -3,56 +3,380 @@
     Layout = ViewBag.LayoutPath;
 }
 
+<!-- Add Animate.css for animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+<style>
+    /* Custom Styles */
+    .hero-section {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+    }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="1000,100 1000,0 0,100"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .section-title {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 2rem;
+    }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(135deg, #0d6efd, #6610f2);
+            border-radius: 2px;
+        }
+
+    .value-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+    .team-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .team-card img {
+            transition: all 0.3s ease;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .team-card:hover img {
+            transform: scale(1.05);
+        }
+
+    .mission-vision-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        height: 100%;
+    }
+
+        .mission-vision-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+
+        100% {
+            transform: translateY(0px);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .gradient-bg {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .story-image {
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .story-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+    .icon-wrapper {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 1.5rem;
+        background: rgba(13, 110, 253, 0.1);
+    }
+
+    .timeline {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background: linear-gradient(to bottom, #0d6efd, #6610f2);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+            border-radius: 10px;
+        }
+
+    .timeline-item {
+        padding: 10px 40px;
+        position: relative;
+        width: 50%;
+        box-sizing: border-box;
+    }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            right: -13px;
+            background: linear-gradient(135deg, #0d6efd, #6610f2);
+            border: 4px solid #fff;
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+    .left {
+        left: 0;
+    }
+
+    .right {
+        left: 50%;
+    }
+
+    .left::before {
+        content: " ";
+        height: 0;
+        position: absolute;
+        top: 22px;
+        width: 0;
+        z-index: 1;
+        right: 30px;
+        border: medium solid white;
+        border-width: 10px 0 10px 10px;
+        border-color: transparent transparent transparent white;
+    }
+
+    .right::before {
+        content: " ";
+        height: 0;
+        position: absolute;
+        top: 22px;
+        width: 0;
+        z-index: 1;
+        left: 30px;
+        border: medium solid white;
+        border-width: 10px 10px 10px 0;
+        border-color: transparent white transparent transparent;
+    }
+
+    .right::after {
+        left: -12px;
+    }
+
+    .timeline-content {
+        padding: 20px 30px;
+        background-color: white;
+        position: relative;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    @@media screen and (max-width: 768px) {
+        .timeline::after {
+            left: 31px;
+        }
+
+        .timeline-item {
+            width: 100%;
+            padding-left: 70px;
+            padding-right: 25px;
+        }
+
+            .timeline-item::before {
+                left: 60px;
+                border: medium solid white;
+                border-width: 10px 10px 10px 0;
+                border-color: transparent white transparent transparent;
+            }
+
+        .left::after, .right::after {
+            left: 18px;
+        }
+
+        .right {
+            left: 0%;
+        }
+    }
+</style>
+
 <!-- Hero Section -->
-<section class="bg-primary text-white text-center py-5">
-    <div class="container">
-        <h1 class="fw-bold mb-3">About EventSphere</h1>
-        <p class="lead mb-0">Connecting people through unforgettable experiences across Sri Lanka 🇱🇰</p>
+<section class="hero-section text-white text-center py-5">
+    <div class="container py-5 hero-content">
+        <div class="animate__animated animate__fadeIn">
+            <h1 class="fw-bold mb-3 display-4">About EventSphere</h1>
+            <p class="lead mb-4 fs-4">Connecting people through unforgettable experiences across Sri Lanka 🇱🇰</p>
+            <div class="mt-4">
+                <span class="badge bg-light text-primary fs-6 me-2 p-2">🎉 Events</span>
+                <span class="badge bg-light text-primary fs-6 me-2 p-2">🎫 Tickets</span>
+                <span class="badge bg-light text-primary fs-6 me-2 p-2">📱 Mobile</span>
+                <span class="badge bg-light text-primary fs-6 p-2">🔒 Secure</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="container my-5 py-4">
+    <div class="row text-center">
+        <div class="col-md-3 col-6 mb-4">
+            <div class="animate__animated animate__fadeInUp" data-wow-delay="0.1s">
+                <div class="stat-number">500+</div>
+                <p class="text-muted fw-semibold">Events Hosted</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-4">
+            <div class="animate__animated animate__fadeInUp" data-wow-delay="0.2s">
+                <div class="stat-number">10K+</div>
+                <p class="text-muted fw-semibold">Happy Attendees</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-4">
+            <div class="animate__animated animate__fadeInUp" data-wow-delay="0.3s">
+                <div class="stat-number">50+</div>
+                <p class="text-muted fw-semibold">Verified Organizers</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-4">
+            <div class="animate__animated animate__fadeInUp" data-wow-delay="0.4s">
+                <div class="stat-number">25+</div>
+                <p class="text-muted fw-semibold">Cities Covered</p>
+            </div>
+        </div>
     </div>
 </section>
 
 <!-- Our Story -->
-<section class="container my-5">
+<section class="container my-5 py-5">
     <div class="row align-items-center">
         <div class="col-md-6 mb-4 mb-md-0">
-            <img src="/Content/Images/about-team.jpg" alt="Our Story" class="img-fluid rounded shadow-sm" />
+            <div class="animate__animated animate__fadeInLeft">
+                <img src="~/Content/Images/about-team.jpg" alt="Our Story" class="img-fluid rounded shadow-sm story-image floating" />
+            </div>
         </div>
         <div class="col-md-6">
-            <h2 class="fw-bold mb-3">Our Story</h2>
-            <p class="text-muted">
-                EventSphere was founded with a simple mission — to make event discovery, booking, and management effortless.
-                From local concerts to large-scale conferences, we empower event organizers and participants through
-                technology and innovation.
-            </p>
-            <p class="text-muted">
-                Our platform provides an integrated solution for managing events, tickets, payments, and reports,
-                helping organizers focus on what truly matters — creating remarkable experiences.
-            </p>
+            <div class="animate__animated animate__fadeInRight">
+                <h2 class="fw-bold mb-3 section-title">Our Story</h2>
+                <p class="text-muted fs-5 mb-4">
+                    EventSphere was founded with a simple mission — to make event discovery, booking, and management effortless.
+                    From local concerts to large-scale conferences, we empower event organizers and participants through
+                    technology and innovation.
+                </p>
+                <p class="text-muted fs-5">
+                    Our platform provides an integrated solution for managing events, tickets, payments, and reports,
+                    helping organizers focus on what truly matters — creating remarkable experiences.
+                </p>
+                <div class="mt-4">
+                    <a href="@Url.Action("Index", "Event")" class="btn btn-primary btn-lg me-3">Explore Events</a>
+                    <a href="@Url.Action("Contact", "Home")" class="btn btn-outline-primary btn-lg">Contact Us</a>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- Mission & Vision -->
-<section class="bg-light py-5">
+<section class="gradient-bg py-5">
     <div class="container text-center">
-        <h2 class="fw-bold mb-4">Our Mission & Vision</h2>
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="p-4 bg-white shadow-sm rounded">
-                    <i class="bi bi-bullseye display-4 text-primary mb-3"></i>
-                    <h5 class="fw-semibold mb-2">Our Mission</h5>
-                    <p class="text-muted">
+        <h2 class="fw-bold mb-5 section-title">Our Mission & Vision</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-5 mb-4 me-md-4">
+                <div class="p-4 bg-white shadow-sm rounded mission-vision-card h-100">
+                    <div class="icon-wrapper mx-auto">
+                        <i class="bi bi-bullseye display-6 text-primary"></i>
+                    </div>
+                    <h4 class="fw-semibold mb-3">Our Mission</h4>
+                    <p class="text-muted fs-5">
                         To simplify event management by connecting organizers and audiences
                         through an intelligent, user-friendly, and secure platform.
                     </p>
                 </div>
             </div>
-            <div class="col-md-6 mb-4">
-                <div class="p-4 bg-white shadow-sm rounded">
-                    <i class="bi bi-eye display-4 text-success mb-3"></i>
-                    <h5 class="fw-semibold mb-2">Our Vision</h5>
-                    <p class="text-muted">
-                        To become Sri Lanka’s most trusted and innovative event management ecosystem,
+            <div class="col-md-5 mb-4">
+                <div class="p-4 bg-white shadow-sm rounded mission-vision-card h-100">
+                    <div class="icon-wrapper mx-auto">
+                        <i class="bi bi-eye display-6 text-success"></i>
+                    </div>
+                    <h4 class="fw-semibold mb-3">Our Vision</h4>
+                    <p class="text-muted fs-5">
+                        To become Sri Lanka's most trusted and innovative event management ecosystem,
                         enabling people to discover, book, and create experiences that inspire.
                     </p>
                 </div>
@@ -61,47 +385,145 @@
     </div>
 </section>
 
-<!-- Our Values -->
-<section class="container py-5">
+<!-- Our Journey -->
+<section class="container py-5 my-5">
     <div class="text-center mb-5">
-        <h2 class="fw-bold">Our Core Values</h2>
-        <p class="text-muted">We believe in innovation, reliability, and excellence in everything we do.</p>
+        <h2 class="fw-bold section-title">Our Journey</h2>
+        <p class="text-muted fs-5">From a simple idea to Sri Lanka's leading event platform</p>
     </div>
 
-    <div class="row text-center">
-        <div class="col-md-4 mb-4">
-            <i class="bi bi-lightning-charge-fill text-warning display-5 mb-3"></i>
-            <h5 class="fw-semibold">Innovation</h5>
-            <p class="text-muted">We constantly evolve our platform to make event experiences smarter and more efficient.</p>
+    <div class="timeline">
+        <div class="timeline-item left animate__animated animate__fadeInLeft">
+            <div class="timeline-content">
+                <h5 class="fw-bold text-primary">2020</h5>
+                <h6 class="fw-semibold">The Beginning</h6>
+                <p>EventSphere was founded with a vision to transform how events are organized and experienced in Sri Lanka.</p>
+            </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <i class="bi bi-heart-fill text-danger display-5 mb-3"></i>
-            <h5 class="fw-semibold">Passion</h5>
-            <p class="text-muted">Our team is driven by a shared love for technology, creativity, and people.</p>
+        <div class="timeline-item right animate__animated animate__fadeInRight">
+            <div class="timeline-content">
+                <h5 class="fw-bold text-primary">2021</h5>
+                <h6 class="fw-semibold">First Milestone</h6>
+                <p>Reached 100 events hosted on our platform and expanded to 5 major cities across Sri Lanka.</p>
+            </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <i class="bi bi-shield-lock-fill text-primary display-5 mb-3"></i>
-            <h5 class="fw-semibold">Trust</h5>
-            <p class="text-muted">We prioritize safety, security, and transparency in every user interaction.</p>
+        <div class="timeline-item left animate__animated animate__fadeInLeft">
+            <div class="timeline-content">
+                <h5 class="fw-bold text-primary">2022</h5>
+                <h6 class="fw-semibold">Mobile App Launch</h6>
+                <p>Launched our mobile application for iOS and Android, making event discovery even more accessible.</p>
+            </div>
         </div>
-    </div>
-</section>
-
-<!-- Team Section -->
-<section class="bg-light py-5">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-4">Meet the Team</h2>
-        <div class="row justify-content-center">
-            <div class="col-md-3 mb-4">
-                <div class="card border-0 shadow-sm rounded-3">
-                    <img src="~/Content/Images/supun.jpg" class="card-img-top rounded-top" alt="Team Member">
-                    <div class="card-body">
-                        <h5 class="fw-bold mb-1">Supun Akalanka</h5>
-                        <p class="text-muted mb-2">Lead Developer</p>
-                        <p class="small text-muted">Passionate about building meaningful web experiences and intelligent systems.</p>
-                    </div>
-                </div>
+        <div class="timeline-item right animate__animated animate__fadeInRight">
+            <div class="timeline-content">
+                <h5 class="fw-bold text-primary">2023</h5>
+                <h6 class="fw-semibold">Expansion & Innovation</h6>
+                <p>Introduced QR code ticketing, advanced analytics for organizers, and expanded to 25+ cities.</p>
+            </div>
+        </div>
+        <div class="timeline-item left animate__animated animate__fadeInLeft">
+            <div class="timeline-content">
+                <h5 class="fw-bold text-primary">2024</h5>
+                <h6 class="fw-semibold">The Future</h6>
+                <p>Working on AI-powered event recommendations and expanding to international markets.</p>
             </div>
         </div>
     </div>
 </section>
+
+<!-- Our Values -->
+<section class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold section-title">Our Core Values</h2>
+        <p class="text-muted fs-5">We believe in innovation, reliability, and excellence in everything we do.</p>
+    </div>
+
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="p-4 value-card bg-white shadow-sm rounded h-100">
+                <div class="icon-wrapper mx-auto">
+                    <i class="bi bi-lightning-charge-fill text-warning display-6"></i>
+                </div>
+                <h5 class="fw-semibold mb-3">Innovation</h5>
+                <p class="text-muted">We constantly evolve our platform to make event experiences smarter and more efficient.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="p-4 value-card bg-white shadow-sm rounded h-100">
+                <div class="icon-wrapper mx-auto">
+                    <i class="bi bi-heart-fill text-danger display-6"></i>
+                </div>
+                <h5 class="fw-semibold mb-3">Passion</h5>
+                <p class="text-muted">Our team is driven by a shared love for technology, creativity, and people.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="p-4 value-card bg-white shadow-sm rounded h-100">
+                <div class="icon-wrapper mx-auto">
+                    <i class="bi bi-shield-lock-fill text-primary display-6"></i>
+                </div>
+                <h5 class="fw-semibold mb-3">Trust</h5>
+                <p class="text-muted">We prioritize safety, security, and transparency in every user interaction.</p>
+            </div>
+        </div>
+    </div>
+</section>=
+
+<!-- Call to Action -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h3 class="fw-bold mb-3">Ready to Create Unforgettable Experiences?</h3>
+        <p class="mb-4 fs-5">Join thousands of organizers and attendees using EventSphere</p>
+        <div class="d-flex justify-content-center flex-wrap gap-3">
+            <a href="@Url.Action("Register", "Account")" class="btn btn-light btn-lg">Get Started</a>
+            <a href="@Url.Action("Index", "Event")" class="btn btn-outline-light btn-lg">Browse Events</a>
+        </div>
+    </div>
+</section>
+
+<!-- JavaScript for animations -->
+<script>
+    // Function to check if element is in viewport
+    function isInViewport(element) {
+        const rect = element.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    }
+
+    // Function to add animation classes when elements come into view
+    function handleScrollAnimations() {
+        const animatedElements = document.querySelectorAll('.animate__animated');
+
+        animatedElements.forEach(el => {
+            if (isInViewport(el) && !el.classList.contains('animate__fadeIn')) {
+                const animationType = el.getAttribute('data-animation') || 'fadeInUp';
+                el.classList.add(`animate__${animationType}`);
+            }
+        });
+    }
+
+    // Initialize animations on page load and scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        handleScrollAnimations();
+
+        window.addEventListener('scroll', function() {
+            handleScrollAnimations();
+        });
+
+        // Add hover effect to team cards
+        const teamCards = document.querySelectorAll('.team-card');
+        teamCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>

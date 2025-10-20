@@ -5,136 +5,267 @@
 }
 
 <div class="container mt-4">
-    <h2 class="fw-bold mb-4">
-        <i class="bi bi-pencil-square"></i> Edit Event
-    </h2>
-
-    <!-- Success/Error Alerts -->
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
-    @using (Html.BeginForm("Edit", "Event", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
-        @Html.AntiForgeryToken()
-        @Html.HiddenFor(m => m.EventID)
-        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
-
-        <div class="card border-0 shadow-sm rounded-3 mb-4">
-            <div class="card-body">
-                <div class="row g-3">
-                    <!-- Title -->
-                    <div class="col-md-6">
-                        @Html.LabelFor(m => m.Title, "Event Title", new { @class = "form-label fw-semibold" })
-                        @Html.TextBoxFor(m => m.Title, new { @class = "form-control", required = "required" })
-                        @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
-                    </div>
-
-                    <!-- Category -->
-                    <div class="col-md-6">
-                        @Html.LabelFor(m => m.CategoryID, "Category", new { @class = "form-label fw-semibold" })
-                        @Html.DropDownListFor(m => m.CategoryID,
-                            new SelectList(ViewBag.Categories, "CategoryID", "CategoryName", Model.CategoryID),
-                            "Select Category",
-                            new { @class = "form-select", required = "required" })
-                        @Html.ValidationMessageFor(m => m.CategoryID, "", new { @class = "text-danger" })
-                    </div>
-
-                    <!-- Venue -->
-                    <div class="col-md-6">
-                        @Html.LabelFor(m => m.VenueID, "Venue", new { @class = "form-label fw-semibold" })
-                        @Html.DropDownListFor(m => m.VenueID,
-                            new SelectList(ViewBag.Venues, "VenueID", "VenueName", Model.VenueID),
-                            "Select Venue",
-                            new { @class = "form-select", required = "required" })
-                        @Html.ValidationMessageFor(m => m.VenueID, "", new { @class = "text-danger" })
-                    </div>
-
-                    <!-- Dates -->
-                    <div class="col-md-3">
-                        @Html.LabelFor(m => m.StartDate, "Start Date", new { @class = "form-label fw-semibold" })
-                        @Html.TextBoxFor(m => m.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
-                        @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="col-md-3">
-                        @Html.LabelFor(m => m.EndDate, "End Date", new { @class = "form-label fw-semibold" })
-                        @Html.TextBoxFor(m => m.EndDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required" })
-                        @Html.ValidationMessageFor(m => m.EndDate, "", new { @class = "text-danger" })
-                    </div>
-
-                    <!-- Ticket Info -->
-                    <div class="col-md-4">
-                        @Html.LabelFor(m => m.TicketPrice, "Ticket Price (LKR)", new { @class = "form-label fw-semibold" })
-                        @Html.TextBoxFor(m => m.TicketPrice, new { @class = "form-control", type = "number", step = "0.01", required = "required" })
-                        @Html.ValidationMessageFor(m => m.TicketPrice, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="col-md-4">
-                        @Html.LabelFor(m => m.TotalTickets, "Total Tickets", new { @class = "form-label fw-semibold" })
-                        @Html.TextBoxFor(m => m.TotalTickets, new { @class = "form-control", type = "number", min = "1", required = "required" })
-                        @Html.ValidationMessageFor(m => m.TotalTickets, "", new { @class = "text-danger" })
-                    </div>
-
-                    <!-- Image Upload -->
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Event Image</label>
-                        <input type="file" name="EventImageFile" id="EventImageFile" class="form-control" accept="image/*" />
-                        <small class="text-muted">Upload a new image to replace the current one.</small>
-
-                        @if (!string.IsNullOrEmpty(Model.EventImage))
-                        {
-                            <div class="mt-3">
-                                <p class="text-muted mb-1">Current Image:</p>
-                                <img src="@Url.Content(Model.EventImage)" alt="Current Image" class="img-thumbnail" style="max-width:180px; max-height:150px;" />
-                            </div>
-                        }
-
-                        <div class="mt-2">
-                            <img id="previewImage" src="#" alt="Preview" class="img-thumbnail d-none" style="max-height: 150px;" />
-                        </div>
-                    </div>
-
-                    <!-- Description -->
-                    <div class="col-12">
-                        @Html.LabelFor(m => m.Description, "Event Description", new { @class = "form-label fw-semibold" })
-                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = "4", placeholder = "Enter event details..." })
-                        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
-                    </div>
-
-                    <!-- Status -->
-                    <div class="col-md-6">
-                        @Html.LabelFor(m => m.Status, "Status", new { @class = "form-label fw-semibold" })
-                        @Html.DropDownListFor(m => m.Status,
-                            new SelectList(new[] { "Active", "Pending", "Inactive" }, Model.Status),
-                            "Select Status",
-                            new { @class = "form-select", required = "required" })
-                        @Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <!-- Header Section -->
+            <div class="d-flex align-items-center mb-4">
+                <div class="flex-shrink-0">
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                        <i class="bi bi-pencil-square text-primary" style="font-size: 1.5rem;"></i>
                     </div>
                 </div>
+                <div class="flex-grow-1 ms-3">
+                    <h2 class="fw-bold text-primary mb-1">Edit Event</h2>
+                    <p class="text-muted mb-0">Update your event information below</p>
+                </div>
+                <div class="flex-shrink-0">
+                    <span class="badge bg-light text-dark border">
+                        <i class="bi bi-hash me-1"></i>@Model.EventID
+                    </span>
+                </div>
             </div>
-        </div>
 
-        <div class="d-flex justify-content-between">
-            <a href="@Url.Action("ManageEvents", "Organizer")" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Back
-            </a>
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-save"></i> Update Event
-            </button>
+            <!-- Success/Error Alerts -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+                    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                    <div class="flex-grow-1">@TempData["Success"]</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    <div class="flex-grow-1">@TempData["Error"]</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @using (Html.BeginForm("Edit", "Event", FormMethod.Post, new { enctype = "multipart/form-data", @class = "needs-validation", novalidate = "novalidate" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.EventID)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+                <!-- Basic Information Card -->
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-header bg-primary bg-opacity-10 border-0 py-3">
+                        <h5 class="mb-0 fw-bold text-primary">
+                            <i class="bi bi-info-circle me-2"></i>Basic Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <!-- Title -->
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.Title, "Event Title", new { @class = "form-label fw-semibold" })
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-pencil-square text-muted"></i>
+                                    </span>
+                                    @Html.TextBoxFor(m => m.Title, new { @class = "form-control border-start-0", required = "required", placeholder = "Enter event title" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger small mt-1" })
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.CategoryID, "Category", new { @class = "form-label fw-semibold" })
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-tag text-muted"></i>
+                                    </span>
+                                    @Html.DropDownListFor(m => m.CategoryID,
+                                        new SelectList(ViewBag.Categories, "CategoryID", "CategoryName", Model.CategoryID),
+                                        "Select Category",
+                                        new { @class = "form-select border-start-0", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.CategoryID, "", new { @class = "text-danger small mt-1" })
+                            </div>
+
+                            <!-- Venue -->
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.VenueID, "Venue", new { @class = "form-label fw-semibold" })
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-geo-alt text-muted"></i>
+                                    </span>
+                                    @Html.DropDownListFor(m => m.VenueID,
+                                        new SelectList(ViewBag.Venues, "VenueID", "VenueName", Model.VenueID),
+                                        "Select Venue",
+                                        new { @class = "form-select border-start-0", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.VenueID, "", new { @class = "text-danger small mt-1" })
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.Status, "Status", new { @class = "form-label fw-semibold" })
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-circle-fill text-muted"></i>
+                                    </span>
+                                    @Html.DropDownListFor(m => m.Status,
+                                        new SelectList(new[] { "Active", "Pending", "Inactive" }, Model.Status),
+                                        "Select Status",
+                                        new { @class = "form-select border-start-0", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger small mt-1" })
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-12">
+                                @Html.LabelFor(m => m.Description, "Event Description", new { @class = "form-label fw-semibold" })
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light align-items-start border-end-0 pt-3">
+                                        <i class="bi bi-text-paragraph text-muted"></i>
+                                    </span>
+                                    @Html.TextAreaFor(m => m.Description, new { @class = "form-control border-start-0", rows = "4", placeholder = "Enter event details..." })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger small mt-1" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date & Time Card -->
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-header bg-primary bg-opacity-10 border-0 py-3">
+                        <h5 class="mb-0 fw-bold text-primary">
+                            <i class="bi bi-calendar-event me-2"></i>Date & Time
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <!-- Start Date -->
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.StartDate, "Start Date", new { @class = "form-label fw-semibold" })
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-calendar-plus text-muted"></i>
+                                    </span>
+                                    @Html.TextBoxFor(m => m.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control border-start-0", type = "date", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "text-danger small mt-1" })
+                            </div>
+
+                            <!-- End Date -->
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.EndDate, "End Date", new { @class = "form-label fw-semibold" })
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-calendar-check text-muted"></i>
+                                    </span>
+                                    @Html.TextBoxFor(m => m.EndDate, "{0:yyyy-MM-dd}", new { @class = "form-control border-start-0", type = "date", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.EndDate, "", new { @class = "text-danger small mt-1" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Information Card -->
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-header bg-primary bg-opacity-10 border-0 py-3">
+                        <h5 class="mb-0 fw-bold text-primary">
+                            <i class="bi bi-ticket-perforated me-2"></i>Ticket Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <!-- Ticket Price -->
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.TicketPrice, "Ticket Price (LKR)", new { @class = "form-label fw-semibold" })
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-currency-dollar text-muted"></i>
+                                    </span>
+                                    @Html.TextBoxFor(m => m.TicketPrice, new { @class = "form-control border-start-0", type = "number", step = "0.01", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.TicketPrice, "", new { @class = "text-danger small mt-1" })
+                            </div>
+
+                            <!-- Total Tickets -->
+                            <div class="col-md-6">
+                                @Html.LabelFor(m => m.TotalTickets, "Total Tickets", new { @class = "form-label fw-semibold" })
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-123 text-muted"></i>
+                                    </span>
+                                    @Html.TextBoxFor(m => m.TotalTickets, new { @class = "form-control border-start-0", type = "number", min = "1", required = "required" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.TotalTickets, "", new { @class = "text-danger small mt-1" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Upload Card -->
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-header bg-primary bg-opacity-10 border-0 py-3">
+                        <h5 class="mb-0 fw-bold text-primary">
+                            <i class="bi bi-image me-2"></i>Event Image
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Upload New Image</label>
+                                <div class="input-group mb-3">
+                                    <input type="file" name="EventImageFile" id="EventImageFile" class="form-control" accept="image/*" />
+                                </div>
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Upload a new image to replace the current one. Leave empty to keep existing image.
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="image-section text-center">
+                                    @if (!string.IsNullOrEmpty(Model.EventImage))
+                                    {
+                                        <div class="current-image mb-3">
+                                            <p class="text-muted mb-2 fw-semibold">Current Image:</p>
+                                            <div class="position-relative d-inline-block">
+                                                <img src="@Url.Content(Model.EventImage)" alt="Current Event Image" class="img-thumbnail rounded shadow-sm" style="max-width: 200px; max-height: 150px;" />
+                                                <span class="position-absolute top-0 start-100 translate-middle badge bg-success">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="preview-container mt-3">
+                                        <img id="previewImage" src="#" alt="New Image Preview" class="img-thumbnail rounded shadow-sm d-none" style="max-width: 200px; max-height: 150px;" />
+                                        <div id="previewPlaceholder" class="text-muted @(string.IsNullOrEmpty(Model.EventImage) ? "" : "d-none")">
+                                            <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                            <p class="mt-2 mb-0 small">New image preview will appear here</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                    <a href="@Url.Action("ManageEvents", "Organizer")" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-left me-2"></i> Back to Events
+                    </a>
+                    <div>
+                        <button type="reset" class="btn btn-outline-danger me-2 px-4">
+                            <i class="bi bi-arrow-clockwise me-2"></i> Reset
+                        </button>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-save me-2"></i> Update Event
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
-    }
+    </div>
 </div>
 
 @section scripts {
@@ -143,18 +274,69 @@
         document.getElementById("EventImageFile").addEventListener("change", function (event) {
             const file = event.target.files[0];
             const preview = document.getElementById("previewImage");
+            const placeholder = document.getElementById("previewPlaceholder");
 
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     preview.src = e.target.result;
                     preview.classList.remove("d-none");
+                    placeholder.classList.add("d-none");
                 };
                 reader.readAsDataURL(file);
             } else {
                 preview.src = "#";
                 preview.classList.add("d-none");
+                if (@(string.IsNullOrEmpty(Model.EventImage) ? "true" : "false")) {
+                    placeholder.classList.remove("d-none");
+                }
             }
+        });
+
+        // Form validation and styling
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const inputs = form.querySelectorAll('input, select, textarea');
+
+            // Add validation styling
+            inputs.forEach(input => {
+                input.addEventListener('invalid', function() {
+                    this.classList.add('is-invalid');
+                });
+
+                input.addEventListener('input', function() {
+                    if (this.checkValidity()) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    } else {
+                        this.classList.remove('is-valid');
+                    }
+                });
+
+                // Initialize validation state
+                if (input.checkValidity()) {
+                    input.classList.add('is-valid');
+                }
+            });
+
+            // Date validation
+            const startDate = document.getElementById('StartDate');
+            const endDate = document.getElementById('EndDate');
+
+            function validateDates() {
+                if (startDate.value && endDate.value) {
+                    if (new Date(startDate.value) > new Date(endDate.value)) {
+                        endDate.classList.add('is-invalid');
+                        endDate.classList.remove('is-valid');
+                    } else {
+                        endDate.classList.remove('is-invalid');
+                        endDate.classList.add('is-valid');
+                    }
+                }
+            }
+
+            startDate.addEventListener('change', validateDates);
+            endDate.addEventListener('change', validateDates);
         });
     </script>
 }

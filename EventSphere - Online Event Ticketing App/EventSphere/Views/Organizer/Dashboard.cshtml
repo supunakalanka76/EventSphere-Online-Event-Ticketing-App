@@ -4,104 +4,530 @@
     Layout = ViewBag.LayoutPath;
 }
 
+<!-- Add Chart.js for analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --info-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    }
+
+    .dashboard-hero {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 4rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .dashboard-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 1000,100 1000,0"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .stats-grid {
+        margin-top: -50px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        text-align: center;
+        height: 100%;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        }
+
+    .stat-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+    }
+
+        .stat-icon.primary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .stat-icon.success {
+            background: rgba(79, 172, 254, 0.1);
+            color: #4facfe;
+        }
+
+        .stat-icon.warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .stat-icon.info {
+            background: rgba(23, 162, 184, 0.1);
+            color: #17a2b8;
+        }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .dashboard-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        margin-bottom: 2rem;
+    }
+
+    .card-header-custom {
+        background: transparent;
+        border: none;
+        padding: 0 0 1.5rem 0;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #f1f3f4;
+    }
+
+    .table-custom {
+        margin-bottom: 0;
+    }
+
+        .table-custom thead th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 700;
+            color: #495057;
+            padding: 1rem;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table-custom tbody tr {
+            transition: all 0.3s ease;
+        }
+
+            .table-custom tbody tr:hover {
+                background: rgba(102, 126, 234, 0.05);
+                transform: scale(1.01);
+            }
+
+        .table-custom tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+        }
+
+    .badge-custom {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-custom {
+        border-radius: 12px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-outline-custom {
+        background: transparent;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+        .btn-outline-custom:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+    .empty-state {
+        padding: 3rem 1rem;
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        height: 400px;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .action-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        text-decoration: none;
+        color: inherit;
+    }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+            color: inherit;
+        }
+
+    .action-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .stats-grid {
+            margin-top: -30px;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .dashboard-card {
+            padding: 1.5rem;
+        }
+
+        .table-responsive {
+            font-size: 0.9rem;
+        }
+    }
+
+    .revenue-trend {
+        color: #198754;
+        font-weight: 600;
+    }
+
+        .revenue-trend.negative {
+            color: #dc3545;
+        }
+
+    .customer-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 10px;
+        border: 2px solid #e9ecef;
+    }
+</style>
+
 <!-- Hero Section -->
-<section class="bg-primary text-white text-center py-5">
-    <div class="container">
-        <h1 class="fw-bold">Organizer Dashboard</h1>
-        <p class="lead mb-0">Manage your events, track bookings, and monitor revenue 📊</p>
+<section class="dashboard-hero">
+    <div class="container hero-content">
+        <div class="text-center">
+            <i class="bi bi-speedometer2 display-1 mb-3 floating"></i>
+            <h1 class="fw-bold display-4 mb-3">Organizer Dashboard</h1>
+            <p class="lead mb-0 fs-4">Manage your events, track bookings, and monitor revenue 📊</p>
+        </div>
     </div>
 </section>
 
-<!-- Summary Cards -->
+<!-- Stats Grid -->
+<section class="container stats-grid">
+    <div class="row g-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+                <div class="stat-number">@ViewBag.TotalEvents</div>
+                <div class="stat-label">Total Events</div>
+                <div class="revenue-trend mt-2">
+                    <i class="bi bi-arrow-up-right me-1"></i>Active Events
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="bi bi-ticket-perforated"></i>
+                </div>
+                <div class="stat-number">@ViewBag.TotalBookings</div>
+                <div class="stat-label">Total Bookings</div>
+                <div class="revenue-trend mt-2">
+                    <i class="bi bi-people-fill me-1"></i>@(ViewBag.TotalAttendees ?? 0) Attendees
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <div class="stat-number">LKR @ViewBag.TotalRevenue.ToString("N0")</div>
+                <div class="stat-label">Total Revenue</div>
+                <div class="revenue-trend mt-2">
+                    <i class="bi bi-graph-up-arrow me-1"></i>This Month
+                </div>
+            </div>
+        </div>
+
+        @*<div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon info">
+                    <i class="bi bi-star-fill"></i>
+                </div>
+                <div class="stat-number">@ViewBag.AverageRating.ToString("0.0")</div>
+                <div class="stat-label">Avg. Rating</div>
+                <div class="revenue-trend mt-2">
+                    <i class="bi bi-hand-thumbs-up me-1"></i>Event Feedback
+                </div>
+            </div>
+        </div>*@
+    </div>
+</section>
+
+<!-- Quick Actions -->
 <section class="container my-5">
-    <div class="row g-4 text-center">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 py-4">
-                <i class="bi bi-calendar-event display-5 text-primary mb-3"></i>
-                <h5>Total Events</h5>
-                <h2 class="fw-bold">@ViewBag.TotalEvents</h2>
+    <div class="quick-actions">
+        <a href="@Url.Action("CreateEvent", "Event")" class="action-card">
+            <div class="action-icon">
+                <i class="bi bi-plus-circle"></i>
             </div>
-        </div>
+            <h6 class="fw-bold mb-2">Create Event</h6>
+            <p class="text-muted small mb-0">Create a new event and start selling tickets</p>
+        </a>
 
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 py-4">
-                <i class="bi bi-ticket-perforated display-5 text-success mb-3"></i>
-                <h5>Total Bookings</h5>
-                <h2 class="fw-bold">@ViewBag.TotalBookings</h2>
+        <a href="@Url.Action("ManageEvents", "Organizer")" class="action-card">
+            <div class="action-icon">
+                <i class="bi bi-calendar-check"></i>
             </div>
-        </div>
+            <h6 class="fw-bold mb-2">Manage Events</h6>
+            <p class="text-muted small mb-0">View and manage all your events</p>
+        </a>
 
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 py-4">
-                <i class="bi bi-currency-dollar display-5 text-warning mb-3"></i>
-                <h5>Total Revenue</h5>
-                <h2 class="fw-bold">LKR @ViewBag.TotalRevenue.ToString("N2")</h2>
+        <a href="@Url.Action("ManageBookings", "Organizer")" class="action-card">
+            <div class="action-icon">
+                <i class="bi bi-list-check"></i>
             </div>
-        </div>
+            <h6 class="fw-bold mb-2">All Bookings</h6>
+            <p class="text-muted small mb-0">View complete booking history</p>
+        </a>
     </div>
 </section>
 
 <!-- Recent Bookings Table -->
 <section class="container my-5">
-    <div class="card border-0 shadow-sm rounded-4">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold mb-0">Recent Bookings</h4>
-                <a href="@Url.Action("ManageBookings", "Organizer")" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-list"></i> View All
+    <div class="dashboard-card">
+        <div class="card-header-custom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="fw-bold mb-0">
+                    <i class="bi bi-clock-history me-2 text-warning"></i>Recent Bookings
+                </h4>
+                <a href="@Url.Action("ManageBookings", "Organizer")" class="btn btn-outline-custom btn-custom">
+                    <i class="bi bi-list me-2"></i>View All
                 </a>
             </div>
-
-            @if (Model != null && Model.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Event</th>
-                                <th>Customer</th>
-                                <th>Tickets</th>
-                                <th>Total (LKR)</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var booking in Model)
-                            {
-                                <tr>
-                                    <td>@booking.Event.Title</td>
-                                    <td>@booking.User.FullName</td>
-                                    <td>@booking.Quantity</td>
-                                    <td>@booking.TotalAmount.ToString("N2")</td>
-                                    <td>
-                                        @(booking.BookingDate.HasValue
-                                        ? booking.BookingDate.Value.ToString("dd MMM yyyy")
-                                        : "N/A")
-                                    </td>
-                                    <td>
-                                        @if (booking.CheckInStatus == true)
-                                        {
-                                            <span class="badge bg-success">Checked In</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Pending</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="text-center py-5">
-                    <i class="bi bi-calendar2-x display-4 text-muted"></i>
-                    <h5 class="text-muted mt-3">No recent bookings found.</h5>
-                </div>
-            }
         </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Event</th>
+                            <th class="text-center">Tickets</th>
+                            <th class="text-end">Amount</th>
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var booking in Model.Take(8))
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@(booking.User.ProfileImage ?? "/Content/ProfileImages/default-profile.png")"
+                                             class="customer-avatar"
+                                             alt="@booking.User.FullName"
+                                             onerror="this.src='/Content/ProfileImages/default-profile.png'">
+                                        <div>
+                                            <div class="fw-semibold">@booking.User.FullName</div>
+                                            <small class="text-muted">@booking.User.Email</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">@booking.Event.Title</div>
+                                    <small class="text-muted">@booking.Event.StartDate.ToString("MMM dd, yyyy")</small>
+                                </td>
+                                <td class="text-center">
+                                    <span class="fw-bold">@booking.Quantity</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold text-success">LKR @booking.TotalAmount.ToString("N2")</span>
+                                </td>
+                                <td class="text-center">
+                                    <small class="text-muted">
+                                        @(booking.BookingDate.HasValue
+                                            ? booking.BookingDate.Value.ToString("MMM dd")
+                                            : "N/A")
+                                    </small>
+                                </td>
+                                <td class="text-center">
+                                    @if (booking.CheckInStatus == true)
+                                    {
+                                        <span class="badge-custom bg-success">
+                                            <i class="bi bi-check-circle me-1"></i>Checked In
+                                        </span>
+                                    }
+                                    else if (booking.PaymentStatus == "Completed")
+                                    {
+                                        <span class="badge-custom bg-primary">
+                                            <i class="bi bi-credit-card me-1"></i>Completed
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-custom bg-secondary">
+                                            <i class="bi bi-clock me-1"></i>Pending
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a href="@Url.Action("Confirmation", "Booking", new { bookingId = booking.BookingID })"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="bi bi-calendar2-x empty-icon"></i>
+                <h5 class="text-muted mb-3">No Recent Bookings</h5>
+                <p class="text-muted mb-4">When you start getting bookings, they will appear here.</p>
+                <a href="@Url.Action("Create", "Event")" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Create Your First Event
+                </a>
+            </div>
+        }
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // Add hover effects to stat cards
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>

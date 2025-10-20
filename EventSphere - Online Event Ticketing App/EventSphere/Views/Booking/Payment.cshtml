@@ -6,45 +6,504 @@
     var promotions = ViewBag.Promotions as List<EventSphere.Models.Promotion>;
 }
 
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    }
+
+    .payment-hero {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 3rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .payment-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 1000,100 1000,0"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .payment-container {
+        margin-top: -50px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        height: fit-content;
+    }
+
+    .payment-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .event-image-container {
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .event-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+
+        .info-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-left-color: #667eea;
+            transform: translateX(5px);
+        }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .info-content {
+        flex-grow: 1;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+    }
+
+    .info-value {
+        color: #6c757d;
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+
+    .amount-breakdown {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border: 2px dashed #dee2e6;
+    }
+
+    .breakdown-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+    .breakdown-label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .breakdown-value {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .final-amount {
+        background: var(--success-gradient);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        margin: 1.5rem 0;
+        box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+    }
+
+    .final-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+    }
+
+    .final-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0;
+    }
+
+    .form-group-custom {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label-custom {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+        .form-label-custom i {
+            margin-right: 8px;
+            color: #667eea;
+        }
+
+    .form-control-custom, .form-select-custom {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+
+        .form-control-custom:focus, .form-select-custom:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+    .promotion-card {
+        background: rgba(255, 193, 7, 0.1);
+        border: 2px dashed #ffc107;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .promotion-card:hover {
+            background: rgba(255, 193, 7, 0.15);
+            transform: translateY(-2px);
+        }
+
+    .loyalty-card {
+        background: rgba(25, 135, 84, 0.1);
+        border: 2px dashed #198754;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .loyalty-card:hover {
+            background: rgba(25, 135, 84, 0.15);
+            transform: translateY(-2px);
+        }
+
+    .payment-method-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .payment-method-card:hover, .payment-method-card.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateY(-2px);
+        }
+
+    .payment-method-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: #667eea;
+    }
+
+    .btn-custom {
+        border-radius: 12px;
+        padding: 14px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-success-custom {
+        background: var(--success-gradient);
+        border-color: transparent;
+        color: white;
+    }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+            color: white;
+        }
+
+    .btn-outline-custom {
+        background: transparent;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+        .btn-outline-custom:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .alert-custom {
+        border: none;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border-left: 4px solid #dc3545;
+    }
+
+    .alert-success {
+        background: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border-left: 4px solid #198754;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .payment-container {
+            margin-top: -30px;
+        }
+
+        .summary-card, .payment-card {
+            padding: 1.5rem;
+        }
+
+        .final-value {
+            font-size: 2rem;
+        }
+
+        .payment-method-card {
+            padding: 1rem;
+        }
+    }
+
+    .security-badge {
+        background: rgba(25, 135, 84, 0.1);
+        border: 1px solid #198754;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .discount-badge {
+        background: var(--warning-gradient);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+</style>
+
 <!-- Hero Section -->
-<section class="bg-primary text-white text-center py-5">
-    <div class="container">
-        <h1 class="fw-bold">Complete Your Payment</h1>
-        <p class="lead mb-0">Finalize your booking for <strong>@Model.Event.Title</strong></p>
+<section class="payment-hero">
+    <div class="container hero-content">
+        <div class="text-center">
+            <i class="bi bi-credit-card-2-front display-1 mb-3 floating"></i>
+            <h1 class="fw-bold display-5 mb-3">Complete Your Payment</h1>
+            <p class="lead mb-0 fs-4">Finalize your booking for <strong>@Model.Event.Title</strong></p>
+        </div>
     </div>
 </section>
 
 <!-- Payment Section -->
-<section class="container my-5">
+<section class="container my-5 payment-container">
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger text-center">@TempData["Error"]</div>
+        <div class="alert alert-custom alert-danger animate__animated animate__shakeX">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+        </div>
     }
     else if (TempData["Success"] != null)
     {
-        <div class="alert alert-success text-center">@TempData["Success"]</div>
+        <div class="alert alert-custom alert-success animate__animated animate__fadeIn">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+        </div>
     }
 
     <div class="row">
         <!-- Left: Booking Summary -->
         <div class="col-lg-6 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h4 class="fw-bold mb-3">Booking Summary</h4>
-                    <p><strong>Event:</strong> @Model.Event.Title</p>
-                    <p><strong>Date:</strong> @Model.Event.StartDate.ToString("MMMM dd, yyyy")</p>
-                    <p><strong>Venue:</strong> @Model.Event.Venue.VenueName, @Model.Event.Venue.City</p>
-                    <p><strong>Tickets:</strong> @Model.Quantity</p>
-                    <p><strong>Total Amount:</strong> LKR <span id="totalAmount">@Model.TotalAmount.ToString("N2")</span></p>
+            <div class="summary-card">
+                <h4 class="fw-bold mb-4 text-dark">
+                    <i class="bi bi-receipt me-2"></i>Booking Summary
+                </h4>
 
-                    <div id="discountSection" style="display:none;">
-                        <p><strong>Discount:</strong> -LKR <span id="discountAmount">0.00</span></p>
+                <!-- Event Image -->
+                <div class="event-image-container">
+                    <img src="@(!string.IsNullOrEmpty(Model.Event.EventImage) ? Model.Event.EventImage : "/Content/Events/default-event.png")"
+                         class="event-image"
+                         alt="@Model.Event.Title"
+                         onerror="this.src='/Content/Events/default-event.png'" />
+                </div>
+
+                <!-- Event Information -->
+                <div class="info-items">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Event Date</div>
+                            <div class="info-value">@Model.Event.StartDate.ToString("MMMM dd, yyyy")</div>
+                        </div>
                     </div>
-                    <div id="pointsSection" style="display:none;">
-                        <p><strong>Loyalty Points Used:</strong> -LKR <span id="pointsUsed">0.00</span></p>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Event Time</div>
+                            <div class="info-value">@Model.Event.StartDate.ToString("hh:mm tt")</div>
+                        </div>
                     </div>
-                    <hr />
-                    <h5 class="fw-bold">Final Amount: LKR <span id="finalAmount">@Model.TotalAmount.ToString("N2")</span></h5>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Venue</div>
+                            <div class="info-value">@Model.Event.Venue.VenueName, @Model.Event.Venue.City</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-ticket-perforated"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Tickets</div>
+                            <div class="info-value">@Model.Quantity</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amount Breakdown -->
+                <div class="amount-breakdown">
+                    <h6 class="fw-bold mb-3">Amount Breakdown</h6>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Subtotal</span>
+                        <span class="breakdown-value">LKR <span id="totalAmount">@Model.TotalAmount.ToString("N2")</span></span>
+                    </div>
+                    <div class="breakdown-item" id="discountSection" style="display: none;">
+                        <span class="breakdown-label text-success">Promotion Discount</span>
+                        <span class="breakdown-value text-success">-LKR <span id="discountAmount">0.00</span></span>
+                    </div>
+                    <div class="breakdown-item" id="pointsSection" style="display: none;">
+                        <span class="breakdown-label text-success">Loyalty Points</span>
+                        <span class="breakdown-value text-success">-LKR <span id="pointsUsed">0.00</span></span>
+                    </div>
+                </div>
+
+                <!-- Final Amount -->
+                <div class="final-amount">
+                    <div class="final-label">Final Amount to Pay</div>
+                    <div class="final-value">LKR <span id="finalAmount">@Model.TotalAmount.ToString("N2")</span></div>
                 </div>
             </div>
         </div>
@@ -53,85 +512,121 @@
         <div class="col-lg-6">
             @if (Model.PaymentStatus == "Completed")
             {
-                <div class="card border-success shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="bi bi-check-circle-fill text-success display-4"></i>
-                        <h4 class="fw-bold mt-3">Payment Already Completed</h4>
-                        <p>Your booking is confirmed. You can download your invoice below.</p>
+                <div class="payment-card text-center border-success">
+                    <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i>
+                    <h4 class="fw-bold mb-3 text-success">Payment Already Completed</h4>
+                    <p class="text-muted mb-4">Your booking is confirmed and payment has been processed successfully.</p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
                         <a href="@Url.Action("DownloadInvoice", "Booking", new { bookingId = Model.BookingID })"
-                           class="btn btn-outline-success">
-                            <i class="bi bi-file-earmark-pdf"></i> Download Invoice (PDF)
+                           class="btn btn-outline-custom btn-custom">
+                            <i class="bi bi-file-earmark-pdf me-2"></i>Download Invoice
                         </a>
                         <a href="@Url.Action("Confirmation", "Booking", new { bookingId = Model.BookingID })"
-                           class="btn btn-primary ms-2">
-                            <i class="bi bi-arrow-right-circle"></i> View Confirmation
+                           class="btn btn-success-custom btn-custom">
+                            <i class="bi bi-arrow-right-circle me-2"></i>View Confirmation
                         </a>
                     </div>
                 </div>
             }
             else
             {
-                using (Html.BeginForm("PaymentConfirmed", "Booking", FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.Hidden("bookingId", Model.BookingID)
+                <div class="payment-card">
+                    <h4 class="fw-bold mb-4 text-dark">
+                        <i class="bi bi-credit-card me-2"></i>Payment Options
+                    </h4>
 
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <h4 class="fw-bold mb-3">Payment Options</h4>
+                    @using (Html.BeginForm("PaymentConfirmed", "Booking", FormMethod.Post, new { id = "paymentForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("bookingId", Model.BookingID)
 
-                            <!-- Promotion Code -->
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Promotion Code</label>
-                                <select name="promoCode" class="form-select" id="promoCode">
-                                    <option value="">-- Select Promotion (if available) --</option>
-                                    @if (promotions != null && promotions.Any())
+                        <!-- Promotion Code -->
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">
+                                <i class="bi bi-tag"></i>Promotion Code
+                            </label>
+                            <select name="promoCode" class="form-select-custom" id="promoCode">
+                                <option value="">-- Select Promotion (if available) --</option>
+                                @if (promotions != null && promotions.Any())
+                                {
+                                    foreach (var promo in promotions)
                                     {
-                                        foreach (var promo in promotions)
-                                        {
-                                            <option value="@promo.Code" data-discount="@promo.DiscountPercentage">
-                                                @promo.Code - @promo.DiscountPercentage% off
-                                            </option>
-                                        }
+                                        <option value="@promo.Code" data-discount="@promo.DiscountPercentage">
+                                            @promo.Code - @promo.DiscountPercentage% off
+                                            <span class="discount-badge">Save @promo.DiscountPercentage%</span>
+                                        </option>
                                     }
-                                </select>
-                            </div>
+                                }
+                            </select>
+                        </div>
 
-                            <!-- Loyalty Points -->
-                            <div class="mb-3 form-check">
+                        <!-- Loyalty Points -->
+                        <div class="loyalty-card">
+                            <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="usePoints" name="usePoints" />
-                                <label class="form-check-label" for="usePoints">
-                                    Use Loyalty Points (<strong>@loyaltyPoints</strong> available)
+                                <label class="form-check-label fw-semibold" for="usePoints">
+                                    <i class="bi bi-stars me-2 text-warning"></i>
+                                    Use Loyalty Points
                                 </label>
                             </div>
-
-                            <!-- Payment Method -->
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Payment Method</label>
-                                <select name="paymentMethod" class="form-select" required>
-                                    <option value="">-- Select Payment Method --</option>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Card">Credit / Debit Card</option>
-                                    <option value="Bank Transfer">Bank Transfer</option>
-                                    <option value="Mobile Payment">Mobile Payment</option>
-                                </select>
-                            </div>
-
-                            <!-- Confirm Button -->
-                            <div class="d-grid mt-4">
-                                <button type="submit" class="btn btn-success btn-lg">
-                                    <i class="bi bi-check-circle"></i> Confirm Payment
-                                </button>
-                            </div>
+                            <small class="text-muted mt-2 d-block">
+                                You have <strong>@loyaltyPoints</strong> points available (1 point = LKR 1)
+                            </small>
                         </div>
-                    </div>
-                }
+
+                        <!-- Payment Method -->
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">
+                                <i class="bi bi-wallet2"></i>Payment Method
+                            </label>
+                            <div class="payment-methods">
+                                <div class="payment-method-card" data-method="Card">
+                                    <i class="bi bi-credit-card payment-method-icon"></i>
+                                    <h6 class="fw-bold mb-1">Credit / Debit Card</h6>
+                                    <small class="text-muted">Visa, MasterCard, AMEX</small>
+                                </div>
+                                <div class="payment-method-card" data-method="Bank Transfer">
+                                    <i class="bi bi-bank payment-method-icon"></i>
+                                    <h6 class="fw-bold mb-1">Bank Transfer</h6>
+                                    <small class="text-muted">Direct bank transfer</small>
+                                </div>
+                                <div class="payment-method-card" data-method="Mobile Payment">
+                                    <i class="bi bi-phone payment-method-icon"></i>
+                                    <h6 class="fw-bold mb-1">Mobile Payment</h6>
+                                    <small class="text-muted">Dialog, Mobitel, Airtel</small>
+                                </div>
+                                <div class="payment-method-card" data-method="Cash">
+                                    <i class="bi bi-cash payment-method-icon"></i>
+                                    <h6 class="fw-bold mb-1">Cash</h6>
+                                    <small class="text-muted">Pay at venue</small>
+                                </div>
+                            </div>
+                            <input type="hidden" name="paymentMethod" id="selectedPaymentMethod" required />
+                        </div>
+
+                        <!-- Security Badge -->
+                        <div class="security-badge">
+                            <i class="bi bi-shield-check text-success me-2"></i>
+                            <span class="fw-semibold">Secure Payment</span>
+                            <small class="d-block text-muted mt-1">Your payment information is encrypted and secure</small>
+                        </div>
+
+                        <!-- Confirm Button -->
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-success-custom btn-custom pulse" id="confirmBtn">
+                                <i class="bi bi-lock-fill me-2"></i>Confirm Secure Payment
+                            </button>
+                        </div>
+                    }
+                </div>
             }
         </div>
     </div>
 </section>
 
-<!-- Dynamic Calculation Script -->
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @section scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -139,6 +634,8 @@
             const promoSelect = document.getElementById("promoCode");
             const pointsCheckbox = document.getElementById("usePoints");
             const loyaltyPoints = parseFloat("@loyaltyPoints");
+            const paymentForm = document.getElementById("paymentForm");
+            const confirmBtn = document.getElementById("confirmBtn");
 
             const discountSection = document.getElementById("discountSection");
             const discountAmount = document.getElementById("discountAmount");
@@ -146,6 +643,19 @@
             const pointsUsed = document.getElementById("pointsUsed");
             const finalAmount = document.getElementById("finalAmount");
 
+            // Payment method selection
+            const paymentCards = document.querySelectorAll('.payment-method-card');
+            const selectedPaymentMethod = document.getElementById('selectedPaymentMethod');
+
+            paymentCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    paymentCards.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedPaymentMethod.value = this.dataset.method;
+                });
+            });
+
+            // Update final amount calculation
             function updateFinalAmount() {
                 let discount = 0;
                 let points = 0;
@@ -153,7 +663,7 @@
                 const selected = promoSelect.options[promoSelect.selectedIndex];
                 if (selected && selected.dataset.discount) {
                     discount = (total * parseFloat(selected.dataset.discount)) / 100;
-                    discountSection.style.display = "block";
+                    discountSection.style.display = "flex";
                     discountAmount.innerText = discount.toFixed(2);
                 } else {
                     discountSection.style.display = "none";
@@ -161,18 +671,106 @@
 
                 if (pointsCheckbox.checked && loyaltyPoints > 0) {
                     points = Math.min(loyaltyPoints, total - discount);
-                    pointsSection.style.display = "block";
+                    pointsSection.style.display = "flex";
                     pointsUsed.innerText = points.toFixed(2);
                 } else {
                     pointsSection.style.display = "none";
                 }
 
-                const final = total - discount - points;
+                const final = Math.max(0, total - discount - points);
                 finalAmount.innerText = final.toFixed(2);
             }
 
             promoSelect.addEventListener("change", updateFinalAmount);
             pointsCheckbox.addEventListener("change", updateFinalAmount);
+
+            // Form submission handling
+            paymentForm.addEventListener('submit', function(e) {
+                if (!selectedPaymentMethod.value) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Select Payment Method',
+                        text: 'Please select a payment method to continue.',
+                        icon: 'warning',
+                        confirmButtonColor: '#667eea'
+                    });
+                    return;
+                }
+
+                const final = parseFloat(document.getElementById('finalAmount').textContent);
+
+                // Show confirmation dialog
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Confirm Payment?',
+                    html: `
+                        <div class="text-start">
+                            <p><strong>Event:</strong> @Model.Event.Title</p>
+                            <p><strong>Amount:</strong> LKR ${final.toFixed(2)}</p>
+                            <p><strong>Method:</strong> ${selectedPaymentMethod.value}</p>
+                            <p class="text-muted small mt-3"><i class="bi bi-shield-check me-1"></i>Your payment is secure and encrypted</p>
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Pay Now',
+                    cancelButtonText: 'Review Details',
+                    confirmButtonColor: '#198754',
+                    background: '#fff',
+                    color: '#333'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state
+                        confirmBtn.innerHTML = '<i class="bi bi-arrow-repeat spinner me-2"></i>Processing...';
+                        confirmBtn.disabled = true;
+
+                        // Submit the form
+                        setTimeout(() => {
+                            paymentForm.submit();
+                        }, 1000);
+                    }
+                });
+            });
+
+            // Add hover effects
+            const infoItems = document.querySelectorAll('.info-item');
+            infoItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(5px)';
+                });
+
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+
+            // Button click animations
+            const buttons = document.querySelectorAll('.btn-custom');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+
+            // Initial calculation
+            updateFinalAmount();
         });
+
+        // Add spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+            .spinner {
+                animation: spin 1s linear infinite;
+            }
+            @@keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 }

@@ -1,44 +1,34 @@
 ﻿using EventSphere.Helpers;
 using EventSphere.Models;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using CrystalDecisions.CrystalReports.Engine;
-using CrystalDecisions.Shared;
 
 namespace EventSphere.Controllers
 {
     public class AdminController : BaseController
     {
-        private EventSphereDBEntities db = new EventSphereDBEntities();
+        private readonly EventSphereDBEntities db = new EventSphereDBEntities();
 
-        // Dashboard (Admin Overview)
+        // Admin Dashboard
         [HttpGet]
         public ActionResult Dashboard()
         {
             if (!SessionHelper.IsAdmin())
                 return RedirectToAction("Login", "Account");
 
-            var totalUsers = db.Users.Count();
-            var totalEvents = db.Events.Count();
-            var totalBookings = db.Bookings.Count();
-            var totalRevenue = db.Payments.Sum(p => (decimal?)p.Amount) ?? 0;
+            ViewBag.TotalUsers = db.Users.Count();
+            ViewBag.TotalEvents = db.Events.Count();
+            ViewBag.TotalBookings = db.Bookings.Count();
+            ViewBag.TotalRevenue = db.Payments.Sum(p => (decimal?)p.Amount) ?? 0;
 
-            ViewBag.TotalUsers = totalUsers;
-            ViewBag.TotalEvents = totalEvents;
-            ViewBag.TotalBookings = totalBookings;
-            ViewBag.TotalRevenue = totalRevenue;
-
-            // Get recent 5 bookings
             var recentBookings = db.Bookings
-                .OrderByDescending(b => b.BookingDate)
-                .Take(5)
                 .Include("Event")
                 .Include("User")
+                .OrderByDescending(b => b.BookingDate)
+                .Take(5)
                 .ToList();
 
             return View(recentBookings);
@@ -57,14 +47,13 @@ namespace EventSphere.Controllers
                 .Include("Venue")
                 .Include("User")
                 .Include("EventCategory")
-                .OrderByDescending(e => e.StartDate);
+                .AsQueryable();
 
             if (categoryId.HasValue)
-                events = events.Where(e => e.CategoryID == categoryId.Value)
-                               .OrderByDescending(e => e.StartDate);
+                events = events.Where(e => e.CategoryID == categoryId.Value);
 
-            return View(events.ToList());
-
+            var eventList = events.OrderByDescending(e => e.StartDate).ToList();
+            return View(eventList);
         }
 
         // Manage Users
@@ -74,10 +63,10 @@ namespace EventSphere.Controllers
             if (!SessionHelper.IsAdmin())
                 return RedirectToAction("Login", "Account");
 
-            int currentAdminId = SessionHelper.GetUserId().Value;
+            int adminId = SessionHelper.GetUserId().Value;
 
             var users = db.Users
-                .Where(u => u.UserID != currentAdminId)
+                .Where(u => u.UserID != adminId)
                 .OrderBy(u => u.Role)
                 .ThenBy(u => u.FullName)
                 .ToList();
@@ -101,7 +90,7 @@ namespace EventSphere.Controllers
             return View(bookings);
         }
 
-        // Reports (Crystal Reports placeholder)
+        // Reports Page
         [HttpGet]
         public ActionResult Reports()
         {
@@ -111,64 +100,134 @@ namespace EventSphere.Controllers
             return View();
         }
 
-        [HttpGet]
-        public ActionResult GenerateReport(string reportType, DateTime? startDate, DateTime? endDate)
+        // Generate Reports (PDF/Excel)
+        [HttpPost]
+        public ActionResult GenerateReport(string reportType, DateTime? startDate, DateTime? endDate, string format = "PDF")
         {
             if (!SessionHelper.IsAdmin())
                 return RedirectToAction("Login", "Account");
 
-            if (string.IsNullOrEmpty(reportType))
-            {
-                ViewBag.Error = "Please select a report type.";
-                return View("Reports");
-            }
-
             try
             {
-                // Report path
-                string reportFile = Server.MapPath($"~/Reports/{reportType}Report.rpt");
-                if (!System.IO.File.Exists(reportFile))
+                if (string.IsNullOrEmpty(reportType))
                 {
-                    ViewBag.Error = $"Report file not found for {reportType}.";
-                    return View("Reports");
+                    TempData["Error"] = "Please select a report type.";
+                    return RedirectToAction("Reports");
                 }
 
-                // Load the report
-                ReportDocument reportDoc = new ReportDocument();
-                reportDoc.Load(reportFile);
-
-                // Database connection (if needed)
-                reportDoc.SetDatabaseLogon("your_db_username", "your_db_password", "your_server_name", "your_database_name");
-
-                // Optional parameters for date filtering
-                if (startDate.HasValue && endDate.HasValue)
-                {
-                    reportDoc.SetParameterValue("StartDate", startDate.Value);
-                    reportDoc.SetParameterValue("EndDate", endDate.Value);
-                }
-
-                // Export to PDF
                 string exportDir = Server.MapPath("~/Reports/Generated/");
                 if (!Directory.Exists(exportDir))
                     Directory.CreateDirectory(exportDir);
 
-                string exportFile = Path.Combine(exportDir, $"{reportType}_Report_{DateTime.Now:yyyyMMddHHmmss}.pdf");
-                reportDoc.ExportToDisk(ExportFormatType.PortableDocFormat, exportFile);
+                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string fileName = $"{reportType}_Report_{timestamp}";
+                string fullPath;
 
-                // Dispose
-                reportDoc.Close();
-                reportDoc.Dispose();
+                // --- SELECT DATA BASED ON REPORT TYPE ---
+                object data;
+                switch (reportType)
+                {
+                    case "Bookings":
+                        data = db.Bookings
+                            .Include("User").Include("Event")
+                            .Where(b => (!startDate.HasValue || b.BookingDate >= startDate)
+                                     && (!endDate.HasValue || b.BookingDate <= endDate))
+                            .Select(b => new
+                            {
+                                b.BookingID,
+                                Event = b.Event.Title,
+                                Customer = b.User.FullName,
+                                b.BookingDate,
+                                b.TotalAmount,
+                                b.PaymentStatus
+                            }).ToList();
+                        break;
 
-                // Send to view
-                ViewBag.ReportPath = "~/Reports/Generated/" + Path.GetFileName(exportFile);
-                ViewBag.Success = $"{reportType} Report generated successfully!";
+                    case "Payments":
+                        data = db.Payments
+                            .Include("Booking.Event").Include("Booking.User")
+                            .Where(p => (!startDate.HasValue || p.PaymentDate >= startDate)
+                                     && (!endDate.HasValue || p.PaymentDate <= endDate))
+                            .Select(p => new
+                            {
+                                p.TransactionID,
+                                Event = p.Booking.Event.Title,
+                                Customer = p.Booking.User.FullName,
+                                p.Amount,
+                                p.PaymentGateway,
+                                p.PaymentDate,
+                                p.Status
+                            }).ToList();
+                        break;
+
+                    case "Events":
+                        data = db.Events
+                            .Include("EventCategory").Include("Venue").Include("User")
+                            .Where(e => (!startDate.HasValue || e.StartDate >= startDate)
+                                     && (!endDate.HasValue || e.StartDate <= endDate))
+                            .Select(e => new
+                            {
+                                e.EventID,
+                                e.Title,
+                                Category = e.EventCategory.CategoryName,
+                                Venue = e.Venue.VenueName,
+                                Organizer = e.User.FullName,
+                                e.StartDate,
+                                e.EndDate,
+                                e.Status
+                            }).ToList();
+                        break;
+
+                    case "Users":
+                        data = db.Users
+                            .Select(u => new
+                            {
+                                u.UserID,
+                                u.FullName,
+                                u.Email,
+                                u.Role,
+                                u.CreatedAt,
+                                u.LoyaltyPoints
+                            }).ToList();
+                        break;
+
+                    default:
+                        TempData["Error"] = "Invalid report type selected.";
+                        return RedirectToAction("Reports");
+                }
+
+                if (data == null || !((System.Collections.IEnumerable)data).Cast<object>().Any())
+                {
+                    TempData["Error"] = "No records found for the selected filters.";
+                    return RedirectToAction("Reports");
+                }
+
+                // --- EXPORT ---
+                if (format.ToUpper() == "EXCEL")
+                {
+                    fullPath = Path.Combine(exportDir, $"{fileName}.xlsx");
+                    Type dataType = data.GetType().GetGenericArguments().FirstOrDefault() ?? typeof(object);
+                    var exportToExcelMethod = typeof(ExportHelper).GetMethod("ExportToExcel").MakeGenericMethod(dataType);
+                    exportToExcelMethod.Invoke(null, new object[] { data, fullPath });
+                }
+                else
+                {
+                    fullPath = Path.Combine(exportDir, $"{fileName}.pdf");
+                    Type dataType = data.GetType().GetGenericArguments().FirstOrDefault() ?? typeof(object);
+                    var exportToPdfMethod = typeof(ExportHelper).GetMethod("ExportToPdf").MakeGenericMethod(dataType);
+                    exportToPdfMethod.Invoke(null, new object[] { data, fullPath, $"{reportType} Report" });
+                }
+
+                TempData["Success"] = $"{reportType} report generated successfully!";
+                TempData["ReportPath"] = "/Reports/Generated/" + Path.GetFileName(fullPath);
+
+                return RedirectToAction("Reports");
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Error generating report: " + ex.Message;
+                TempData["Error"] = "Error generating report: " + ex.Message;
+                return RedirectToAction("Reports");
             }
-
-            return View("Reports");
         }
     }
 }

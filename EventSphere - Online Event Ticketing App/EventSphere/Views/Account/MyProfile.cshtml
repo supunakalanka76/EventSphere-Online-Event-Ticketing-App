@@ -4,111 +4,647 @@
     Layout = ViewBag.LayoutPath ?? "~/Views/Shared/_LayoutCustomer.cshtml";
 }
 
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .profile-hero {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 3rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 1000,100 1000,0"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .profile-container {
+        position: relative;
+        z-index: 2;
+    }
+
+    .profile-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+        overflow: hidden;
+        animation: slideUp 0.8s ease-out;
+        margin-top: -50px;
+    }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .profile-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .profile-avatar {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .profile-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+        .profile-image:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+    .avatar-upload {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: var(--success-gradient);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+    }
+
+        .avatar-upload:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.6);
+        }
+
+    .role-badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+    }
+
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+        .form-label i {
+            margin-right: 8px;
+            color: #667eea;
+            width: 16px;
+            text-align: center;
+        }
+
+    .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-control[readonly] {
+            background-color: #f8f9fa;
+            opacity: 0.8;
+        }
+
+    .loyalty-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        margin: 2rem 0;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .loyalty-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+    @@keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .loyalty-points {
+        font-size: 3rem;
+        font-weight: 700;
+        margin: 1rem 0;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .loyalty-stars {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-loyalty {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        padding: 8px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+        .btn-loyalty:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+    .btn-update {
+        background: var(--success-gradient);
+        border: none;
+        border-radius: 12px;
+        padding: 14px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .btn-update::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-update:hover::before {
+            left: 100%;
+        }
+
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+    .back-link {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+        .back-link:hover {
+            color: #764ba2;
+            transform: translateX(-5px);
+        }
+
+    .alert {
+        border: none;
+        border-radius: 12px;
+        padding: 15px 20px;
+        margin-bottom: 1.5rem;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .alert-success {
+        background: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border-left: 4px solid #198754;
+    }
+
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border-left: 4px solid #dc3545;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .stat-item {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .profile-card {
+            margin-top: -30px;
+        }
+
+        .profile-header {
+            padding: 1.5rem;
+        }
+
+        .profile-image {
+            width: 120px;
+            height: 120px;
+        }
+
+        .loyalty-points {
+            font-size: 2.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+</style>
+
 <!-- Hero Section -->
-<section class="bg-primary text-white text-center py-5">
-    <div class="container">
-        <h1 class="fw-bold"><i class="bi bi-person-circle"></i> My Profile</h1>
-        <p class="lead mb-0">Manage your personal details and stay up to date.</p>
+<section class="profile-hero">
+    <div class="container profile-container">
+        <div class="text-center">
+            <h1 class="fw-bold display-5 mb-3"><i class="bi bi-person-circle me-3"></i>My Profile</h1>
+            <p class="lead mb-0">Manage your personal details and stay up to date</p>
+        </div>
     </div>
 </section>
 
 <!-- Profile Form -->
-<div class="container my-5" style="max-width: 750px;">
-    <div class="card shadow-lg border-0 rounded-3">
-        <div class="card-body p-4">
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success text-center"><i class="bi bi-check-circle-fill"></i> @TempData["Success"]</div>
-            }
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger text-center"><i class="bi bi-exclamation-triangle-fill"></i> @ViewBag.Error</div>
-            }
-
-            @using (Html.BeginForm("MyProfile", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
-            {
-                @Html.AntiForgeryToken()
-
-                @Html.HiddenFor(m => m.UserID)
-
-                <div class="text-center mb-4">
-                    <div class="position-relative d-inline-block">
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
                         <img src="@Url.Content(Model.ProfileImage ?? "~/Content/ProfileImages/default-profile.png")"
                              id="profilePreview"
                              alt="Profile"
-                             class="rounded-circle shadow-sm border"
-                             style="width:130px; height:130px; object-fit:cover;" />
-                        <label for="ProfileImageFile" class="btn btn-sm btn-light position-absolute bottom-0 end-0 border">
-                            <i class="bi bi-camera"></i>
+                             class="profile-image floating" />
+                        <label for="ProfileImageFile" class="avatar-upload">
+                            <i class="bi bi-camera-fill"></i>
                         </label>
                     </div>
-                    <input type="file" name="ProfileImageFile" id="ProfileImageFile" class="d-none" accept="image/*" />
-                    <h4 class="fw-bold mt-3">@Model.FullName</h4>
-                    <p class="text-muted">@Model.Role</p>
+                    <h3 class="fw-bold mb-2">@Model.FullName</h3>
+                    <div class="role-badge">@Model.Role</div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Full Name</label>
-                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter full name", required = "required" })
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Email</label>
-                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @readonly = "readonly" })
-                    </div>
-                </div>
+                <div class="card-body p-4">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success animate__animated animate__fadeIn">
+                            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                        </div>
+                    }
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger animate__animated animate__shakeX">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> @ViewBag.Error
+                        </div>
+                    }
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Phone</label>
-                        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "Enter phone number" })
+                    <!-- Quick Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number">@(Model.LoyaltyPoints ?? 0)</div>
+                            <div class="stat-label">Loyalty Points</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Events Attended</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Upcoming Events</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">@DateTime.Now.Year</div>
+                            <div class="stat-label">Member Since</div>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Address</label>
-                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "Enter address" })
-                    </div>
-                </div>
 
-                <!-- Loyalty Points -->
-                <div class="card bg-light border-0 mt-4 mb-3 p-3 text-center">
-                    @if (Model.Role == "Customer")
-                     {
-                        <h5 class="fw-bold mb-1"><i class="bi bi-stars text-warning"></i> Loyalty Points</h5>
-                        <p class="fs-4 fw-semibold text-primary">@Model.LoyaltyPoints</p>
-                        <a href="@Url.Action("Loyalty", "Account")" class="btn btn-outline-primary btn-sm">
-                            View Loyalty History
+                    @using (Html.BeginForm("MyProfile", "Account", FormMethod.Post, new { enctype = "multipart/form-data", id = "profileForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.UserID)
+
+                        <input type="file" name="ProfileImageFile" id="ProfileImageFile" class="d-none" accept="image/*" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-person-fill"></i>Full Name
+                                    </label>
+                                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter your full name", required = "required" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-envelope-fill"></i>Email Address
+                                    </label>
+                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @readonly = "readonly" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-telephone-fill"></i>Phone Number
+                                    </label>
+                                    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "Enter your phone number" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="bi bi-geo-alt-fill"></i>Address
+                                    </label>
+                                    @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "Enter your address" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Loyalty Points Section -->
+                            <div class="loyalty-card">
+                                <div class="loyalty-stars">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                </div>
+                                @if (Model.Role == "Customer") 
+                                { 
+                                    <h5 class="fw-bold mb-2">Your Loyalty Points</h5>
+                                    <div class="loyalty-points pulse">@Model.LoyaltyPoints</div>
+                                    <p class="mb-3 opacity-75">Keep attending events to earn more points!</p>
+                                    <a href="@Url.Action("Loyalty", "Account")" class="btn btn-loyalty">
+                                        <i class="bi bi-graph-up me-2"></i>View Loyalty History
+                                    </a>
+                                 }
+                            </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-update" id="updateButton">
+                                <i class="bi bi-save me-2"></i>Update Profile
+                            </button>
+                        </div>
+                    }
+
+                    <div class="text-center mt-4">
+                        <a href="@Url.Action("Index", "Home")" class="back-link">
+                            <i class="bi bi-arrow-left-circle me-2"></i>Back to Home
                         </a>
-                     }
+                    </div>
                 </div>
-
-                <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-success btn-lg fw-semibold">
-                        <i class="bi bi-save"></i> Update Profile
-                    </button>
-                </div>
-            }
-
-            <div class="text-center mt-4">
-                <a href="@Url.Action("Index", "Home")" class="text-decoration-none fw-semibold">
-                    <i class="bi bi-arrow-left-circle"></i> Back to Home
-                </a>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @section scripts {
     <script>
-        // Profile image preview
-        document.getElementById('ProfileImageFile').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (ev) {
-                    document.getElementById('profilePreview').src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Profile image preview and upload
+            const profileImageFile = document.getElementById('ProfileImageFile');
+            const profilePreview = document.getElementById('profilePreview');
+
+            profileImageFile.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    if (!file.type.startsWith('image/')) {
+                        Swal.fire({
+                            title: 'Invalid File',
+                            text: 'Please select an image file (JPEG, PNG, etc.)',
+                            icon: 'error',
+                            confirmButtonColor: '#667eea'
+                        });
+                        return;
+                    }
+
+                    // Validate file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        Swal.fire({
+                            title: 'File Too Large',
+                            text: 'Please select an image smaller than 5MB',
+                            icon: 'error',
+                            confirmButtonColor: '#667eea'
+                        });
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        profilePreview.src = ev.target.result;
+
+                        // Show success message
+                        Swal.fire({
+                            title: 'Image Updated!',
+                            text: 'Your profile picture has been updated. Click "Update Profile" to save changes.',
+                            icon: 'success',
+                            confirmButtonColor: '#667eea',
+                            timer: 3000
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Form submission handling
+            const profileForm = document.getElementById('profileForm');
+            const updateButton = document.getElementById('updateButton');
+
+            profileForm.addEventListener('submit', function(e) {
+                // Show loading state
+                updateButton.innerHTML = '<i class="bi bi-arrow-repeat spinner me-2"></i>Updating...';
+                updateButton.disabled = true;
+
+                // Re-enable button after 5 seconds (in case of slow response)
+                setTimeout(() => {
+                    updateButton.innerHTML = '<i class="bi bi-save me-2"></i>Update Profile';
+                    updateButton.disabled = false;
+                }, 5000);
+            });
+
+            // Add input focus effects
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.parentElement.classList.remove('focused');
+                    }
+                });
+            });
+
+            // Add hover effects to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
         });
+
+        // Add spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+            .spinner {
+                animation: spin 1s linear infinite;
+            }
+            @@keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 }

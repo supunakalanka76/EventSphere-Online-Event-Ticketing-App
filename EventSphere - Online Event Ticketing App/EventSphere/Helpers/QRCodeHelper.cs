@@ -27,7 +27,7 @@ namespace EventSphere.Helpers
             return GenerateQRCode(qrContent, "Tickets");
         }
 
-        /// Generates and saves a QR image in ~/Content/{folderName}/,
+        /// Generates and saves a QR image in ~/Content/QRCodes/,
         /// returns relative URL (for web display).
         public static string GenerateQRCode(string qrText, string folderName)
         {
@@ -35,7 +35,7 @@ namespace EventSphere.Helpers
                 throw new ArgumentException("QR text cannot be empty.");
 
             // Folder path resolution
-            string folderPath = HttpContext.Current.Server.MapPath($"~/Content/{folderName}/");
+            string folderPath = HttpContext.Current.Server.MapPath($"~/Content/QRCodes/");
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
@@ -52,7 +52,7 @@ namespace EventSphere.Helpers
                 qrBitmap.Save(fullPath, System.Drawing.Imaging.ImageFormat.Png);
             }
 
-            return $"/Content/{folderName}/{fileName}";
+            return $"/Content/QRCodes/{fileName}";
         }
         /// Generates a Base64-encoded QR image (for inline PDF embedding).
         /// Returns a "data:image/png;base64,..." string.

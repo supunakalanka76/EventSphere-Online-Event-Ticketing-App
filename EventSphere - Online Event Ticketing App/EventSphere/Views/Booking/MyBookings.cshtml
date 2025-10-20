@@ -4,22 +4,411 @@
     Layout = ViewBag.LayoutPath;
 }
 
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+    }
+
+    .bookings-hero {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 4rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .bookings-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 1000,100 1000,0"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .filter-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: -50px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .filter-btn {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 25px;
+        padding: 10px 25px;
+        font-weight: 600;
+        color: #6c757d;
+        transition: all 0.3s ease;
+        margin: 0 5px;
+    }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-gradient);
+            border-color: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+    .booking-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        height: 100%;
+    }
+
+        .booking-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+    .event-image-container {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .event-image {
+        height: 200px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .booking-card:hover .event-image {
+        transform: scale(1.05);
+    }
+
+    .event-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: var(--secondary-gradient);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        z-index: 2;
+    }
+
+    .date-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-align: center;
+        backdrop-filter: blur(10px);
+    }
+
+    .date-day {
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 1;
+        display: block;
+    }
+
+    .date-month {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        opacity: 0.9;
+    }
+
+    .booking-info {
+        padding: 1.5rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .info-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+        .info-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+    .info-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 0;
+    }
+
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .ticket-preview {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-top: 2px dashed #dee2e6;
+    }
+
+    .qr-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 10px;
+        justify-items: center;
+    }
+
+    .qr-item {
+        text-align: center;
+    }
+
+    .qr-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+        .qr-image:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+        }
+
+    .btn-custom {
+        border-radius: 12px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-outline-custom {
+        background: transparent;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+        .btn-outline-custom:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+    .empty-state {
+        padding: 4rem 2rem;
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .stats-bar {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 0 1rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .filter-section {
+            margin-top: -30px;
+            padding: 1.5rem;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            margin: 2px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-bar {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+        }
+    }
+
+    .countdown-badge {
+        background: var(--warning-gradient);
+        color: #2c3e50;
+        padding: 0.5rem 1rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        display: inline-block;
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+</style>
+
 <!-- Hero Section -->
-<section class="bg-primary text-white text-center py-5">
-    <div class="container">
-        <i class="bi bi-ticket-perforated-fill display-3 mb-3"></i>
-        <h1 class="fw-bold">My Bookings</h1>
-        <p class="lead mb-0">View all your past and upcoming event bookings 🎟️</p>
+<section class="bookings-hero">
+    <div class="container hero-content">
+        <div class="text-center">
+            <i class="bi bi-ticket-perforated-fill display-1 mb-3 floating"></i>
+            <h1 class="fw-bold display-4 mb-3">My Bookings</h1>
+            <p class="lead mb-0 fs-4">View all your past and upcoming event bookings 🎟️</p>
+        </div>
     </div>
 </section>
 
-<!-- Filter Section -->
+<!-- Filter & Stats Section -->
 <section class="container my-5">
-    <div class="text-center mb-4">
-        <div class="btn-group" role="group" aria-label="Filter Bookings">
-            <button class="btn btn-outline-primary active" id="filterAll">All</button>
-            <button class="btn btn-outline-primary" id="filterUpcoming">Upcoming</button>
-            <button class="btn btn-outline-primary" id="filterPast">Past</button>
+    <div class="filter-section">
+        <!-- Stats Bar -->
+        @{
+            var upcomingCount = Model?.Count(b => b.Event.StartDate > DateTime.Now) ?? 0;
+            var pastCount = Model?.Count(b => b.Event.StartDate <= DateTime.Now) ?? 0;
+
+            // Safe calculation for total spent
+            var totalSpent = Model?
+                .Where(b => string.Equals(b.PaymentStatus, "Completed", StringComparison.OrdinalIgnoreCase))
+                .Sum(b => (decimal?)b.TotalAmount) ?? 0;
+        }
+
+        <div class="stats-bar">
+            <div class="row text-center">
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="stat-item">
+                        <div class="stat-number">@(Model?.Count() ?? 0)</div>
+                        <div class="stat-label">Total Bookings</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="stat-item">
+                        <div class="stat-number">@upcomingCount</div>
+                        <div class="stat-label">Upcoming</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="stat-item">
+                        <div class="stat-number">@pastCount</div>
+                        <div class="stat-label">Past Events</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="stat-item">
+                        <div class="stat-number">LKR @ViewBag.TotalSpent.ToString("N0")</div>
+                        <div class="stat-label">Total Spent</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="text-center">
+            <div class="btn-group" role="group" aria-label="Filter Bookings">
+                <button class="filter-btn active" id="filterAll">All Bookings</button>
+                <button class="filter-btn" id="filterUpcoming">Upcoming</button>
+                <button class="filter-btn" id="filterPast">Past Events</button>
+            </div>
         </div>
     </div>
 
@@ -29,53 +418,101 @@
             @foreach (var booking in Model)
             {
                 var isUpcoming = booking.Event.StartDate > DateTime.Now;
+                var daysUntil = isUpcoming ? (booking.Event.StartDate - DateTime.Now).Days : 0;
                 var statusBadge = booking.PaymentStatus == "Paid"
-                    ? "bg-success"
+                    ? "status-badge bg-success text-white"
                     : booking.PaymentStatus == "Pending"
-                        ? "bg-warning text-dark"
-                        : "bg-secondary";
+                        ? "status-badge bg-warning text-dark"
+                        : "status-badge bg-secondary text-white";
 
                 <div class="col-md-6 col-lg-4 booking-card" data-upcoming="@isUpcoming.ToString().ToLower()">
                     <div class="card border-0 shadow-sm h-100">
-                        <img src="@(!string.IsNullOrEmpty(booking.Event.EventImage) ? booking.Event.EventImage : "/Content/Images/default-event.jpg")"
-                             class="card-img-top"
-                             alt="@booking.Event.Title"
-                             style="height: 180px; object-fit: cover;" />
+                        <div class="event-image-container">
+                            <img src="@(!string.IsNullOrEmpty(booking.Event.EventImage) ? booking.Event.EventImage : "/Content/Events/default-event.png")"
+                                 class="event-image"
+                                 alt="@booking.Event.Title"
+                                 onerror="this.src='/Content/Events/default-event.png'" />
 
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">@booking.Event.Title</h5>
-                            <p class="text-muted mb-2">
-                                <i class="bi bi-geo-alt"></i> @booking.Event.Venue.VenueName, @booking.Event.Venue.City
-                            </p>
+                            <div class="event-badge">
+                                @booking.Quantity Ticket@(booking.Quantity > 1 ? "s" : "")
+                            </div>
+
+                            <div class="date-badge">
+                                <span class="date-day">@booking.Event.StartDate.Day</span>
+                                <span class="date-month">@booking.Event.StartDate.ToString("MMM")</span>
+                            </div>
+                        </div>
+
+                        <div class="booking-info">
+                            <h5 class="fw-bold text-dark mb-2">@booking.Event.Title</h5>
                             <p class="text-muted mb-3">
-                                <i class="bi bi-calendar-event"></i> @booking.Event.StartDate.ToString("MMMM dd, yyyy")
+                                <i class="bi bi-geo-alt me-1"></i>@booking.Event.Venue.VenueName, @booking.Event.Venue.City
                             </p>
-                            <p><strong>Tickets:</strong> @booking.Quantity</p>
-                            <p><strong>Total:</strong> LKR @booking.TotalAmount.ToString("N2")</p>
-                            <p><strong>Status:</strong> <span class="badge @statusBadge">@booking.PaymentStatus</span></p>
+
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Time</div>
+                                    <div class="info-value">@booking.Event.StartDate.ToString("hh:mm tt")</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Total</div>
+                                    <div class="info-value">LKR @booking.TotalAmount.ToString("N0")</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Status</div>
+                                    <div class="info-value">
+                                        <span class="@statusBadge">@booking.PaymentStatus</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Booked On</div>
+                                    <div class="info-value">@booking.BookingDate?.ToString("MMM dd")</div>
+                                </div>
+                            </div>
+
+                            @if (isUpcoming && daysUntil > 0)
+                            {
+                                <div class="text-center">
+                                    <span class="countdown-badge pulse">
+                                        <i class="bi bi-clock me-1"></i>@daysUntil day@(daysUntil > 1 ? "s" : "") to go!
+                                    </span>
+                                </div>
+                            }
                         </div>
 
                         <!-- Ticket Preview -->
                         @if (booking.Tickets != null && booking.Tickets.Any())
                         {
-                            <div class="card-footer bg-light text-center">
-                                <div class="d-flex flex-wrap justify-content-center gap-2">
-                                    @foreach (var t in booking.Tickets.Take(2))
+                            <div class="ticket-preview">
+                                <h6 class="fw-bold mb-3 text-center">
+                                    <i class="bi bi-qr-code me-2"></i>Your Tickets
+                                </h6>
+                                <div class="qr-grid">
+                                    @foreach (var t in booking.Tickets.Take(3))
                                     {
-                                        <img src="@t.QRCodeImage" alt="QR" class="img-thumbnail" style="width:80px; height:80px;">
+                                        <div class="qr-item">
+                                            <img src="@t.QRCodeImage" alt="QR Code" class="qr-image"
+                                                 onerror="this.src='/Content/Images/qr-placeholder.png'" />
+                                            <small class="text-muted d-block mt-1">@t.TicketNumber.Substring(t.TicketNumber.Length - 4)</small>
+                                        </div>
                                     }
-                                    @if (booking.Tickets.Count > 2)
+                                    @if (booking.Tickets.Count > 3)
                                     {
-                                        <span class="text-muted">+@((booking.Tickets.Count - 2)) more</span>
+                                        <div class="qr-item">
+                                            <div class="qr-image bg-light d-flex align-items-center justify-content-center">
+                                                <span class="text-muted fw-bold">+@(booking.Tickets.Count - 3)</span>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">More</small>
+                                        </div>
                                     }
                                 </div>
                             </div>
                         }
 
-                        <div class="card-footer bg-white border-0 text-center">
+                        <div class="card-footer bg-white border-0 text-center pt-0">
                             <a href="@Url.Action("Confirmation", "Booking", new { bookingId = booking.BookingID })"
-                               class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-eye"></i> View Details
+                               class="btn btn-outline-custom btn-custom w-100">
+                                <i class="bi bi-eye me-2"></i>View Details
                             </a>
                         </div>
                     </div>
@@ -85,37 +522,117 @@
     }
     else
     {
-        <div class="text-center py-5">
-            <i class="bi bi-calendar-x display-3 text-muted"></i>
-            <h5 class="text-muted mt-3">You don’t have any bookings yet.</h5>
-            <a href="@Url.Action("Index", "Event")" class="btn btn-primary mt-3">
-                <i class="bi bi-calendar-event"></i> Browse Events
+        <div class="empty-state">
+            <i class="bi bi-calendar-x empty-icon"></i>
+            <h3 class="text-muted mb-3">No Bookings Yet</h3>
+            <p class="text-muted mb-4">Start exploring events and book your first experience!</p>
+            <a href="@Url.Action("Index", "Event")" class="btn btn-primary btn-lg">
+                <i class="bi bi-calendar-event me-2"></i>Browse Events
             </a>
         </div>
     }
 </section>
 
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @section scripts {
     <script>
-        const filterButtons = document.querySelectorAll('[id^="filter"]');
-        const cards = document.querySelectorAll('.booking-card');
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterButtons = document.querySelectorAll('[id^="filter"]');
+            const cards = document.querySelectorAll('.booking-card');
 
-        filterButtons.forEach(btn => {
-            btn.addEventListener("click", () => {
-                filterButtons.forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
+            // Filter functionality
+            filterButtons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    filterButtons.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
 
-                const filter = btn.id.replace("filter", "").toLowerCase();
+                    const filter = btn.id.replace("filter", "").toLowerCase();
 
-                cards.forEach(card => {
-                    const isUpcoming = card.dataset.upcoming === "true";
-                    card.style.display = (
-                        filter === "all" ||
-                        (filter === "upcoming" && isUpcoming) ||
-                        (filter === "past" && !isUpcoming)
-                    ) ? "block" : "none";
+                    cards.forEach(card => {
+                        const isUpcoming = card.dataset.upcoming === "true";
+                        card.style.display = (
+                            filter === "all" ||
+                            (filter === "upcoming" && isUpcoming) ||
+                            (filter === "past" && !isUpcoming)
+                        ) ? "block" : "none";
+                    });
+
+                    // Show filter result message
+                    const visibleCount = document.querySelectorAll('.booking-card[style="block"]').length;
+                    if (visibleCount === 0) {
+                        Swal.fire({
+                            title: 'No Bookings Found',
+                            text: `No ${filter === 'all' ? '' : filter} bookings match your criteria.`,
+                            icon: 'info',
+                            confirmButtonColor: '#667eea',
+                            timer: 2000
+                        });
+                    }
                 });
             });
+
+            // Add hover effects to cards
+            const bookingCards = document.querySelectorAll('.booking-card');
+            bookingCards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-10px)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Add click animation to buttons
+            const buttons = document.querySelectorAll('.btn-custom');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+
+            // Image error handling
+            const eventImages = document.querySelectorAll('.event-image');
+            eventImages.forEach(img => {
+                img.addEventListener('error', function () {
+                    this.src = '/Content/Events/default-event.png';
+                });
+            });
+
+            // QR code error handling
+            const qrImages = document.querySelectorAll('.qr-image');
+            qrImages.forEach(img => {
+                img.addEventListener('error', function () {
+                    this.src = '/Content/Images/qr-placeholder.png';
+                });
+            });
+
+            // Show welcome message for first-time visitors
+            if (!sessionStorage.getItem('bookingsPageVisited')) {
+                setTimeout(() => {
+                    Swal.fire({
+                        title: 'Your Booking History 📅',
+                        html: `
+                                <div class="text-start">
+                                    <p class="mb-2"><i class="bi bi-filter text-primary me-2"></i><strong>Filter Bookings:</strong> View upcoming, past, or all bookings</p>
+                                    <p class="mb-2"><i class="bi bi-qr-code text-success me-2"></i><strong>Quick Access:</strong> View QR codes for easy event entry</p>
+                                    <p class="mb-0"><i class="bi bi-clock text-warning me-2"></i><strong>Stay Updated:</strong> Countdown to your upcoming events</p>
+                                </div>
+                            `,
+                        icon: 'info',
+                        confirmButtonColor: '#667eea',
+                        confirmButtonText: 'Got It!',
+                        background: '#fff',
+                        color: '#333'
+                    });
+                    sessionStorage.setItem('bookingsPageVisited', 'true');
+                }, 1000);
+            }
         });
     </script>
 }

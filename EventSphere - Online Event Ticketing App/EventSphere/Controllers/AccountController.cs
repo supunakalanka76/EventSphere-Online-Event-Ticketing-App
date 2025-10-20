@@ -34,7 +34,11 @@ namespace EventSphere.Controllers
                     }
 
                     model.PasswordHash = PasswordHelper.HashPassword(model.PasswordHash);
-                    model.Role = "Customer"; // default self-registration role
+
+                    // Use selected role from dropdown
+                    if (string.IsNullOrEmpty(model.Role))
+                        model.Role = "Customer"; // Default fallback
+
                     model.AccountStatus = "Active";
                     model.ProfileImage = "/Content/ProfileImages/default-profile.png";
                     model.LoyaltyPoints = 0;

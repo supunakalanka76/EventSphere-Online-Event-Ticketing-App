@@ -4,11 +4,393 @@
     Layout = ViewBag.LayoutPath;
 }
 
-<!-- Hero Banner -->
-<section class="bg-primary text-white text-center py-5">
-    <div class="container">
-        <h1 class="fw-bold mb-3">@Model.Title</h1>
-        <p class="lead mb-0">Experience the best events organized for you by EventSphere</p>
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .event-hero {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 4rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .event-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 1000,100 1000,0"></polygon></svg>');
+        background-size: cover;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .event-image-container {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .event-image-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .event-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .event-image-container:hover .event-image {
+        transform: scale(1.05);
+    }
+
+    .event-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: var(--secondary-gradient);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        z-index: 2;
+    }
+
+    .event-category-badge {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+
+    .info-item:hover {
+        background: rgba(102, 126, 234, 0.05);
+        border-left-color: #667eea;
+        transform: translateX(5px);
+    }
+
+    .info-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .info-content {
+        flex-grow: 1;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    .price-tag {
+        background: var(--success-gradient);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 15px;
+        text-align: center;
+        margin: 2rem 0;
+        box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+    }
+
+    .price-amount {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+
+    .price-label {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    .btn-custom {
+        border-radius: 12px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary-custom {
+        background: var(--primary-gradient);
+        border-color: transparent;
+        color: white;
+    }
+
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+
+    .btn-outline-custom {
+        background: transparent;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .btn-outline-custom:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary-custom {
+        background: #6c757d;
+        border-color: transparent;
+        color: white;
+    }
+
+    .btn-secondary-custom:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .map-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        padding: 3rem;
+        margin: 3rem 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .map-container {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .countdown-timer {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        text-align: center;
+    }
+
+    .countdown-item {
+        display: inline-block;
+        margin: 0 10px;
+    }
+
+    .countdown-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        display: block;
+    }
+
+    .countdown-label {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-transform: uppercase;
+    }
+
+    .organizer-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        margin: 2rem 0;
+    }
+
+    .organizer-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1rem;
+        border: 3px solid #667eea;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .event-hero {
+            padding: 3rem 0;
+        }
+        
+        .info-card {
+            padding: 1.5rem;
+        }
+        
+        .price-amount {
+            font-size: 2rem;
+        }
+        
+        .map-section {
+            padding: 1.5rem;
+        }
+        
+        .countdown-item {
+            margin: 0 5px;
+        }
+        
+        .countdown-number {
+            font-size: 1.5rem;
+        }
+    }
+
+    .share-section {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .share-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 5px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .share-facebook { background: #3b5998; color: white; }
+    .share-twitter { background: #1da1f2; color: white; }
+    .share-whatsapp { background: #25d366; color: white; }
+    .share-linkedin { background: #0077b5; color: white; }
+
+    .share-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="event-hero">
+    <div class="container hero-content">
+        <div class="text-center">
+            <h1 class="fw-bold display-4 mb-3">@Model.Title</h1>
+            <p class="lead mb-0 fs-4">Experience the best events organized for you by EventSphere</p>
+            
+            <!-- Countdown Timer -->
+            @if (Model.StartDate > DateTime.Now)
+            {
+                <div class="countdown-timer mt-4">
+                    <h6 class="text-white mb-3">Event Starts In</h6>
+                    <div class="countdown" id="countdownTimer">
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="days">00</span>
+                            <span class="countdown-label">Days</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="hours">00</span>
+                            <span class="countdown-label">Hours</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="minutes">00</span>
+                            <span class="countdown-label">Minutes</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="seconds">00</span>
+                            <span class="countdown-label">Seconds</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 </section>
 
@@ -17,89 +399,290 @@
     <div class="row">
         <!-- Event Image -->
         <div class="col-lg-6 mb-4 mb-lg-0">
-            <img src="@(!string.IsNullOrEmpty(Model.EventImage) ? Model.EventImage : "/Content/Images/default-event.jpg")"
-                 class="img-fluid rounded shadow-sm w-100"
-                 alt="@Model.Title"
-                 style="object-fit: cover; max-height: 400px;" />
+            <div class="event-image-container">
+                <img src="@(!string.IsNullOrEmpty(Model.EventImage) ? Model.EventImage : "/Content/Events/default-event.png")"
+                     class="event-image"
+                     alt="@Model.Title"
+                     onerror="this.src='/Content/Events/default-event.png'" />
+                <div class="event-badge">
+                    <i class="bi bi-ticket-perforated me-1"></i>
+                    @(Model.AvailableTickets > 0 ? $"{Model.AvailableTickets} Tickets Left" : "Sold Out")
+                </div>
+                <div class="event-category-badge">
+                    @Model.EventCategory.CategoryName
+                </div>
+            </div>
+
+            <!-- Share Section -->
+            <div class="share-section mt-4">
+                <h6 class="fw-bold mb-3"><i class="bi bi-share me-2"></i>Share This Event</h6>
+                <div class="text-center">
+                    <a href="#" class="share-btn share-facebook">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                    <a href="#" class="share-btn share-twitter">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                    <a href="#" class="share-btn share-whatsapp">
+                        <i class="bi bi-whatsapp"></i>
+                    </a>
+                    <a href="#" class="share-btn share-linkedin">
+                        <i class="bi bi-linkedin"></i>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- Event Info -->
         <div class="col-lg-6">
-            <h2 class="fw-bold mb-3">@Model.Title</h2>
-            <p class="text-muted mb-4">@Model.Description</p>
+            <div class="info-card">
+                <h2 class="fw-bold mb-4 text-dark">@Model.Title</h2>
+                <p class="text-muted mb-4 lead">@Model.Description</p>
 
-            <ul class="list-unstyled mb-4">
-                <li class="mb-2">
-                    <i class="bi bi-calendar-event text-primary me-2"></i>
-                    <strong>Date:</strong> @Model.StartDate.ToString("MMMM dd, yyyy") to @Model.EndDate.ToString("MMMM dd, yyyy")
-                </li>
-                <li class="mb-2">
-                    <i class="bi bi-clock text-primary me-2"></i>
-                    <strong>Time:</strong> @Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")
-                </li>
-                <li class="mb-2">
-                    <i class="bi bi-geo-alt text-primary me-2"></i>
-                    <strong>Venue:</strong> @Model.Venue.VenueName, @Model.Venue.Address, @Model.Venue.City
-                </li>
-                <li class="mb-2">
-                    <i class="bi bi-tag text-primary me-2"></i>
-                    <strong>Category:</strong> @Model.EventCategory.CategoryName
-                </li>
-                <li class="mb-2">
-                    <i class="bi bi-person-circle text-primary me-2"></i>
-                    <strong>Organizer:</strong>
+                <div class="info-items">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Event Date</div>
+                            <div class="info-value">
+                                @Model.StartDate.ToString("MMMM dd, yyyy") to @Model.EndDate.ToString("MMMM dd, yyyy")
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Event Time</div>
+                            <div class="info-value">
+                                @Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Venue</div>
+                            <div class="info-value">
+                                @Model.Venue.VenueName, @Model.Venue.Address, @Model.Venue.City
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-tag"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Category</div>
+                            <div class="info-value">@Model.EventCategory.CategoryName</div>
+                        </div>
+                    </div>
+
                     @if (Model.User != null && Model.User.Role == "Organizer")
                     {
-                        @Model.User.FullName
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Organizer</div>
+                                <div class="info-value">@Model.User.FullName</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Price Tag -->
+                <div class="price-tag">
+                    <div class="price-amount">
+                        @if (Model.TicketPrice > 0)
+                        {
+                            @:LKR @Model.TicketPrice.ToString("N0")
+                        }
+                        else
+                        {
+                            @:FREE
+                        }
+                    </div>
+                    <div class="price-label">Per Ticket</div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="@Url.Action("Index", "Event")" class="btn btn-outline-custom btn-custom flex-fill">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Events
+                    </a>
+
+                    @if (Session["UserRole"] != null && Session["UserRole"].ToString().ToLower() == "customer")
+                    {
+                        if (Model.EndDate < DateTime.Now)
+                        {
+                            <button class="btn btn-secondary-custom btn-custom flex-fill" disabled>
+                                <i class="bi bi-calendar-x me-2"></i>Event Ended
+                            </button>
+                        }
+                        else if (Model.AvailableTickets <= 0)
+                        {
+                            <button class="btn btn-secondary-custom btn-custom flex-fill" disabled>
+                                <i class="bi bi-ticket-perforated me-2"></i>Sold Out
+                            </button>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Book", "Booking", new { eventId = Model.EventID })" class="btn btn-primary-custom btn-custom flex-fill pulse">
+                                <i class="bi bi-ticket-perforated me-2"></i>Book Now
+                            </a>
+                        }
                     }
                     else
                     {
-                        <span class="text-muted">Not specified</span>
-                    }
-                </li>
-                <li class="mb-2">
-                    <i class="bi bi-currency-dollar text-primary me-2"></i>
-                    <strong>Price:</strong> LKR @Model.TicketPrice.ToString("N2")
-                </li>
-            </ul>
-
-            <div class="d-flex gap-3 mt-4">
-                <a href="@Url.Action("Index", "Event")" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Back to Events
-                </a>
-
-                @if (Session["UserRole"] != null && Session["UserRole"].ToString().ToLower() == "customer")
-                 {
-                    if (Model.EndDate < DateTime.Now)
-                    {
-                        <button class="btn btn-secondary" disabled>Event Ended</button>
-                    }
-                    else
-                    {
-                        <a href="@Url.Action("Book", "Booking", new { eventId = Model.EventID })" class="btn btn-primary">
-                            Book Now
+                        <a href="@Url.Action("Login", "Account", new { returnUrl = Request.Url.PathAndQuery })" class="btn btn-primary-custom btn-custom flex-fill">
+                            <i class="bi bi-person me-2"></i>Login to Book
                         </a>
                     }
-                 }
-                else
-                {
-                    <a href="@Url.Action("Login", "Account")" class="btn btn-primary">
-                        <i class="bi bi-person"></i> Login to Book
-                    </a>
-                }
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Venue Map -->
-<section class="mt-5 bg-light py-4">
+<!-- Venue Map Section -->
+<section class="map-section">
     <div class="container">
-        <h4 class="fw-bold mb-4 text-center">Venue Location</h4>
-        <div class="ratio ratio-16x9 shadow-sm rounded overflow-hidden">
-            <iframe src="https://www.google.com/maps?q=@Uri.EscapeDataString(Model.Venue.MapLink)&output=embed"
-                    style="border:0;" allowfullscreen loading="lazy">
-            </iframe>
+        <h4 class="fw-bold mb-4 text-center">
+            <i class="bi bi-geo-alt-fill me-2 text-primary"></i>Venue Location
+        </h4>
+        <div class="map-container">
+            <div class="ratio ratio-16x9">
+                <iframe src="https://www.google.com/maps?q=@Uri.EscapeDataString(Model.Venue.MapLink)&output=embed"
+                        style="border:0;" allowfullscreen loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
         </div>
     </div>
 </section>
+
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Countdown Timer
+        function updateCountdown() {
+            const eventDate = new Date('@Model.StartDate.ToString("yyyy-MM-ddTHH:mm:ss")').getTime();
+            const now = new Date().getTime();
+            const distance = eventDate - now;
+
+            if (distance < 0) {
+                document.getElementById('countdownTimer').innerHTML = '<div class="text-white"><i class="bi bi-play-circle-fill me-2"></i>Event Started!</div>';
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        // Update countdown every second
+        if ('@Model.StartDate' > '@DateTime.Now') {
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
+        // Share functionality
+        const shareButtons = document.querySelectorAll('.share-btn');
+        shareButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const eventTitle = '@Model.Title';
+                const eventUrl = window.location.href;
+                
+                let shareUrl = '';
+                const platform = this.classList[1].replace('share-', '');
+                
+                switch(platform) {
+                    case 'facebook':
+                        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
+                        break;
+                    case 'twitter':
+                        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(eventTitle)}&url=${encodeURIComponent(eventUrl)}`;
+                        break;
+                    case 'whatsapp':
+                        shareUrl = `https://wa.me/?text=${encodeURIComponent(eventTitle + ' - ' + eventUrl)}`;
+                        break;
+                    case 'linkedin':
+                        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(eventUrl)}`;
+                        break;
+                }
+                
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+            });
+        });
+
+        // Add hover effects
+        const infoItems = document.querySelectorAll('.info-item');
+        infoItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Button click animations
+        const buttons = document.querySelectorAll('.btn-custom');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+
+        // Show event status alert
+        const eventStatus = '@(Model.EndDate < DateTime.Now ? "ended" : Model.AvailableTickets <= 0 ? "soldout" : "active")';
+        if (eventStatus === 'ended') {
+            setTimeout(() => {
+                Swal.fire({
+                    title: 'Event Ended',
+                    text: 'This event has already concluded. Check out other upcoming events!',
+                    icon: 'info',
+                    confirmButtonText: 'Browse Events',
+                    confirmButtonColor: '#667eea'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '@Url.Action("Index", "Event")';
+                    }
+                });
+            }, 2000);
+        } else if (eventStatus === 'soldout') {
+            setTimeout(() => {
+                Swal.fire({
+                    title: 'Sold Out!',
+                    text: 'All tickets for this event have been sold out.',
+                    icon: 'warning',
+                    confirmButtonText: 'Find Similar Events',
+                    confirmButtonColor: '#667eea'
+                });
+            }, 2000);
+        }
+    });
+</script>

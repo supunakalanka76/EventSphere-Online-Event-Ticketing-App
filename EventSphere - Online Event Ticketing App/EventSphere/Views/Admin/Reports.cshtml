@@ -1,72 +1,425 @@
 ﻿@{
     ViewBag.Title = "Reports";
     Layout = ViewBag.LayoutPath;
+    var reportPath = TempData["ReportPath"] as string;
+    var successMsg = TempData["Success"] as string;
+    var errorMsg = TempData["Error"] as string;
 }
 
-<!-- Page Header -->
-<section class="bg-primary text-white py-4 mb-4 shadow-sm">
-    <div class="container d-flex justify-content-between align-items-center">
-        <h2 class="fw-bold mb-0"><i class="bi bi-bar-chart-line"></i> Reports</h2>
-        <span class="text-light">Manage and view event analytics</span>
-    </div>
-</section>
+<!-- Custom Styles -->
+<style>
+    .reports-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
 
-<!-- Reports Content -->
-<div class="container my-5">
-    <div class="card border-0 shadow-sm rounded-3 mb-4">
-        <div class="card-body">
-            <h4 class="fw-bold mb-3"><i class="bi bi-graph-up"></i> Generate Reports</h4>
-            <p class="text-muted">Use the filters below to generate Crystal Reports for bookings, payments, and events.</p>
+        .reports-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
 
-            <form method="get" action="@Url.Action("GenerateReport", "Admin")" class="row g-3 mt-4">
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Report Type</label>
-                    <select name="reportType" class="form-select" required>
-                        <option value="">-- Select Report --</option>
-                        <option value="Bookings">Bookings Report</option>
-                        <option value="Payments">Payments Report</option>
-                        <option value="Events">Events Report</option>
-                        <option value="Users">Users Report</option>
-                    </select>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(30deg);
+        }
+
+    .report-type-card {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        height: 100%;
+    }
+
+        .report-type-card:hover {
+            border-color: #007bff;
+            background: #f8f9ff;
+            transform: translateY(-3px);
+        }
+
+        .report-type-card.active {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+    .report-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+    }
+
+    .report-type-card.active .report-icon {
+        background: rgba(255,255,255,0.2);
+    }
+
+    .metric-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .quick-stat {
+        text-align: center;
+        padding: 1rem;
+    }
+
+        .quick-stat .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        .quick-stat .label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+    .export-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+        .export-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+    .preview-card {
+        border: 2px dashed #dee2e6;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .preview-card.has-content {
+            border-color: #007bff;
+            border-style: solid;
+        }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                        <i class="bi bi-bar-chart-line text-primary fs-4"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 fw-bold text-primary mb-1">Analytics & Reports</h1>
+                        <p class="text-muted mb-0">Generate detailed reports and view system analytics</p>
+                    </div>
                 </div>
-
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">Start Date</label>
-                    <input type="date" name="startDate" class="form-control" />
+                <div class="d-flex gap-2">
+                    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                    </a>
                 </div>
-
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">End Date</label>
-                    <input type="date" name="endDate" class="form-control" />
-                </div>
-
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-file-earmark-bar-graph"></i> Generate
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    <!-- Report Viewer -->
-    <div class="card border-0 shadow-sm rounded-3">
-        <div class="card-body">
-            <h4 class="fw-bold mb-3"><i class="bi bi-eye"></i> Report Viewer</h4>
-            <p class="text-muted mb-3">View the generated Crystal Report below:</p>
-
-            @if (ViewBag.ReportPath != null)
-            {
-                <iframe src="@Url.Content(ViewBag.ReportPath)" width="100%" height="800px" frameborder="0" class="rounded border"></iframe>
-            }
-            else
-            {
-                <div class="text-center text-muted py-5">
-                    <i class="bi bi-file-earmark-bar-graph display-4 mb-3"></i>
-                    <h5>No report generated yet</h5>
-                    <p>Select filters above and click “Generate” to view a report.</p>
+    <div class="row g-4">
+        <!-- Report Types & Generator -->
+        <div class="col-lg-8">
+            <!-- Report Type Selection -->
+            <div class="card reports-card mb-4">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <h5 class="mb-0 fw-bold text-primary">
+                        <i class="bi bi-graph-up me-2"></i>Select Report Type
+                    </h5>
                 </div>
-            }
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="report-type-card" data-report-type="Bookings">
+                                <div class="report-icon">
+                                    <i class="bi bi-ticket-perforated"></i>
+                                </div>
+                                <h6 class="fw-bold mb-2">Bookings Report</h6>
+                                <p class="text-muted small mb-0">Detailed booking analytics and trends</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="report-type-card" data-report-type="Payments">
+                                <div class="report-icon">
+                                    <i class="bi bi-credit-card"></i>
+                                </div>
+                                <h6 class="fw-bold mb-2">Payments Report</h6>
+                                <p class="text-muted small mb-0">Revenue and payment statistics</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="report-type-card" data-report-type="Events">
+                                <div class="report-icon">
+                                    <i class="bi bi-calendar-event"></i>
+                                </div>
+                                <h6 class="fw-bold mb-2">Events Report</h6>
+                                <p class="text-muted small mb-0">Event performance and attendance</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="report-type-card" data-report-type="Users">
+                                <div class="report-icon">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <h6 class="fw-bold mb-2">Users Report</h6>
+                                <p class="text-muted small mb-0">User growth and activity analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Generator -->
+            <div class="card reports-card">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <h5 class="mb-0 fw-bold text-primary">
+                        <i class="bi bi-gear me-2"></i>Report Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Alerts -->
+                    @if (!string.IsNullOrEmpty(successMsg))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+                            <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                            <div class="flex-grow-1">@successMsg</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(errorMsg))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                            <div class="flex-grow-1">@errorMsg</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @using (Html.BeginForm("GenerateReport", "Admin", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+                    {
+                        <div class="row g-3">
+                            <!-- Hidden Report Type -->
+                            <input type="hidden" name="reportType" id="selectedReportType" value="Bookings" required>
+
+                            <!-- Date Range -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-muted mb-2">Start Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-calendar text-muted"></i>
+                                    </span>
+                                    <input type="date" name="startDate" class="form-control border-start-0" id="startDate" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-muted mb-2">End Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-calendar-check text-muted"></i>
+                                    </span>
+                                    <input type="date" name="endDate" class="form-control border-start-0" id="endDate" required>
+                                </div>
+                            </div>
+
+                            <!-- Format & Options -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted mb-2">Output Format</label>
+                                <select name="format" class="form-select" id="formatSelect">
+                                    <option value="PDF">PDF Document</option>
+                                    <option value="EXCEL">Excel Spreadsheet</option>
+                                </select>
+                            </div>
+
+                            <!-- Generate Button -->
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100 py-2" id="generateBtn">
+                                    <i class="bi bi-lightning-charge"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Additional Options -->
+                        <div class="row g-3 mt-2" id="additionalOptions">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-muted mb-2">Include Charts</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="includeCharts" checked>
+                                    <label class="form-check-label">Show visual charts in report</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-muted mb-2">Data Granularity</label>
+                                <select name="granularity" class="form-select">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Charts Preview -->
+            <div class="card reports-card mt-4">
+                
+            </div>
+        </div>
+
+        <!-- Report Preview & Recent Reports -->
+        <div class="col-lg-4">
+            <!-- Report Preview -->
+            <div class="card reports-card preview-card @(!string.IsNullOrEmpty(reportPath) ? "has-content" : "")">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <h5 class="mb-0 fw-bold text-primary">
+                        <i class="bi bi-eye me-2"></i>Report Preview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(reportPath))
+                    {
+                        if (reportPath.EndsWith(".pdf"))
+                        {
+                            <div class="text-center mb-3">
+                                <i class="bi bi-file-earmark-pdf text-danger display-4"></i>
+                                <h6 class="mt-2 fw-bold">PDF Report Generated</h6>
+                            </div>
+                            <iframe src="@Url.Content(reportPath)" width="100%" height="300px" frameborder="0" class="rounded border"></iframe>
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="@Url.Content(reportPath)" class="btn btn-danger" download>
+                                    <i class="bi bi-download me-2"></i>Download PDF
+                                </a>
+                            </div>
+                        }
+                        else if (reportPath.EndsWith(".xlsx"))
+                        {
+                            <div class="text-center py-4">
+                                <i class="bi bi-file-earmark-excel text-success display-4"></i>
+                                <h5 class="mt-3 fw-bold">Excel Report Ready!</h5>
+                                <p class="text-muted mb-3">Your spreadsheet report has been generated successfully.</p>
+                                <a href="@Url.Content(reportPath)" class="btn export-btn btn-lg" download>
+                                    <i class="bi bi-download me-2"></i> Download Excel
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-file-earmark-bar-graph display-4 mb-3"></i>
+                            <h5>No Report Generated</h5>
+                            <p class="mb-0">Configure your report settings and click generate to create a new report.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Recent Reports -->
+            <div class="card reports-card mt-4">
+                
+            </div>
         </div>
     </div>
 </div>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Report type selection
+            const reportTypeCards = document.querySelectorAll('.report-type-card');
+            const selectedReportType = document.getElementById('selectedReportType');
+
+            reportTypeCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove active class from all cards
+                    reportTypeCards.forEach(c => c.classList.remove('active'));
+                    // Add active class to clicked card
+                    this.classList.add('active');
+                    // Update hidden input
+                    selectedReportType.value = this.getAttribute('data-report-type');
+                });
+            });
+
+            // Set default active card
+            document.querySelector('.report-type-card[data-report-type="Bookings"]').classList.add('active');
+
+            // Date validation
+            const startDate = document.getElementById('startDate');
+            const endDate = document.getElementById('endDate');
+            const generateBtn = document.getElementById('generateBtn');
+
+            function validateDates() {
+                if (startDate.value && endDate.value) {
+                    if (new Date(startDate.value) > new Date(endDate.value)) {
+                        endDate.classList.add('is-invalid');
+                        generateBtn.disabled = true;
+                    } else {
+                        endDate.classList.remove('is-invalid');
+                        generateBtn.disabled = false;
+                    }
+                }
+            }
+
+            startDate.addEventListener('change', validateDates);
+            endDate.addEventListener('change', validateDates);
+
+            // Set default dates (last 30 days)
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+
+            startDate.value = lastMonth.toISOString().split('T')[0];
+            endDate.value = today.toISOString().split('T')[0];
+
+            // Form validation
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        });
+    </script>
+}

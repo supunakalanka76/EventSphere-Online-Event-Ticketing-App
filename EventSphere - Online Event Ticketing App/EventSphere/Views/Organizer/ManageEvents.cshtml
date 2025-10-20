@@ -4,37 +4,530 @@
     Layout = ViewBag.LayoutPath;
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">
-            <i class="bi bi-calendar-event"></i> Manage My Events
-        </h2>
-        <a href="@Url.Action("CreateEvent", "Organizer")" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> Add New Event
-        </a>
-    </div>
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --organizer-gradient: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
 
+    .page-header {
+        background: var(--organizer-gradient);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 1000,100 1000,0"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+    }
+
+        .stat-icon.primary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .stat-icon.success {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+
+        .stat-icon.warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .stat-icon.info {
+            background: rgba(23, 162, 184, 0.1);
+            color: #17a2b8;
+        }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .filter-section {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .form-control-custom, .form-select-custom {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+    }
+
+        .form-control-custom:focus, .form-select-custom:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+    .btn-custom {
+        border-radius: 10px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary-custom {
+        background: var(--primary-gradient);
+        border-color: transparent;
+        color: white;
+    }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+    .btn-outline-custom {
+        background: transparent;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+        .btn-outline-custom:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .events-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .card-header-custom {
+        background: transparent;
+        border: none;
+        padding: 0 0 1.5rem 0;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #f1f3f4;
+    }
+
+    .table-custom {
+        margin-bottom: 0;
+    }
+
+        .table-custom thead th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 700;
+            color: #495057;
+            padding: 1rem;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table-custom tbody tr {
+            transition: all 0.3s ease;
+        }
+
+            .table-custom tbody tr:hover {
+                background: rgba(102, 126, 234, 0.05);
+                transform: scale(1.01);
+            }
+
+        .table-custom tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+        }
+
+    .event-image {
+        width: 70px;
+        height: 70px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+        .event-image:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+        }
+
+    .badge-custom {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .btn-action {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: 2px solid;
+    }
+
+    .btn-edit {
+        background: rgba(102, 126, 234, 0.1);
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+        .btn-edit:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .btn-delete {
+        background: rgba(220, 53, 69, 0.1);
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .btn-view {
+        background: rgba(25, 135, 84, 0.1);
+        border-color: #198754;
+        color: #198754;
+    }
+
+        .btn-view:hover {
+            background: #198754;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .empty-state {
+        padding: 3rem 1rem;
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .alert-custom {
+        border: none;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .alert-success {
+        background: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border-left: 4px solid #198754;
+    }
+
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border-left: 4px solid #dc3545;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .stats-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .events-card {
+            padding: 1rem;
+        }
+
+        .table-responsive {
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .btn-action {
+            width: 35px;
+            height: 35px;
+        }
+    }
+
+    .quick-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .quick-action-btn {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+        min-width: 200px;
+    }
+
+        .quick-action-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            color: inherit;
+        }
+
+    .quick-action-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+</style>
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container header-content">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="fw-bold display-5 mb-3">
+                    <i class="bi bi-calendar-event me-3 floating"></i>Manage My Events
+                </h1>
+                <p class="lead mb-0 fs-5">Create, edit, and manage all your events in one place</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="@Url.Action("CreateEvent", "Organizer")" class="btn btn-primary-custom btn-custom">
+                    <i class="bi bi-plus-lg me-2"></i>Add New Event
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="container">
     <!-- Alerts -->
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle"></i> @TempData["Success"]
+        <div class="alert alert-custom alert-success animate__animated animate__fadeIn">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
     else if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle"></i> @TempData["Error"]
+        <div class="alert alert-custom alert-danger animate__animated animate__shakeX">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    <!-- Optional Filter Section -->
-    <div class="mb-3">
-        <form method="get" action="@Url.Action("ManageEvents", "Organizer")" class="row g-2">
+    <!-- Quick Stats -->
+    @{
+        var totalEvents = Model?.Count() ?? 0;
+        var activeEvents = Model?.Count(e => e.Status?.Equals("Approved", StringComparison.OrdinalIgnoreCase) == true) ?? 0;
+        var pendingEvents = Model?.Count(e => e.Status?.Equals("Pending", StringComparison.OrdinalIgnoreCase) == true) ?? 0;
+        var totalTickets = Model?.Sum(e => e.TotalTickets) ?? 0;
+    }
+
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="bi bi-calendar-event"></i>
+            </div>
+            <div class="stat-number">@totalEvents</div>
+            <div class="stat-label">Total Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stat-number">@activeEvents</div>
+            <div class="stat-label">Active Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="bi bi-clock"></i>
+            </div>
+            <div class="stat-number">@pendingEvents</div>
+            <div class="stat-label">Pending Approval</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon info">
+                <i class="bi bi-ticket-perforated"></i>
+            </div>
+            <div class="stat-number">@totalTickets</div>
+            <div class="stat-label">Total Tickets</div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="@Url.Action("CreateEvent", "Organizer")" class="quick-action-btn">
+            <div class="quick-action-icon">
+                <i class="bi bi-plus-circle"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-1">Create Event</h6>
+                <p class="text-muted small mb-0">Create a new event</p>
+            </div>
+        </a>
+        <a href="@Url.Action("Dashboard", "Organizer")" class="quick-action-btn">
+            <div class="quick-action-icon">
+                <i class="bi bi-speedometer2"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-1">Dashboard</h6>
+                <p class="text-muted small mb-0">View analytics</p>
+            </div>
+        </a>
+        <a href="@Url.Action("ManageBookings", "Organizer")" class="quick-action-btn">
+            <div class="quick-action-icon">
+                <i class="bi bi-ticket-detailed"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-1">Bookings</h6>
+                <p class="text-muted small mb-0">Manage bookings</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <form method="get" action="@Url.Action("ManageEvents", "Organizer")" class="row g-3 align-items-end">
             <div class="col-md-4">
-                <select name="categoryId" class="form-select">
+                <label class="form-label fw-semibold">Filter by Category</label>
+                <select name="categoryId" class="form-select form-select-custom">
                     <option value="">All Categories</option>
                     @if (ViewBag.Categories != null)
                     {
@@ -48,125 +541,244 @@
                     }
                 </select>
             </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Filter by Status</label>
+                <select name="status" class="form-select form-select-custom">
+                    <option value="">All Status</option>
+                    <option value="Approved" @(Request["status"] == "Approved" ? "selected" : "")>Approved</option>
+                    <option value="Pending" @(Request["status"] == "Pending" ? "selected" : "")>Pending</option>
+                    <option value="Inactive" @(Request["status"] == "Inactive" ? "selected" : "")>Inactive</option>
+                </select>
+            </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-outline-primary w-100">
-                    <i class="bi bi-filter"></i> Filter
+                <button type="submit" class="btn btn-outline-custom btn-custom w-100">
+                    <i class="bi bi-funnel me-2"></i>Filter
                 </button>
+            </div>
+            <div class="col-md-2">
+                <a href="@Url.Action("ManageEvents", "Organizer")" class="btn btn-outline-secondary btn-custom w-100">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                </a>
             </div>
         </form>
     </div>
 
     <!-- Events Table -->
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Image</th>
-                            <th>Event Title</th>
-                            <th>Category</th>
-                            <th>Venue</th>
-                            <th>Start</th>
-                            <th>End</th>
-                            <th>Tickets</th>
-                            <th>Status</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
+    <div class="events-card">
+        <div class="card-header-custom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="fw-bold mb-0">
+                    <i class="bi bi-list-task me-2 text-primary"></i>My Events
+                </h4>
+                <span class="badge bg-primary">@totalEvents Events</span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Category</th>
+                        <th>Venue</th>
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Tickets</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var evt in Model)
                         {
-                            foreach (var evt in Model)
-                            {
-                                <tr>
-                                    <!-- Thumbnail -->
-                                    <td>
-                                        @if (!string.IsNullOrEmpty(evt.EventImage))
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="@(!string.IsNullOrEmpty(evt.EventImage) ? Url.Content(evt.EventImage) : "/Content/Events/default-event.png")"
+                                             alt="Event Image"
+                                             class="event-image me-3"
+                                             onerror="this.src='/Content/Events/default-event.png'" />
+                                        <div>
+                                            <h6 class="fw-bold mb-1">@evt.Title</h6>
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock me-1"></i>@evt.StartDate.ToString("hh:mm tt")
+                                            </small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold">@evt.EventCategory.CategoryName</span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@evt.Venue.VenueName</small>
+                                </td>
+                                <td class="text-center">
+                                    <div class="fw-semibold">@evt.StartDate.ToString("dd MMM")</div>
+                                    <small class="text-muted">@evt.StartDate.ToString("yyyy")</small>
+                                </td>
+                                <td class="text-center">
+                                    <div class="progress" style="height: 8px; width: 80px; margin: 0 auto;">
+                                        @{
+                                            var ticketPercentage = evt.TotalTickets > 0 ? (evt.AvailableTickets * 100) / evt.TotalTickets : 0;
+                                        }
+                                        <div class="progress-bar bg-@(ticketPercentage > 50 ? "success" : ticketPercentage > 20 ? "warning" : "danger")"
+                                             style="width: @ticketPercentage%">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted mt-1 d-block">
+                                        @evt.AvailableTickets / @evt.TotalTickets
+                                    </small>
+                                </td>
+                                <td class="text-center">
+                                    @if (!string.IsNullOrEmpty(evt.Status))
+                                    {
+                                        if (evt.Status.Equals("Approved", StringComparison.OrdinalIgnoreCase))
                                         {
-                                            <img src="@Url.Content(evt.EventImage)" alt="Event Image"
-                                                 class="img-thumbnail" style="width: 70px; height: 70px; object-fit: cover;" />
+                                            <span class="badge-custom bg-success">
+                                                <i class="bi bi-check-circle me-1"></i>Approved
+                                            </span>
+                                        }
+                                        else if (evt.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge-custom bg-warning text-dark">
+                                                <i class="bi bi-clock me-1"></i>Pending
+                                            </span>
                                         }
                                         else
                                         {
-                                            <img src="~/Content/Images/default-event.png" alt="No Image"
-                                                 class="img-thumbnail" style="width: 70px; height: 70px; object-fit: cover;" />
+                                            <span class="badge-custom bg-secondary">
+                                                <i class="bi bi-pause-circle me-1"></i>Inactive
+                                            </span>
                                         }
-                                    </td>
-
-                                    <!-- Title -->
-                                    <td class="fw-semibold">@evt.Title</td>
-                                    <td>@evt.EventCategory.CategoryName</td>
-                                    <td>@evt.Venue.VenueName</td>
-                                    <td>@(evt.StartDate.ToString("dd MMM yyyy") ?? "N/A")</td>
-                                    <td>@(evt.EndDate.ToString("dd MMM yyyy") ?? "N/A")</td>
-
-                                    <!-- Tickets -->
-                                    <td>
-                                        <span class="badge bg-info text-dark">
-                                            @evt.AvailableTickets / @evt.TotalTickets
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-custom bg-light text-muted">
+                                            <i class="bi bi-question-circle me-1"></i>Unknown
                                         </span>
-                                    </td>
-
-                                    <!-- Status -->
-                                    <td>
-                                        @if (!string.IsNullOrEmpty(evt.Status))
-                                        {
-                                            if (evt.Status.Equals("Active", StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                <span class="badge bg-success">Active</span>
-                                            }
-                                            else if (evt.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                <span class="badge bg-warning text-dark">Pending</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-secondary">Inactive</span>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-light text-muted">Unknown</span>
-                                        }
-                                    </td>
-
-                                    <!-- Actions -->
-                                    <td class="text-center">
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="action-buttons">
+                                        <a href="@Url.Action("Details", "Event", new { id = evt.EventID })"
+                                           class="btn-action btn-view" title="View Event">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                         <a href="@Url.Action("EditEvent", "Organizer", new { id = evt.EventID })"
-                                           class="btn btn-sm btn-outline-primary me-1" title="Edit Event">
+                                           class="btn-action btn-edit" title="Edit Event">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
                                         <a href="@Url.Action("DeleteEvent", "Organizer", new { id = evt.EventID })"
-                                           class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('Are you sure you want to delete this event?');"
-                                           title="Delete Event">
+                                           class="btn-action btn-delete" title="Delete Event"
+                                           onclick="return confirmDelete('@evt.Title')">
                                             <i class="bi bi-trash"></i>
                                         </a>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="9" class="text-center text-muted py-4">
-                                    <i class="bi bi-info-circle"></i> No events found.
-                                    Click <strong>"Add New Event"</strong> to create one.
+                                    </div>
                                 </td>
                             </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="bi bi-calendar2-x empty-icon"></i>
+                                    <h5 class="text-muted mb-3">No Events Found</h5>
+                                    <p class="text-muted mb-4">You haven't created any events yet. Start by creating your first event!</p>
+                                    <a href="@Url.Action("CreateEvent", "Organizer")" class="btn btn-primary-custom btn-custom">
+                                        <i class="bi bi-plus-lg me-2"></i>Create Your First Event
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @section scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             console.log("ManageEvents page loaded.");
+
+            // Add hover effects to table rows
+            const tableRows = document.querySelectorAll('.table-custom tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function () {
+                    this.style.transform = 'scale(1.01)';
+                });
+
+                row.addEventListener('mouseleave', function () {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // Button click animations
+            const buttons = document.querySelectorAll('.btn-custom, .btn-action');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
         });
+
+        // Enhanced delete confirmation
+        function confirmDelete(eventTitle) {
+            Swal.fire({
+                title: 'Delete Event?',
+                html: `Are you sure you want to delete <strong>"${eventTitle}"</strong>?<br><small class="text-muted">This action cannot be undone.</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Delete It!',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                background: '#fff',
+                color: '#333'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, the link will proceed
+                    return true;
+                } else {
+                    // If cancelled, prevent the link from proceeding
+                    return false;
+                }
+            });
+
+            // Prevent the default link behavior
+            return false;
+        }
+
+        // Show welcome message for first-time organizers
+        if (!sessionStorage.getItem('manageEventsVisited')) {
+            setTimeout(() => {
+                Swal.fire({
+                    title: 'Manage Your Events 🎯',
+                    html: `
+                            <div class="text-start">
+                                <p class="mb-2"><i class="bi bi-pencil-square text-primary me-2"></i><strong>Edit Events:</strong> Update event details anytime</p>
+                                <p class="mb-2"><i class="bi bi-graph-up text-success me-2"></i><strong>Track Performance:</strong> Monitor ticket sales and attendance</p>
+                                <p class="mb-0"><i class="bi bi-funnel text-warning me-2"></i><strong>Filter & Search:</strong> Quickly find events by status or category</p>
+                            </div>
+                        `,
+                    icon: 'info',
+                    confirmButtonColor: '#667eea',
+                    confirmButtonText: 'Got It!',
+                    background: '#fff',
+                    color: '#333'
+                });
+                sessionStorage.setItem('manageEventsVisited', 'true');
+            }, 1500);
+        }
     </script>
 }

@@ -1,0 +1,72 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewBag.Title = "Organizer Reports";
+    Layout = ViewBag.LayoutPath;
+}
+
+<section class="container my-5">
+    <h2 class="fw-bold mb-4"><i class="bi bi-bar-chart-line text-primary me-2"></i> Organizer Reports</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 border-0 text-center">
+                <h5>Total Events</h5>
+                <h3 class="fw-bold text-primary">@ViewBag.TotalEvents</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 border-0 text-center">
+                <h5>Total Tickets Sold</h5>
+                <h3 class="fw-bold text-success">@ViewBag.TotalTickets</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 border-0 text-center">
+                <h5>Total Sales</h5>
+                <h3 class="fw-bold text-warning">LKR @String.Format("{0:N0}", ViewBag.TotalSales)</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end mb-3">
+        <a href="@Url.Action("ExportExcel", "Organizer")" class="btn btn-success me-2">
+            <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
+        </a>
+        <a href="@Url.Action("ExportPdf", "Organizer")" class="btn btn-danger">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">Detailed Report</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Event</th>
+                            <th>Customer</th>
+                            <th>Tickets</th>
+                            <th>Total (LKR)</th>
+                            <th>Payment Date</th>
+                            <th>Payment Method</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model)
+                        {
+                            <tr>
+                                <td>@row.EventTitle</td>
+                                <td>@row.CustomerName</td>
+                                <td>@row.Tickets</td>
+                                <td>@String.Format("{0:N0}", row.TotalAmount)</td>
+                                <td>@(row.PaymentDate?.ToString("dd MMM yyyy") ?? "N/A")</td>
+                                <td>@row.PaymentMethod</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

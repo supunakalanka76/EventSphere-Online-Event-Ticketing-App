@@ -23,12 +23,68 @@ namespace EventSphere.Controllers
 
             int organizerId = SessionHelper.GetUserId().Value;
 
+            // Core Metrics
             ViewBag.TotalEvents = db.Events.Count(e => e.OrganizerID == organizerId);
             ViewBag.TotalBookings = db.Bookings.Count(b => b.Event.OrganizerID == organizerId);
             ViewBag.TotalRevenue = db.Payments
                 .Where(p => p.Booking.Event.OrganizerID == organizerId)
                 .Sum(p => (decimal?)p.Amount) ?? 0;
 
+            // Ticket Metrics
+            var ticketsSold = db.Bookings
+                .Where(b => b.Event.OrganizerID == organizerId && b.PaymentStatus == "Completed")
+                .Sum(b => (int?)b.Quantity) ?? 0;
+
+            var totalTickets = db.Events
+                .Where(e => e.OrganizerID == organizerId)
+                .Sum(e => (int?)e.TotalTickets) ?? 0;
+
+            var ticketsAvailable = db.Events
+                .Where(e => e.OrganizerID == organizerId)
+                .Sum(e => (int?)e.AvailableTickets) ?? 0;
+
+            ViewBag.TotalTicketsSold = ticketsSold;
+            ViewBag.TotalTicketsAvailable = ticketsAvailable;
+            ViewBag.SalesProgress = totalTickets > 0 ? (ticketsSold * 100 / totalTickets) : 0;
+
+            // Top Event (by revenue)
+            var topEvent = db.Payments
+                .Where(p => p.Booking.Event.OrganizerID == organizerId)
+                .GroupBy(p => p.Booking.Event.Title)
+                .Select(g => new
+                {
+                    EventTitle = g.Key,
+                    TotalRevenue = g.Sum(p => p.Amount)
+                })
+                .OrderByDescending(x => x.TotalRevenue)
+                .FirstOrDefault();
+
+            ViewBag.TopEventName = topEvent?.EventTitle ?? "No Data";
+            ViewBag.TopEventRevenue = topEvent?.TotalRevenue ?? 0m;
+
+            // Monthly Sales Chart Data (last 6 months)
+            var last6Months = DateTime.Now.AddMonths(-5);
+            var monthlySales = db.Payments
+                .Where(p => p.Booking.Event.OrganizerID == organizerId && p.PaymentDate >= last6Months)
+                .GroupBy(p => new { Month = p.PaymentDate.Value.Month, Year = p.PaymentDate.Value.Year })
+                .Select(g => new
+                {
+                    Month = g.Key.Month,
+                    Year = g.Key.Year,
+                    Total = g.Sum(x => x.Amount)
+                })
+                .ToList()
+                .OrderBy(g => new DateTime(g.Year, g.Month, 1))
+                .Select(g => new
+                {
+                    Label = new DateTime(g.Year, g.Month, 1).ToString("MMM yyyy"),
+                    Value = g.Total
+                })
+                .ToList();
+
+            ViewBag.MonthlySalesData = monthlySales;
+
+            // Recent Bookings
             var recentBookings = db.Bookings
                 .Include("Event")
                 .Include("User")
@@ -88,7 +144,7 @@ namespace EventSphere.Controllers
                     // Handle Image Upload
                     if (EventImageFile != null && EventImageFile.ContentLength > 0)
                     {
-                        string folderPath = Server.MapPath("~/Content/Events/");
+                        string folderPath = Server.MapPath("/Content/Events/");
                         if (!Directory.Exists(folderPath))
                             Directory.CreateDirectory(folderPath);
 
@@ -116,6 +172,7 @@ namespace EventSphere.Controllers
                     model.OrganizerID = organizerId;
                     model.CreatedAt = DateTime.Now;
                     model.Status = model.Status ?? "Pending";
+                    model.AvailableTickets = model.TotalTickets; // initialize available tickets
 
                     db.Events.Add(model);
                     db.SaveChanges();
@@ -166,7 +223,6 @@ namespace EventSphere.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    // Update main fields
                     ev.Title = model.Title;
                     ev.Description = model.Description;
                     ev.CategoryID = model.CategoryID;
@@ -178,10 +234,13 @@ namespace EventSphere.Controllers
                     ev.Status = model.Status;
                     ev.UpdatedAt = DateTime.Now;
 
-                    // Handle new image upload
+                    // recalculate available tickets if total increased
+                    if (model.TotalTickets > ev.TotalTickets)
+                        ev.AvailableTickets += (model.TotalTickets - ev.TotalTickets);
+
                     if (EventImageFile != null && EventImageFile.ContentLength > 0)
                     {
-                        string folderPath = Server.MapPath("~/Content/Events/");
+                        string folderPath = Server.MapPath("/Content/Events/");
                         if (!Directory.Exists(folderPath))
                             Directory.CreateDirectory(folderPath);
 
@@ -192,7 +251,6 @@ namespace EventSphere.Controllers
                             string fullPath = Path.Combine(folderPath, fileName);
                             EventImageFile.SaveAs(fullPath);
 
-                            // Delete old image if exists
                             if (!string.IsNullOrEmpty(ev.EventImage))
                             {
                                 string oldPath = Server.MapPath(ev.EventImage);
@@ -239,7 +297,6 @@ namespace EventSphere.Controllers
 
             try
             {
-                // Delete image file from disk
                 if (!string.IsNullOrEmpty(ev.EventImage))
                 {
                     string path = Server.MapPath(ev.EventImage);
@@ -290,5 +347,132 @@ namespace EventSphere.Controllers
             var user = db.Users.Find(userId);
             return View(user);
         }
+
+        // ORGANIZER REPORTS
+        [HttpGet]
+        public ActionResult Reports()
+        {
+            if (!SessionHelper.IsOrganizer())
+                return RedirectToAction("Login", "Account");
+
+            int organizerId = SessionHelper.GetUserId().Value;
+
+            var reportData = db.Bookings
+                .Include("Event")
+                .Include("User")
+                .Where(b => b.Event.OrganizerID == organizerId && b.PaymentStatus == "Completed")
+                .Select(b => new
+                {
+                    EventTitle = b.Event.Title,
+                    CustomerName = b.User.FullName,
+                    Tickets = b.Quantity,
+                    TotalAmount = b.TotalAmount,
+                    PaymentDate = b.Payment != null ? b.Payment.PaymentDate : null,
+                    PaymentMethod = b.Payment != null ? b.Payment.PaymentGateway : null
+                })
+                .OrderByDescending(b => b.PaymentDate)
+                .ToList();
+
+            ViewBag.TotalSales = reportData.Sum(r => r.TotalAmount);
+            ViewBag.TotalTickets = reportData.Sum(r => r.Tickets);
+            ViewBag.TotalEvents = reportData.Select(r => r.EventTitle).Distinct().Count();
+
+            return View(reportData);
+        }
+
+        // EXPORT TO EXCEL
+        [HttpGet]
+        public ActionResult ExportExcel()
+        {
+            try
+            {
+                int organizerId = SessionHelper.GetUserId().Value;
+
+                var reportData = db.Bookings
+                    .Include("Event")
+                    .Include("User")
+                    .Where(b => b.Event.OrganizerID == organizerId && b.PaymentStatus == "Completed")
+                    .Select(b => new
+                    {
+                        EventTitle = b.Event.Title,
+                        CustomerName = b.User.FullName,
+                        Tickets = b.Quantity,
+                        TotalAmount = b.TotalAmount,
+                        PaymentDate = b.Payment != null ? b.Payment.PaymentDate : null,
+                        PaymentMethod = b.Payment != null ? b.Payment.PaymentGateway : null
+                    })
+                    .ToList();
+
+                if (!reportData.Any())
+                {
+                    TempData["Error"] = "No data available to export.";
+                    return RedirectToAction("Reports");
+                }
+
+                string folder = Server.MapPath("~/Reports/");
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                string filePath = Path.Combine(folder, $"OrganizerReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+
+                ExportHelper.ExportToExcel(reportData, filePath);
+
+                return File(filePath, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    Path.GetFileName(filePath));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error exporting Excel: " + ex.Message;
+                return RedirectToAction("Reports");
+            }
+        }
+
+        // EXPORT TO PDF
+        [HttpGet]
+        public ActionResult ExportPdf()
+        {
+            try
+            {
+                int organizerId = SessionHelper.GetUserId().Value;
+
+                var reportData = db.Bookings
+                    .Include("Event")
+                    .Include("User")
+                    .Where(b => b.Event.OrganizerID == organizerId && b.PaymentStatus == "Completed")
+                    .Select(b => new
+                    {
+                        EventTitle = b.Event.Title,
+                        CustomerName = b.User.FullName,
+                        Tickets = b.Quantity,
+                        TotalAmount = b.TotalAmount,
+                        PaymentDate = b.Payment != null ? b.Payment.PaymentDate : null,
+                        PaymentMethod = b.Payment != null ? b.Payment.PaymentGateway : null
+                    })
+                    .ToList();
+
+                if (!reportData.Any())
+                {
+                    TempData["Error"] = "No data available to export.";
+                    return RedirectToAction("Reports");
+                }
+
+                string folder = Server.MapPath("~/Reports/");
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                string filePath = Path.Combine(folder, $"OrganizerReport_{DateTime.Now:yyyyMMddHHmmss}.pdf");
+
+                ExportHelper.ExportToPdf(reportData, filePath, "EventSphere - Organizer Report");
+
+                return File(filePath, "application/pdf", Path.GetFileName(filePath));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error exporting PDF: " + ex.Message;
+                return RedirectToAction("Reports");
+            }
+        }
+
+
     }
 }

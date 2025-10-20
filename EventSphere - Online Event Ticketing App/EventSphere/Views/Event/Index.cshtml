@@ -4,21 +4,404 @@
     Layout = ViewBag.LayoutPath;
 }
 
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .events-hero {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 4rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .events-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 1000,100 1000,0"></polygon></svg>');
+        background-size: cover;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .search-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: -50px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .search-form {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .search-form .form-select,
+    .search-form .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .search-form .form-select:focus,
+    .search-form .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .btn-search {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 30px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .event-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .event-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .event-image {
+        height: 250px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .event-card:hover .event-image {
+        transform: scale(1.05);
+    }
+
+    .event-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: var(--secondary-gradient);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .event-category {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+    }
+
+    .event-date {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 10px;
+        text-align: center;
+        border-radius: 10px;
+        margin-right: 15px;
+        min-width: 70px;
+    }
+
+    .event-date .month {
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .event-date .day {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .event-price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #198754;
+    }
+
+    .btn-details {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 25px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-details:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+
+    .empty-state {
+        padding: 4rem 2rem;
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .alert {
+        border: none;
+        border-radius: 15px;
+        padding: 15px 20px;
+        margin-bottom: 2rem;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border-left: 4px solid #dc3545;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .stats-bar {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 0 1rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .quick-filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+        justify-content: center;
+    }
+
+    .filter-btn {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 25px;
+        padding: 8px 20px;
+        font-weight: 500;
+        color: #6c757d;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+        background: var(--primary-gradient);
+        border-color: #667eea;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .search-section {
+            margin-top: -30px;
+            padding: 1.5rem;
+        }
+        
+        .search-form {
+            flex-direction: column;
+        }
+        
+        .search-form .form-select,
+        .search-form .form-control {
+            min-width: 100%;
+        }
+        
+        .event-date {
+            min-width: 60px;
+            margin-right: 10px;
+        }
+        
+        .event-date .day {
+            font-size: 1.2rem;
+        }
+        
+        .stats-bar {
+            padding: 1rem;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+        }
+    }
+
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .view-toggle {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 2rem;
+        justify-content: center;
+    }
+
+    .view-btn {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 10px 15px;
+        color: #6c757d;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .view-btn.active {
+        background: var(--primary-gradient);
+        border-color: #667eea;
+        color: white;
+    }
+
+    .view-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
 <!-- Hero Section -->
-<section class="bg-primary text-white text-center py-5">
-    <div class="container">
-        <h1 class="fw-bold mb-3">Explore Events</h1>
-        <p class="lead mb-0">Discover upcoming events and experiences across Sri Lanka 🎉</p>
+<section class="events-hero">
+    <div class="container hero-content">
+        <div class="text-center">
+            <i class="bi bi-calendar-event display-1 mb-3 floating"></i>
+            <h1 class="fw-bold display-4 mb-3">Explore Events</h1>
+            <p class="lead mb-0 fs-4">Discover upcoming events and experiences across Sri Lanka 🎉</p>
+        </div>
     </div>
 </section>
 
-<!-- Filter & Search Section -->
+<!-- Search & Filter Section -->
 <section class="container my-5">
-    <div class="row justify-content-center mb-4">
-        <div class="col-md-8">
-            @using (Html.BeginForm("Index", "Event", FormMethod.Get))
-            {
-                <div class="input-group">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="search-section">
+                <!-- Quick Filters -->
+                <div class="quick-filters mb-4">
+                    <a href="@Url.Action("Index", "Event")" class="filter-btn @(string.IsNullOrEmpty(ViewBag.SelectedCategory?.ToString()) ? "active" : "")">
+                        All Events
+                    </a>
+                    @foreach (var category in ViewBag.Categories as IEnumerable<EventSphere.Models.EventCategory>)
+                    {
+                        <a href="@Url.Action("Index", "Event", new { categoryId = category.CategoryID })" 
+                           class="filter-btn @(ViewBag.SelectedCategory?.ToString() == category.CategoryID.ToString() ? "active" : "")">
+                            @category.CategoryName
+                        </a>
+                    }
+                </div>
+
+                <!-- Search Form -->
+                @using (Html.BeginForm("Index", "Event", FormMethod.Get, new { @class = "search-form", id = "searchForm" }))
+                {
                     <select class="form-select" name="categoryId">
                         <option value="">All Categories</option>
                         @foreach (var category in ViewBag.Categories as IEnumerable<EventSphere.Models.EventCategory>)
@@ -28,53 +411,229 @@
                             </option>
                         }
                     </select>
-                    <input type="text" name="search" class="form-control" placeholder="Search events..." value="@ViewBag.SearchTerm" />
-                    <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Search</button>
-                </div>
-            }
+                    <input type="text" name="search" class="form-control" placeholder="Search events by name, venue, or description..." value="@ViewBag.SearchTerm" />
+                    <button class="btn btn-search" type="submit">
+                        <i class="bi bi-search me-2"></i>Search
+                    </button>
+                }
+            </div>
         </div>
     </div>
 
     @if (ViewBag.Error != null)
     {
-        <div class="alert alert-danger text-center">@ViewBag.Error</div>
+        <div class="alert alert-danger animate__animated animate__shakeX">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@ViewBag.Error
+        </div>
     }
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="row text-center">
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-item">
+                    <div class="stat-number">@(Model?.Count() ?? 0)</div>
+                    <div class="stat-label">Events Found</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-item">
+                    <div class="stat-number">@(ViewBag.CategoriesCount ?? 0)</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-item">
+                    <div class="stat-number">@(DateTime.Now.ToString("MMM"))</div>
+                    <div class="stat-label">This Month</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
-<!-- Event Cards Section -->
+<!-- Events Section -->
 <section class="container pb-5">
-    <div class="row">
+    <div class="row" id="eventsContainer">
         @if (Model != null && Model.Any())
-        {
+         {
             foreach (var ev in Model)
             {
-                <div class="col-md-4 mb-4">
-                    <div class="card border-0 shadow-sm h-100">
-                        <img src="@ev.EventImage" class="card-img-top" alt="@ev.Title" style="height: 220px; object-fit: cover;">
+                <div class="col-xl-4 col-lg-6 mb-4">
+                    <div class="card event-card">
+                        <div class="position-relative overflow-hidden">
+                            <img src="@(!string.IsNullOrEmpty(ev.EventImage) ? ev.EventImage : "/Content/Events/default-event.png")" 
+                                 class="event-image w-100" alt="@ev.Title">
+                            <div class="event-badge">
+                                <i class="bi bi-people-fill me-1"></i>@(ev.AvailableTickets) Left
+                            </div>
+                            <div class="event-category">
+                                @ev.EventCategory.CategoryName
+                            </div>
+                        </div>
+                        
                         <div class="card-body d-flex flex-column">
-                            <h5 class="fw-bold">@ev.Title</h5>
-                            <p class="text-muted small mb-2">
-                                <i class="bi bi-calendar-event"></i> @ev.StartDate.ToString("MMM dd, yyyy") |
-                                <i class="bi bi-geo-alt"></i> @ev.Venue.VenueName
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="event-date">
+                                    <div class="month">@ev.StartDate.ToString("MMM")</div>
+                                    <div class="day">@ev.StartDate.Day</div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="fw-bold mb-2 text-dark">@ev.Title</h5>
+                                    <p class="text-muted small mb-2">
+                                        <i class="bi bi-clock me-1"></i>@ev.StartDate.ToString("hh:mm tt") |
+                                        <i class="bi bi-geo-alt me-1"></i>@ev.Venue.VenueName
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-muted mb-3 flex-grow-1">
+                                @(ev.Description.Length > 120 ? ev.Description.Substring(0, 120) + "..." : ev.Description)
                             </p>
-                            <p class="text-muted mb-3">@ev.Description</p>
-
-                            <div class="mt-auto">
-                                <a href="@Url.Action("Details", "Event", new { id = ev.EventID })" class="btn btn-outline-primary btn-sm">
-                                    View Details
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <div class="event-price">
+                                    @if (ev.TicketPrice > 0)
+                                    {
+                                        <text>LKR @ev.TicketPrice.ToString("N0")</text>
+                                    }
+                                    else
+                                    {
+                                        <text>FREE</text>
+                                    }
+                                </div>
+                                <a href="@Url.Action("Details", "Event", new { id = ev.EventID })" class="btn btn-details">
+                                    <i class="bi bi-eye me-1"></i>View Details
                                 </a>
                             </div>
                         </div>
                     </div>
                 </div>
             }
-        }
+         }
         else
         {
-            <div class="col-12 text-center py-5">
-                <i class="bi bi-emoji-frown display-3 text-muted"></i>
-                <h4 class="text-muted mt-3">No events found.</h4>
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="bi bi-calendar-x empty-icon"></i>
+                    <h3 class="text-muted mb-3">No Events Found</h3>
+                    <p class="text-muted mb-4">Try adjusting your search criteria or browse all categories</p>
+                    <a href="@Url.Action("Index", "Event")" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-clockwise me-2"></i>View All Events
+                    </a>
+                </div>
             </div>
         }
     </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p class="text-muted mt-3">Loading events...</p>
+    </div>
 </section>
+
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add hover effects to cards
+        const eventCards = document.querySelectorAll('.event-card');
+        eventCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Form submission with loading state
+        const searchForm = document.getElementById('searchForm');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        searchForm.addEventListener('submit', function(e) {
+            loadingSpinner.style.display = 'block';
+            document.getElementById('eventsContainer').style.opacity = '0.5';
+            
+            // Simulate loading for better UX
+            setTimeout(() => {
+                loadingSpinner.style.display = 'none';
+                document.getElementById('eventsContainer').style.opacity = '1';
+            }, 1000);
+        });
+
+        // Quick filter animations
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!this.classList.contains('active')) {
+                    loadingSpinner.style.display = 'block';
+                    document.getElementById('eventsContainer').style.opacity = '0.5';
+                }
+            });
+        });
+
+        // Add click animation to buttons
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+
+        // Image error handling
+        const eventImages = document.querySelectorAll('.event-image');
+        eventImages.forEach(img => {
+            img.addEventListener('error', function() {
+                this.src = '/Content/Events/default-event.png';
+            });
+        });
+
+        // Search input debounce
+        let searchTimeout;
+        const searchInput = document.querySelector('input[name="search"]');
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (this.value.length >= 3 || this.value.length === 0) {
+                    searchForm.submit();
+                }
+            }, 500);
+        });
+    });
+
+    // Show welcome message for first-time visitors
+    if (!sessionStorage.getItem('eventsPageVisited')) {
+        setTimeout(() => {
+            Swal.fire({
+                title: 'Discover Amazing Events! 🎉',
+                html: `
+                    <div class="text-start">
+                        <p class="mb-2"><i class="bi bi-search text-primary me-2"></i><strong>Search & Filter:</strong> Find events by category, date, or keyword</p>
+                        <p class="mb-2"><i class="bi bi-ticket-perforated text-success me-2"></i><strong>Easy Booking:</strong> Secure your spot in just a few clicks</p>
+                        <p class="mb-0"><i class="bi bi-star-fill text-warning me-2"></i><strong>Earn Rewards:</strong> Get loyalty points for every booking</p>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonColor: '#667eea',
+                confirmButtonText: 'Start Exploring!',
+                background: '#fff',
+                color: '#333'
+            });
+            sessionStorage.setItem('eventsPageVisited', 'true');
+        }, 1500);
+    }
+</script>

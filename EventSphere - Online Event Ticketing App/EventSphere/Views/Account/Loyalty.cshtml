@@ -7,100 +7,637 @@
     int totalRedeemed = transactions?.Where(t => t.Type == "Redeem").Sum(t => t.Points) ?? 0;
 }
 
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    }
+
+    .loyalty-hero {
+        background: var(--gold-gradient);
+        color: #2c3e50;
+        padding: 3rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .loyalty-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.3"><polygon points="0,0 1000,100 1000,0"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .loyalty-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+        overflow: hidden;
+        animation: slideUp 0.8s ease-out;
+        transition: all 0.3s ease;
+    }
+
+        .loyalty-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .summary-card {
+        border: none;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        .summary-card:nth-child(1)::before {
+            background: var(--success-gradient);
+        }
+
+        .summary-card:nth-child(2)::before {
+            background: var(--warning-gradient);
+        }
+
+        .summary-card:nth-child(3)::before {
+            background: var(--primary-gradient);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+    .summary-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+        .summary-icon.earned {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+
+        .summary-icon.redeemed {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .summary-icon.balance {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+    .points-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0.5rem 0;
+        position: relative;
+        z-index: 2;
+    }
+
+    .points-label {
+        color: #6c757d;
+        font-weight: 600;
+        position: relative;
+        z-index: 2;
+    }
+
+    .table-container {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .table-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .table-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,100 1000,0 1000,100"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .transaction-table {
+        margin: 0;
+    }
+
+        .transaction-table thead th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 700;
+            color: #495057;
+            padding: 1rem;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .transaction-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+            .transaction-table tbody tr:hover {
+                background: rgba(102, 126, 234, 0.05);
+                transform: scale(1.01);
+            }
+
+        .transaction-table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+        }
+
+    .points-badge {
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .points-earned {
+        background: linear-gradient(135deg, #198754, #20c997);
+        color: white;
+    }
+
+    .points-redeemed {
+        background: linear-gradient(135deg, #dc3545, #e83e8c);
+        color: white;
+    }
+
+    .empty-state {
+        padding: 3rem 1rem;
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .btn-custom {
+        border-radius: 12px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid;
+    }
+
+    .btn-outline-primary {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+        .btn-outline-primary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        border: none;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .progress-ring {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1rem;
+    }
+
+    .progress-circle {
+        transform: rotate(-90deg);
+        width: 120px;
+        height: 120px;
+    }
+
+    .progress-bg {
+        fill: none;
+        stroke: #e9ecef;
+        stroke-width: 8;
+    }
+
+    .progress-bar {
+        fill: none;
+        stroke: #667eea;
+        stroke-width: 8;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 1s ease;
+    }
+
+    .milestone-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+
+    .milestone-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+        .milestone-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+    .milestone-achieved {
+        border-left: 4px solid #198754;
+    }
+
+    .milestone-upcoming {
+        border-left: 4px solid #6c757d;
+        opacity: 0.7;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .summary-card {
+            margin-bottom: 1rem;
+        }
+
+        .points-number {
+            font-size: 2rem;
+        }
+
+        .table-header h5 {
+            font-size: 1.1rem;
+        }
+
+        .transaction-table thead {
+            display: none;
+        }
+
+        .transaction-table tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+        }
+
+        .transaction-table tbody td {
+            display: block;
+            text-align: right;
+            padding: 0.5rem 1rem;
+            border: none;
+        }
+
+            .transaction-table tbody td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: bold;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                color: #6c757d;
+            }
+    }
+</style>
+
 <!-- Hero Section -->
-<section class="bg-warning bg-gradient text-dark text-center py-5 shadow-sm">
-    <div class="container">
-        <i class="bi bi-stars display-3 mb-3"></i>
-        <h1 class="fw-bold">My Loyalty Points</h1>
-        <p class="lead mb-0">Earn, Redeem, and Enjoy Exclusive Rewards!</p>
+<section class="loyalty-hero">
+    <div class="container hero-content">
+        <div class="text-center">
+            <i class="bi bi-stars display-1 mb-3 floating"></i>
+            <h1 class="fw-bold display-5 mb-3">My Loyalty Points</h1>
+            <p class="lead mb-0 fs-4">Earn, Redeem, and Enjoy Exclusive Rewards!</p>
+        </div>
     </div>
 </section>
 
 <!-- Loyalty Summary -->
 <section class="container my-5">
-    <div class="row text-center mb-5">
-        <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm p-4">
-                <i class="bi bi-trophy-fill text-warning display-5 mb-2"></i>
-                <h5 class="fw-bold text-muted mb-1">Total Earned</h5>
-                <h3 class="fw-bold text-success">@totalEarned</h3>
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="summary-card">
+                <div class="summary-icon earned">
+                    <i class="bi bi-trophy-fill"></i>
+                </div>
+                <div class="points-number text-success">@totalEarned</div>
+                <div class="points-label">Total Points Earned</div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm p-4">
-                <i class="bi bi-arrow-repeat text-danger display-5 mb-2"></i>
-                <h5 class="fw-bold text-muted mb-1">Total Redeemed</h5>
-                <h3 class="fw-bold text-danger">@totalRedeemed</h3>
+        <div class="col-md-4 mb-4">
+            <div class="summary-card">
+                <div class="summary-icon redeemed">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+                <div class="points-number text-danger">@totalRedeemed</div>
+                <div class="points-label">Total Points Redeemed</div>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm p-4">
-                <i class="bi bi-stars text-primary display-5 mb-2"></i>
-                <h5 class="fw-bold text-muted mb-1">Current Balance</h5>
-                <h3 class="fw-bold text-primary">@Model.LoyaltyPoints</h3>
+        <div class="col-md-4 mb-4">
+            <div class="summary-card">
+                <div class="summary-icon balance">
+                    <i class="bi bi-stars"></i>
+                </div>
+                <div class="points-number text-primary pulse">@Model.LoyaltyPoints</div>
+                <div class="points-label">Current Balance</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="milestone-section">
+        <h4 class="fw-bold text-center mb-4"><i class="bi bi-flag-fill me-2"></i>Loyalty Milestones</h4>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="milestone-item @(Model.LoyaltyPoints >= 100 ? "milestone-achieved" : "milestone-upcoming")">
+                    <i class="bi bi-award-fill text-warning me-3 fs-4"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Bronze Member</h6>
+                        <small class="text-muted">Reach 100 points</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="milestone-item @(Model.LoyaltyPoints >= 500 ? "milestone-achieved" : "milestone-upcoming")">
+                    <i class="bi bi-award-fill text-secondary me-3 fs-4"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Silver Member</h6>
+                        <small class="text-muted">Reach 500 points</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="milestone-item @(Model.LoyaltyPoints >= 1000 ? "milestone-achieved" : "milestone-upcoming")">
+                    <i class="bi bi-award-fill text-warning me-3 fs-4"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Gold Member</h6>
+                        <small class="text-muted">Reach 1,000 points</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="milestone-item @(Model.LoyaltyPoints >= 2000 ? "milestone-achieved" : "milestone-upcoming")">
+                    <i class="bi bi-gem text-primary me-3 fs-4"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Platinum Member</h6>
+                        <small class="text-muted">Reach 2,000 points</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Transaction History -->
-    <div class="card shadow-lg border-0">
-        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history"></i> Loyalty Transaction History</h5>
-            <span class="badge bg-light text-primary fw-semibold">@((transactions?.Count ?? 0)) Transactions</span>
+    <div class="loyalty-card">
+        <div class="table-header">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2"></i>Loyalty Transaction History</h5>
+                <span class="badge bg-light text-primary fw-semibold px-3 py-2">
+                    @((transactions?.Count ?? 0)) Transactions
+                </span>
+            </div>
         </div>
 
-        <div class="card-body table-responsive">
-            <table class="table align-middle table-striped mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th class="text-center">Points</th>
-                        <th class="text-center">Type</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (transactions != null && transactions.Any())
-                    {
-                        foreach (var t in transactions)
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table transaction-table mb-0">
+                    <thead>
+                        <tr>
+                            <th data-label="Date">Date & Time</th>
+                            <th data-label="Description">Description</th>
+                            <th class="text-center" data-label="Points">Points</th>
+                            <th class="text-center" data-label="Type">Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (transactions != null && transactions.Any())
+                        {
+                            foreach (var t in transactions)
+                            {
+                                <tr>
+                                    <td data-label="Date">
+                                        <div class="fw-semibold">
+                                            @(t.TransactionDate.HasValue
+                                                ? t.TransactionDate.Value.ToString("MMM dd, yyyy")
+                                                : "N/A")
+                                        </div>
+                                        <small class="text-muted">
+                                            @(t.TransactionDate.HasValue
+                                                ? t.TransactionDate.Value.ToString("hh:mm tt")
+                                                : "")
+                                        </small>
+                                    </td>
+                                    <td data-label="Description">
+                                        <div class="fw-semibold">@t.Description</div>
+                                    </td>
+                                    <td class="text-center" data-label="Points">
+                                        <span class="fw-bold fs-5 @(t.Type == "Earn" ? "text-success" : "text-danger")">
+                                            @(t.Type == "Earn" ? "+" : "-")@t.Points
+                                        </span>
+                                    </td>
+                                    <td class="text-center" data-label="Type">
+                                        <span class="points-badge @(t.Type == "Earn" ? "points-earned" : "points-redeemed")">
+                                            <i class="bi @(t.Type == "Earn" ? "bi-plus-circle" : "bi-dash-circle") me-1"></i>
+                                            @t.Type.ToUpper()
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
-                                <td>
-                                    @(t.TransactionDate.HasValue
-                                        ? t.TransactionDate.Value.ToString("MMM dd, yyyy hh:mm tt")
-                                        : "N/A")
-                                </td>
-                                <td>@t.Description</td>
-                                <td class="text-center fw-bold">@t.Points</td>
-                                <td class="text-center">
-                                    <span class="badge @(t.Type == "Earn" ? "bg-success" : "bg-danger") px-3 py-2">
-                                        <i class="bi @(t.Type == "Earn" ? "bi-plus-circle" : "bi-dash-circle")"></i> @t.Type
-                                    </span>
+                                <td colspan="4">
+                                    <div class="empty-state">
+                                        <i class="bi bi-emoji-neutral empty-icon"></i>
+                                        <h5 class="text-muted mb-2">No Transactions Yet</h5>
+                                        <p class="text-muted mb-3">Start attending events to earn loyalty points!</p>
+                                        <a href="@Url.Action("Index", "Event")" class="btn btn-primary">
+                                            <i class="bi bi-calendar-event me-2"></i>Browse Events
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                <i class="bi bi-emoji-neutral display-6 d-block mb-2"></i>
-                                No loyalty transactions yet.
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Back Button -->
-    <div class="text-center mt-4">
-        <a href="@Url.Action("MyProfile", "Account")" class="btn btn-outline-primary">
-            <i class="bi bi-person-circle"></i> Back to Profile
+    <!-- Action Buttons -->
+    <div class="text-center mt-5">
+        <a href="@Url.Action("MyProfile", "Account")" class="btn btn-outline-primary btn-custom me-3">
+            <i class="bi bi-person-circle me-2"></i>Back to Profile
         </a>
-        <a href="@Url.Action("Index", "Home")" class="btn btn-primary ms-2">
-            <i class="bi bi-house-door"></i> Home
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-custom me-3">
+            <i class="bi bi-house-door me-2"></i>Go Home
+        </a>
+        <a href="@Url.Action("Index", "Event")" class="btn btn-success btn-custom">
+            <i class="bi bi-calendar-event me-2"></i>Find Events
         </a>
     </div>
 </section>
+
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add hover effects to cards
+        const cards = document.querySelectorAll('.summary-card, .milestone-item');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function () {
+                this.style.transform = 'translateY(-8px)';
+            });
+
+            card.addEventListener('mouseleave', function () {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Add click animation to buttons
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+
+        // Show welcome message if first visit
+        if (!sessionStorage.getItem('loyaltyPageVisited')) {
+            setTimeout(() => {
+                Swal.fire({
+                    title: 'Welcome to Loyalty Rewards! 🎉',
+                    html: `
+                        <div class="text-start">
+                            <p class="mb-2"><i class="bi bi-star-fill text-warning me-2"></i><strong>Earn Points:</strong> Attend events and complete activities</p>
+                            <p class="mb-2"><i class="bi bi-gift-fill text-primary me-2"></i><strong>Redeem Rewards:</strong> Use points for discounts and perks</p>
+                            <p class="mb-0"><i class="bi bi-trophy-fill text-success me-2"></i><strong>Achieve Milestones:</strong> Unlock exclusive benefits</p>
+                        </div>
+                    `,
+                    icon: 'info',
+                    confirmButtonColor: '#667eea',
+                    confirmButtonText: 'Start Earning!',
+                    background: '#fff',
+                    color: '#333'
+                });
+                sessionStorage.setItem('loyaltyPageVisited', 'true');
+            }, 1000);
+        }
+
+        // Add progress animation
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(bar => {
+            const radius = bar.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+            bar.style.strokeDasharray = `${circumference} ${circumference}`;
+            bar.style.strokeDashoffset = circumference;
+
+            const offset = circumference - (75 / 100) * circumference;
+            setTimeout(() => {
+                bar.style.strokeDashoffset = offset;
+            }, 500);
+        });
+    });
+</script>

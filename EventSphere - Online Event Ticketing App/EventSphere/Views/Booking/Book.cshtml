@@ -4,82 +4,660 @@
     Layout = ViewBag.LayoutPath;
 }
 
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --warning-gradient: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+    }
+
+    .booking-hero {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 3rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .booking-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 1000,100 1000,0"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .booking-container {
+        margin-top: -50px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .event-image-container {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+    }
+
+        .event-image-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+        }
+
+    .event-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .event-image-container:hover .event-image {
+        transform: scale(1.05);
+    }
+
+    .booking-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        height: fit-content;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+
+        .info-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-left-color: #667eea;
+            transform: translateX(5px);
+        }
+
+    .info-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .info-content {
+        flex-grow: 1;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    .quantity-selector {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 2rem 0;
+        border: 2px dashed #dee2e6;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .quantity-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 2px solid #667eea;
+        background: white;
+        color: #667eea;
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .quantity-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+    .quantity-input {
+        width: 80px;
+        height: 60px;
+        border: 2px solid #667eea;
+        border-radius: 12px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #495057;
+    }
+
+        .quantity-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+        }
+
+    .total-card {
+        background: var(--success-gradient);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        margin: 2rem 0;
+        box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+    }
+
+    .total-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+    }
+
+    .total-amount {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0;
+    }
+
+    .btn-custom {
+        border-radius: 12px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary-custom {
+        background: var(--primary-gradient);
+        border-color: transparent;
+        color: white;
+    }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+    .btn-outline-custom {
+        background: transparent;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+        .btn-outline-custom:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .alert-custom {
+        border: none;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border-left: 4px solid #dc3545;
+    }
+
+    .alert-info {
+        background: rgba(23, 162, 184, 0.1);
+        color: #17a2b8;
+        border-left: 4px solid #17a2b8;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+
+    @@keyframes floating {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .availability-badge {
+        background: var(--warning-gradient);
+        color: #2c3e50;
+        padding: 1rem;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .booking-container {
+            margin-top: -30px;
+        }
+
+        .booking-card {
+            padding: 1.5rem;
+        }
+
+        .total-amount {
+            font-size: 2rem;
+        }
+
+        .quantity-control {
+            gap: 0.5rem;
+        }
+
+        .quantity-btn {
+            width: 45px;
+            height: 45px;
+        }
+
+        .quantity-input {
+            width: 70px;
+            height: 50px;
+        }
+    }
+
+    .benefits-list {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: #495057;
+    }
+
+        .benefit-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .benefit-item i {
+            color: #198754;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+</style>
+
 <!-- Hero Section -->
-<section class="bg-primary text-white text-center py-5">
-    <div class="container">
-        <h1 class="fw-bold mb-3">Book Your Tickets</h1>
-        <p class="lead mb-0">Confirm your event booking and secure your spot now 🎟️</p>
+<section class="booking-hero">
+    <div class="container hero-content">
+        <div class="text-center">
+            <i class="bi bi-ticket-perforated display-1 mb-3 floating"></i>
+            <h1 class="fw-bold display-5 mb-3">Book Your Tickets</h1>
+            <p class="lead mb-0 fs-4">Confirm your event booking and secure your spot now 🎟️</p>
+        </div>
     </div>
 </section>
+
+<!-- Error Alert -->
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger text-center mt-3">
-        @TempData["Error"]
+    <div class="container mt-4">
+        <div class="alert alert-custom alert-danger animate__animated animate__shakeX">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+        </div>
     </div>
 }
 
 <!-- Booking Section -->
-<section class="container my-5">
+<section class="container my-5 booking-container">
     <div class="row">
         <!-- Event Image -->
         <div class="col-lg-6 mb-4">
-            <img src="@(!string.IsNullOrEmpty(Model.EventImage) ? Model.EventImage : "/Content/Images/default-event.jpg")"
-                 class="img-fluid rounded shadow-sm w-100"
-                 alt="@Model.Title"
-                 style="object-fit: cover; max-height: 400px;" />
+            <div class="event-image-container">
+                <img src="@(!string.IsNullOrEmpty(Model.EventImage) ? Model.EventImage : "/Content/Events/default-event.png")"
+                     class="event-image"
+                     alt="@Model.Title"
+                     onerror="this.src='/Content/Events/default-event.png'" />
+            </div>
         </div>
 
         <!-- Booking Form -->
         <div class="col-lg-6">
-            <h2 class="fw-bold mb-3">@Model.Title</h2>
-            <p class="text-muted">@Model.Description</p>
+            <div class="booking-card">
+                <h2 class="fw-bold mb-4 text-dark">@Model.Title</h2>
+                <p class="text-muted lead mb-4">@Model.Description</p>
 
-            <ul class="list-unstyled mb-4">
-                <li class="mb-2"><i class="bi bi-calendar-event text-primary me-2"></i><strong>Date:</strong> @Model.StartDate.ToString("MMMM dd, yyyy")</li>
-                <li class="mb-2"><i class="bi bi-clock text-primary me-2"></i><strong>Time:</strong> @Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")</li>
-                <li class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i><strong>Venue:</strong> @Model.Venue.VenueName, @Model.Venue.Address, @Model.Venue.City</li>
-                <li class="mb-2"><i class="bi bi-currency-dollar text-primary me-2"></i><strong>Price per Ticket:</strong>@Model.TicketPrice.ToString("N2") LKR</li>
-            </ul>
+                <!-- Event Information -->
+                <div class="info-items">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Event Date</div>
+                            <div class="info-value">@Model.StartDate.ToString("MMMM dd, yyyy")</div>
+                        </div>
+                    </div>
 
-            @using (Html.BeginForm("BookConfirmed", "Booking", FormMethod.Post))
-            {
-                @Html.AntiForgeryToken()
-                @Html.Hidden("eventId", Model.EventID)
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Event Time</div>
+                            <div class="info-value">@Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")</div>
+                        </div>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="quantity" class="form-label fw-semibold">Select Quantity</label>
-                    <input type="number" id="quantity" name="quantity" class="form-control" min="1" max="10" value="1" required />
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Venue</div>
+                            <div class="info-value">@Model.Venue.VenueName, @Model.Venue.Address, @Model.Venue.City</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="bi bi-tag"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Price per Ticket</div>
+                            <div class="info-value">LKR @Model.TicketPrice.ToString("N2")</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i>
-                    Total: <span id="totalAmount" class="fw-bold">@Model.TicketPrice.ToString("N2") USD</span>
+                <!-- Availability Badge -->
+                <div class="availability-badge">
+                    <i class="bi bi-info-circle me-2"></i>
+                    @(Model.AvailableTickets > 0 ? $"{Model.AvailableTickets} tickets available" : "Sold Out")
                 </div>
 
-                <div class="d-flex gap-3 mt-4">
-                    <a href="@Url.Action("Details", "Event", new { id = Model.EventID })" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left"></i> Back
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-ticket-perforated"></i> Confirm Booking
-                    </button>
-                </div>
-            }
+                @using (Html.BeginForm("BookConfirmed", "Booking", FormMethod.Post, new { id = "bookingForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("eventId", Model.EventID)
+
+                    <!-- Quantity Selector -->
+                    <div class="quantity-selector">
+                        <label class="form-label fw-semibold fs-5 text-center d-block">Select Number of Tickets</label>
+
+                        <div class="quantity-control">
+                            <button type="button" class="quantity-btn" id="decreaseBtn">-</button>
+                            <input type="number" id="quantity" name="quantity" class="quantity-input" min="1" max="10" value="1" required readonly />
+                            <button type="button" class="quantity-btn" id="increaseBtn">+</button>
+                        </div>
+
+                        <div class="text-center text-muted small">
+                            Maximum 10 tickets per booking
+                        </div>
+                    </div>
+
+                    <!-- Total Amount -->
+                    <div class="total-card">
+                        <div class="total-label">Total Amount</div>
+                        <div class="total-amount" id="totalAmount">LKR @Model.TicketPrice.ToString("N2")</div>
+                    </div>
+
+                    <!-- Benefits -->
+                    <div class="benefits-list">
+                        <div class="benefit-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Instant e-ticket delivery</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Secure payment processing</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Free cancellation up to 24 hours before event</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Earn loyalty points with every booking</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 mt-4 flex-wrap">
+                        <a href="@Url.Action("Details", "Event", new { id = Model.EventID })" class="btn btn-outline-custom btn-custom flex-fill">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Event
+                        </a>
+                        <button type="submit" class="btn btn-primary-custom btn-custom flex-fill pulse" id="confirmBtn">
+                            <i class="bi bi-ticket-perforated me-2"></i>Confirm Booking
+                        </button>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Script for Dynamic Total Calculation -->
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @section scripts {
     <script>
-        const pricePerTicket = @Model.TicketPrice;
-        const quantityInput = document.getElementById("quantity");
-        const totalElement = document.getElementById("totalAmount");
+        document.addEventListener('DOMContentLoaded', function() {
+            const pricePerTicket = @Model.TicketPrice;
+            const maxTickets = 10;
+            const quantityInput = document.getElementById("quantity");
+            const decreaseBtn = document.getElementById("decreaseBtn");
+            const increaseBtn = document.getElementById("increaseBtn");
+            const totalElement = document.getElementById("totalAmount");
+            const bookingForm = document.getElementById("bookingForm");
+            const confirmBtn = document.getElementById("confirmBtn");
 
-        quantityInput.addEventListener("input", function () {
-            const qty = parseInt(quantityInput.value) || 1;
-            const total = pricePerTicket * qty;
-            totalElement.textContent = `${total.toLocaleString(undefined, { minimumFractionDigits: 2 })} LKR`;
+            // Update total amount
+            function updateTotal() {
+                const qty = parseInt(quantityInput.value) || 1;
+                const total = pricePerTicket * qty;
+                totalElement.textContent = `LKR ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            }
+
+            // Quantity controls
+            decreaseBtn.addEventListener("click", function () {
+                let currentQty = parseInt(quantityInput.value) || 1;
+                if (currentQty > 1) {
+                    quantityInput.value = currentQty - 1;
+                    updateTotal();
+                }
+            });
+
+            increaseBtn.addEventListener("click", function () {
+                let currentQty = parseInt(quantityInput.value) || 1;
+                if (currentQty < maxTickets) {
+                    quantityInput.value = currentQty + 1;
+                    updateTotal();
+                } else {
+                    Swal.fire({
+                        title: 'Maximum Reached',
+                        text: `You can only book up to ${maxTickets} tickets for this event.`,
+                        icon: 'warning',
+                        confirmButtonColor: '#667eea'
+                    });
+                }
+            });
+
+            // Form submission handling
+            bookingForm.addEventListener('submit', function(e) {
+                const quantity = parseInt(quantityInput.value);
+
+                if (quantity > maxTickets) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Not Enough Tickets',
+                        text: `Only ${maxTickets} tickets are available for this event.`,
+                        icon: 'error',
+                        confirmButtonColor: '#667eea'
+                    });
+                    return;
+                }
+
+                if (quantity <= 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Invalid Quantity',
+                        text: 'Please select at least 1 ticket.',
+                        icon: 'warning',
+                        confirmButtonColor: '#667eea'
+                    });
+                    return;
+                }
+
+                // Show loading state
+                confirmBtn.innerHTML = '<i class="bi bi-arrow-repeat spinner me-2"></i>Processing...';
+                confirmBtn.disabled = true;
+
+                // Show confirmation dialog
+                e.preventDefault();
+                const totalAmount = pricePerTicket * quantity;
+
+                Swal.fire({
+                    title: 'Confirm Booking?',
+                    html: `
+                        <div class="text-start">
+                            <p><strong>Event:</strong> @Model.Title</p>
+                            <p><strong>Tickets:</strong> ${quantity}</p>
+                            <p><strong>Total Amount:</strong> LKR ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Book Now!',
+                    cancelButtonText: 'Review Details',
+                    confirmButtonColor: '#667eea',
+                    background: '#fff',
+                    color: '#333'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Submit the form
+                        bookingForm.submit();
+                    } else {
+                        // Reset button state
+                        confirmBtn.innerHTML = '<i class="bi bi-ticket-perforated me-2"></i>Confirm Booking';
+                        confirmBtn.disabled = false;
+                    }
+                });
+            });
+
+            // Add hover effects
+            const infoItems = document.querySelectorAll('.info-item');
+            infoItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(5px)';
+                });
+
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+
+            // Button click animations
+            const buttons = document.querySelectorAll('.btn-custom');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+
+            // Initial total calculation
+            updateTotal();
         });
+
+        // Add spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+            .spinner {
+                animation: spin 1s linear infinite;
+            }
+            @@keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 }

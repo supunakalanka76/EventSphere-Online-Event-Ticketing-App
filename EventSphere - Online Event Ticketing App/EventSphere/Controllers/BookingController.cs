@@ -31,6 +31,12 @@ namespace EventSphere.Controllers
                 return RedirectToAction("Index", "Event");
             }
 
+            if (ev.AvailableTickets <= 0)
+            {
+                TempData["Error"] = "No tickets available for this event.";
+                return RedirectToAction("Index", "Event");
+            }
+
             return View(ev);
         }
 
@@ -52,6 +58,12 @@ namespace EventSphere.Controllers
                 {
                     TempData["Error"] = "This event has already ended. Booking is not allowed.";
                     return RedirectToAction("Index", "Event");
+                }
+
+                if (ev.AvailableTickets < quantity)
+                {
+                    TempData["Error"] = $"Only {ev.AvailableTickets} tickets are remaining.";
+                    return RedirectToAction("Book", new { eventId });
                 }
 
                 int userId = SessionHelper.GetUserId().Value;
@@ -78,13 +90,12 @@ namespace EventSphere.Controllers
 
                 for (int i = 1; i <= quantity; i++)
                 {
-                    var ticket = new Ticket
+                    db.Tickets.Add(new Ticket
                     {
                         BookingID = booking.BookingID,
                         TicketNumber = $"{ticketBaseCode}-{i:D3}",
                         IssueDate = DateTime.Now
-                    };
-                    db.Tickets.Add(ticket);
+                    });
                 }
                 db.SaveChanges();
 
@@ -113,7 +124,7 @@ namespace EventSphere.Controllers
             return View(booking);
         }
 
-        // CONFIRM PAYMENT
+        // CONFIRM PAYMENT (updates revenue, ticket availability)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult PaymentConfirmed(int bookingId, string promoCode, bool? usePoints, string paymentMethod)
@@ -131,6 +142,17 @@ namespace EventSphere.Controllers
                 var user = db.Users.Find(booking.UserID);
                 if (user == null)
                     return HttpNotFound("User not found.");
+
+                var ev = booking.Event;
+                if (ev == null)
+                    return HttpNotFound("Event not found.");
+
+                // Check ticket availability again (avoid overselling)
+                if (ev.AvailableTickets < booking.Quantity)
+                {
+                    TempData["Error"] = $"Not enough tickets available. Remaining: {ev.AvailableTickets}";
+                    return RedirectToAction("Payment", new { bookingId });
+                }
 
                 decimal total = booking.TotalAmount;
                 decimal discount = 0;
@@ -182,7 +204,7 @@ namespace EventSphere.Controllers
                 booking.PaymentMethod = paymentMethod;
 
                 // Payment record
-                var payment = new Payment
+                db.Payments.Add(new Payment
                 {
                     BookingID = booking.BookingID,
                     Amount = finalAmount,
@@ -191,24 +213,28 @@ namespace EventSphere.Controllers
                     PaymentGateway = paymentMethod,
                     ReferenceNo = $"REF-{DateTime.Now:yyyyMMddHHmmss}",
                     InvoiceNumber = $"INV-{DateTime.Now:yyyy}-{booking.BookingID:D6}"
-                };
-                db.Payments.Add(payment);
+                });
 
-                // Generate QRs
-                var customerName = user.FullName;
-                foreach (var ticket in booking.Tickets.ToList())
+                // Decrease available tickets (important!)
+                ev.AvailableTickets -= booking.Quantity;
+                if (ev.AvailableTickets < 0)
+                    ev.AvailableTickets = 0; // safety clamp
+
+                db.Entry(ev).State = EntityState.Modified;
+
+                // Generate QR codes
+                foreach (var ticket in booking.Tickets)
                 {
-                    string qrPath = QRCodeHelper.GenerateTicketQRCode(
+                    ticket.QRCodeImage = QRCodeHelper.GenerateTicketQRCode(
                         ticket.TicketNumber,
                         booking.BookingID,
-                        booking.Event.Title,
-                        customerName,
-                        booking.Event.StartDate
+                        ev.Title,
+                        user.FullName,
+                        ev.StartDate
                     );
-                    ticket.QRCodeImage = qrPath;
                 }
 
-                // Earn Points
+                // Earn points (5%)
                 int earnedPoints = (int)(finalAmount * 0.05m);
                 if (earnedPoints > 0)
                 {
@@ -227,7 +253,7 @@ namespace EventSphere.Controllers
 
                 db.SaveChanges();
 
-                TempData["Success"] = "Payment successful!";
+                TempData["Success"] = "Payment successful! Tickets updated.";
                 return RedirectToAction("Confirmation", new { bookingId = booking.BookingID });
             }
             catch (Exception ex)
@@ -253,117 +279,6 @@ namespace EventSphere.Controllers
             return View(booking);
         }
 
-        // DOWNLOAD INVOICE (PDF)
-        public ActionResult DownloadInvoice(int bookingId)
-        {
-            var booking = db.Bookings
-                .Include("Event.Venue")
-                .Include("Payment")
-                .Include("User")
-                .Include("Tickets")
-                .FirstOrDefault(b => b.BookingID == bookingId);
-
-            if (booking == null)
-                return HttpNotFound("Booking not found.");
-
-            using (var ms = new MemoryStream())
-            {
-                Document doc = new Document(PageSize.A4, 40, 40, 50, 40);
-                PdfWriter.GetInstance(doc, ms);
-                doc.Open();
-
-                var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.BLACK);
-                var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 13, BaseColor.BLACK);
-                var textFont = FontFactory.GetFont(FontFactory.HELVETICA, 11, BaseColor.BLACK);
-
-                doc.Add(new Paragraph("EventSphere Booking Invoice", titleFont));
-                doc.Add(new Paragraph("Generated on: " + DateTime.Now.ToString("MMMM dd, yyyy hh:mm tt"), textFont));
-                doc.Add(new Paragraph("--------------------------------------------------------------------"));
-
-                doc.Add(new Paragraph("\nBooking Details", headerFont));
-                doc.Add(new Paragraph($"Invoice #: {booking.Payment?.InvoiceNumber}", textFont));
-                doc.Add(new Paragraph($"Customer: {booking.User?.FullName}", textFont));
-                doc.Add(new Paragraph($"Event: {booking.Event.Title}", textFont));
-                doc.Add(new Paragraph($"Venue: {booking.Event.Venue?.VenueName}, {booking.Event.Venue?.City}", textFont));
-                doc.Add(new Paragraph($"Date: {booking.Event.StartDate:MMMM dd, yyyy}", textFont));
-                doc.Add(new Paragraph($"Tickets: {booking.Quantity}", textFont));
-                doc.Add(new Paragraph($"Booking Date: {booking.BookingDate:MMMM dd, yyyy hh:mm tt}", textFont));
-
-                doc.Add(new Paragraph("\nPayment Information", headerFont));
-                doc.Add(new Paragraph($"Method: {booking.Payment?.PaymentGateway}", textFont));
-                doc.Add(new Paragraph($"Reference: {booking.Payment?.ReferenceNo}", textFont));
-                doc.Add(new Paragraph($"Status: {booking.Payment?.Status}", textFont));
-                doc.Add(new Paragraph($"Payment Date: {booking.Payment?.PaymentDate:MMMM dd, yyyy hh:mm tt}", textFont));
-                doc.Add(new Paragraph($"\nFinal Amount Paid: LKR {booking.FinalAmount:N2}", headerFont));
-
-                doc.Add(new Paragraph("\n--------------------------------------------------------------------\n"));
-                doc.Add(new Paragraph("Tickets & QR Codes", headerFont));
-
-                if (booking.Tickets != null && booking.Tickets.Any())
-                {
-                    PdfPTable table = new PdfPTable(2);
-                    table.WidthPercentage = 100;
-                    table.SetWidths(new float[] { 40f, 60f });
-
-                    foreach (var ticket in booking.Tickets)
-                    {
-                        iTextSharp.text.Image qrImage = null;
-
-                        // If Base64 QR exists
-                        if (!string.IsNullOrEmpty(ticket.QRCodeImage) && ticket.QRCodeImage.StartsWith("data:image"))
-                        {
-                            var base64Data = ticket.QRCodeImage.Split(',')[1];
-                            byte[] qrBytes = Convert.FromBase64String(base64Data);
-                            qrImage = iTextSharp.text.Image.GetInstance(qrBytes);
-                        }
-                        // If file path exists
-                        else if (!string.IsNullOrEmpty(ticket.QRCodeImage))
-                        {
-                            string qrFullPath = HttpContext.Server.MapPath(ticket.QRCodeImage);
-                            if (System.IO.File.Exists(qrFullPath))
-                                qrImage = iTextSharp.text.Image.GetInstance(qrFullPath);
-                            else
-                            {
-                                // Generate Base64 QR dynamically
-                                string qrBase64 = QRCodeHelper.GenerateQRCodeBase64(ticket.TicketNumber);
-                                var bytes = Convert.FromBase64String(qrBase64.Split(',')[1]);
-                                qrImage = iTextSharp.text.Image.GetInstance(bytes);
-                            }
-                        }
-
-                        if (qrImage != null)
-                        {
-                            qrImage.ScaleAbsolute(100f, 100f);
-                            PdfPCell qrCell = new PdfPCell(qrImage)
-                            {
-                                Border = PdfPCell.NO_BORDER,
-                                HorizontalAlignment = Element.ALIGN_CENTER
-                            };
-                            table.AddCell(qrCell);
-                        }
-
-                        PdfPCell infoCell = new PdfPCell();
-                        infoCell.Border = PdfPCell.NO_BORDER;
-                        infoCell.AddElement(new Paragraph($"Ticket #: {ticket.TicketNumber}", textFont));
-                        infoCell.AddElement(new Paragraph($"Issued: {ticket.IssueDate:MMMM dd, yyyy}", textFont));
-                        table.AddCell(infoCell);
-                    }
-
-                    doc.Add(table);
-                }
-                else
-                {
-                    doc.Add(new Paragraph("No tickets available.", textFont));
-                }
-
-                doc.Add(new Paragraph("\nThank you for booking with EventSphere!", headerFont));
-                doc.Add(new Paragraph("Please present your QR code at event entry.", textFont));
-
-                doc.Close();
-                return File(ms.ToArray(), "application/pdf", $"Invoice_{booking.BookingID}.pdf");
-            }
-        }
-
         // USER BOOKINGS
         [HttpGet]
         public ActionResult MyBookings()
@@ -380,6 +295,10 @@ namespace EventSphere.Controllers
                 .Where(b => b.UserID == userId)
                 .OrderByDescending(b => b.BookingDate)
                 .ToList();
+
+            ViewBag.TotalSpent = bookings
+                .Where(b => b.PaymentStatus == "Completed")
+                .Sum(b => (decimal?)b.TotalAmount) ?? 0;
 
             return View(bookings);
         }

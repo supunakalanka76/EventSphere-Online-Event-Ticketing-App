@@ -4,135 +4,545 @@
     Layout = ViewBag.LayoutPath;
 }
 
-<!-- Header -->
-<section class="bg-primary text-white text-center py-5 mb-4">
-    <div class="container">
-        <h1 class="fw-bold mb-2">Manage Events</h1>
-        <p class="lead mb-0">View, filter, and manage all events in the system</p>
-    </div>
-</section>
+<!-- Custom Styles -->
+<style>
+    .events-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
 
-<!-- Filters -->
-<section class="container mb-4">
-    <div class="card border-0 shadow-sm rounded-3">
-        <div class="card-body">
-            <div class="row g-3 align-items-center">
-                <div class="col-md-4">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search by title or location...">
+        .events-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(30deg);
+        }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .event-row {
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+
+        .event-row:hover {
+            background-color: #f8f9ff !important;
+            border-left-color: #007bff;
+        }
+
+    .filter-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    }
+
+    .event-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        border: 3px solid white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .export-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+        .export-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+    .empty-state {
+        padding: 3rem 1rem;
+        text-align: center;
+    }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+    .category-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border: 2px solid transparent;
+    }
+
+    .price-tag {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .date-badge {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        text-align: center;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                        <i class="bi bi-calendar-event text-primary fs-4"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 fw-bold text-primary mb-1">Manage Events</h1>
+                        <p class="text-muted mb-0">View, filter, and manage all events in the system</p>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <select id="categoryFilter" class="form-select">
-                        <option value="">All Categories</option>
-                        @foreach (var category in ViewBag.Categories as List<EventSphere.Models.EventCategory>)
-                        {
-                            <option value="@category.CategoryName">@category.CategoryName</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-4 text-end">
-                    <a href="@Url.Action("Create", "Event")" class="btn btn-success">
-                        <i class="bi bi-plus-circle me-2"></i>Add New Event
+                <div class="d-flex gap-2">
+                    <button class="btn export-btn">
+                        <i class="bi bi-download me-2"></i>Export Events
+                    </button>
+                    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
                     </a>
                 </div>
             </div>
         </div>
     </div>
-</section>
 
-<!-- Event List -->
-<section class="container mb-5">
-    <div class="card border-0 shadow-sm rounded-3">
-        <div class="card-header bg-light py-3">
-            <h5 class="mb-0"><i class="bi bi-calendar-event me-2 text-primary"></i>All Events</h5>
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card events-card stats-card text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-white-50 mb-2">TOTAL EVENTS</h6>
+                            <h2 class="fw-bold mb-1">@Model.Count()</h2>
+                            <span class="text-white-50 small">All events</span>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                            <i class="bi bi-calendar-check fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body p-0">
-            @if (Model != null && Model.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-striped align-middle mb-0" id="eventsTable">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Event ID</th>
-                                <th>Title</th>
-                                <th>Category</th>
-                                <th>Location</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Ticket Price (LKR)</th>
-                                <th>Status</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var ev in Model)
-                            {
-                                <tr data-category="@ev.CategoryID" data-title="@ev.Title.ToLower()">
-                                    <td>@ev.EventID</td>
-                                    <td>@ev.Title</td>
-                                    <td>@(ev.EventCategory != null ? ev.EventCategory.CategoryName : "Uncategorized")</td>
-                                    <td>@ev.Venue.City</td>
-                                    <td>@ev.StartDate.ToString("dd MMM yyyy")</td>
-                                    <td>@ev.EndDate.ToString("dd MMM yyyy")</td>
-                                    <td>@ev.TicketPrice.ToString("N2")</td>
-                                    <td>
-                                        @if (ev.Status == "Approved")
-                                        {
-                                            <span class="badge bg-success">Approved</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">Pending</span>
-                                        }
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="@Url.Action("Edit", "Event", new { id = ev.EventID })" class="btn btn-sm btn-outline-primary me-1">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                        <a href="@Url.Action("Delete", "Event", new { id = ev.EventID })"
-                                           class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('Are you sure you want to delete this event?');">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+        <div class="col-xl-3 col-md-6">
+            <div class="card events-card stats-card text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-white-50 mb-2">APPROVED EVENTS</h6>
+                            <h2 class="fw-bold mb-1">@Model.Count(e => e.Status == "Approved")</h2>
+                            <span class="text-white-50 small">Active events</span>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                            <i class="bi bi-check-circle fs-4"></i>
+                        </div>
+                    </div>
                 </div>
-            }
-            else
-            {
-                <div class="text-center py-5">
-                    <i class="bi bi-calendar-x display-4 text-muted"></i>
-                    <p class="text-muted mt-3 mb-0">No events found.</p>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card events-card stats-card text-white" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-white-50 mb-2">PENDING EVENTS</h6>
+                            <h2 class="fw-bold mb-1">@Model.Count(e => e.Status != "Approved")</h2>
+                            <span class="text-white-50 small">Awaiting approval</span>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                            <i class="bi bi-clock fs-4"></i>
+                        </div>
+                    </div>
                 </div>
-            }
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card events-card stats-card text-white" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-white-50 mb-2">UPCOMING EVENTS</h6>
+                            <h2 class="fw-bold mb-1">@Model.Count(e => e.StartDate > DateTime.Now)</h2>
+                            <span class="text-white-50 small">Future events</span>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                            <i class="bi bi-arrow-up-right fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</section>
 
-<!-- Scripts -->
+    <!-- Filters Section -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card events-card filter-card">
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-muted mb-2">Search Events</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Title, location, venue...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold text-muted mb-2">Category</label>
+                            <select id="categoryFilter" class="form-select">
+                                <option value="">All Categories</option>
+                                @foreach (var category in ViewBag.Categories as List<EventSphere.Models.EventCategory>)
+                                {
+                                    <option value="@category.CategoryID">@category.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold text-muted mb-2">Status</label>
+                            <select id="statusFilter" class="form-select">
+                                <option value="">All Status</option>
+                                <option value="approved">Approved</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-muted mb-2">Date Range</label>
+                            <input type="date" class="form-control" id="dateFilter">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button id="clearFilters" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-x-circle me-2"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card events-card">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-primary">
+                            <i class="bi bi-list-ul me-2"></i>All Events
+                            <span class="badge bg-primary bg-opacity-20 text-primary ms-2" id="eventCount">@Model.Count()</span>
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-sort-down me-2"></i>Sort By
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item sort-option" data-sort="date-desc" href="#">Newest First</a></li>
+                                    <li><a class="dropdown-item sort-option" data-sort="date-asc" href="#">Oldest First</a></li>
+                                    <li><a class="dropdown-item sort-option" data-sort="price-desc" href="#">Highest Price</a></li>
+                                    <li><a class="dropdown-item sort-option" data-sort="price-asc" href="#">Lowest Price</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="eventsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">Event Details</th>
+                                        <th>Category & Location</th>
+                                        <th>Date & Time</th>
+                                        <th>Ticket Price</th>
+                                        <th>Status</th>
+                                        <th class="text-end pe-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ev in Model)
+                                    {
+                                        <tr class="event-row"
+                                            data-category="@ev.CategoryID"
+                                            data-status="@ev.Status.ToLower()"
+                                            data-title="@ev.Title.ToLower()"
+                                            data-location="@ev.Venue.City.ToLower()"
+                                            data-date="@ev.StartDate.ToString("yyyy-MM-dd")"
+                                            data-price="@ev.TicketPrice">
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="event-icon me-3">
+                                                        <i class="bi bi-calendar-event"></i>
+                                                    </div>
+                                                    <div>
+                                                        <strong class="d-block">@ev.Title</strong>
+                                                        <small class="text-muted">ID: @ev.EventID</small>
+                                                        <div class="text-muted small mt-1">
+                                                            <i class="bi bi-geo-alt me-1"></i>@ev.Venue.VenueName
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="category-badge bg-primary bg-opacity-10 text-primary border border-primary mb-2 d-inline-block">
+                                                    @(ev.EventCategory != null ? ev.EventCategory.CategoryName : "Uncategorized")
+                                                </span>
+                                                <div class="text-muted small">
+                                                    <i class="bi bi-pin-map me-1"></i>@ev.Venue.Address, @ev.Venue.City
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="date-badge mb-2">
+                                                    <div class="fw-semibold">Start</div>
+                                                    <div class="text-primary">@ev.StartDate.ToString("dd MMM yy")</div>
+                                                </div>
+                                                <div class="date-badge">
+                                                    <div class="fw-semibold">End</div>
+                                                    <div class="text-muted">@ev.EndDate.ToString("dd MMM yy")</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="price-tag text-center">
+                                                    LKR @ev.TicketPrice.ToString("N2")
+                                                </div>
+                                                <div class="text-center text-muted small mt-1">
+                                                    @ev.TotalTickets tickets
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (ev.Status == "Approved")
+                                                {
+                                                    <span class="status-badge bg-opacity-20 text-success border border-success">
+                                                        <i class="bi bi-check-circle me-1"></i>
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="status-badge bg-opacity-20 text-warning border border-warning">
+                                                        <i class="bi bi-clock me-1"></i>
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <a href="@Url.Action("Edit", "Event", new { id = ev.EventID })"
+                                                       class="btn action-btn btn-outline-primary"
+                                                       data-bs-toggle="tooltip" title="Edit Event">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                    <button class="btn action-btn btn-outline-@(ev.Status == "Approved" ? "warning" : "success") toggle-status-btn"
+                                                            data-event-id="@ev.EventID"
+                                                            data-current-status="@ev.Status"
+                                                            data-bs-toggle="tooltip"
+                                                            title="@(ev.Status == "Approved" ? "Set Pending" : "Approve Event")">
+                                                        <i class="bi bi-@(ev.Status == "Approved" ? "clock" : "check")"></i>
+                                                    </button>
+                                                    <a href="@Url.Action("Details", "Event", new { id = ev.EventID })"
+                                                       class="btn action-btn btn-outline-info"
+                                                       data-bs-toggle="tooltip" title="View Details">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Delete", "Event", new { id = ev.EventID })"
+                                                       class="btn action-btn btn-outline-danger"
+                                                       data-bs-toggle="tooltip" title="Delete Event"
+                                                       onclick="return confirm('Are you sure you want to delete this event? This action cannot be undone.');">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state text-muted">
+                            <i class="bi bi-calendar-x"></i>
+                            <h5 class="mb-2">No Events Found</h5>
+                            <p class="mb-0">There are no events in the system yet.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section scripts {
     <script>
-        const searchInput = document.getElementById("searchInput");
-        const categoryFilter = document.getElementById("categoryFilter");
-        const rows = document.querySelectorAll("#eventsTable tbody tr");
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById("searchInput");
+            const categoryFilter = document.getElementById("categoryFilter");
+            const statusFilter = document.getElementById("statusFilter");
+            const dateFilter = document.getElementById("dateFilter");
+            const clearFilters = document.getElementById("clearFilters");
+            const eventCount = document.getElementById("eventCount");
+            const rows = document.querySelectorAll("#eventsTable tbody tr");
+            const sortOptions = document.querySelectorAll(".sort-option");
+            const toggleStatusBtns = document.querySelectorAll(".toggle-status-btn");
 
-        function filterEvents() {
-            const searchValue = searchInput.value.toLowerCase();
-            const selectedCategory = categoryFilter.value;
+            // Initialize tooltips
+            const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
 
-            rows.forEach(row => {
-                const title = row.getAttribute("data-title");
-                const category = row.getAttribute("data-category");
-                const matchSearch = title.includes(searchValue);
-                const matchCategory = !selectedCategory || category === selectedCategory;
+            function filterEvents() {
+                const searchValue = searchInput.value.toLowerCase();
+                const selectedCategory = categoryFilter.value;
+                const selectedStatus = statusFilter.value;
+                const selectedDate = dateFilter.value;
 
-                row.style.display = (matchSearch && matchCategory) ? "" : "none";
+                let visibleCount = 0;
+
+                rows.forEach(row => {
+                    const title = row.getAttribute("data-title");
+                    const location = row.getAttribute("data-location");
+                    const category = row.getAttribute("data-category");
+                    const status = row.getAttribute("data-status");
+                    const date = row.getAttribute("data-date");
+
+                    const matchSearch = title.includes(searchValue) ||
+                        location.includes(searchValue) ||
+                        row.querySelector('strong.d-block').textContent.toLowerCase().includes(searchValue);
+                    const matchCategory = !selectedCategory || category === selectedCategory;
+                    const matchStatus = !selectedStatus || status === selectedStatus;
+                    const matchDate = !selectedDate || date === selectedDate;
+
+                    if (matchSearch && matchCategory && matchStatus && matchDate) {
+                        row.style.display = "";
+                        visibleCount++;
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+
+                eventCount.textContent = visibleCount;
+            }
+
+            // Event listeners
+            searchInput.addEventListener("input", filterEvents);
+            categoryFilter.addEventListener("change", filterEvents);
+            statusFilter.addEventListener("change", filterEvents);
+            dateFilter.addEventListener("change", filterEvents);
+
+            clearFilters.addEventListener("click", function () {
+                searchInput.value = "";
+                categoryFilter.value = "";
+                statusFilter.value = "";
+                dateFilter.value = "";
+                filterEvents();
             });
-        }
 
-        searchInput.addEventListener("input", filterEvents);
-        categoryFilter.addEventListener("change", filterEvents);
+            // Sort functionality
+            sortOptions.forEach(option => {
+                option.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const sortType = this.getAttribute("data-sort");
+                    sortEvents(sortType);
+                });
+            });
+
+            function sortEvents(sortType) {
+                const tbody = document.querySelector("#eventsTable tbody");
+                const rowsArray = Array.from(rows);
+
+                rowsArray.sort((a, b) => {
+                    switch (sortType) {
+                        case "date-desc":
+                            return new Date(b.getAttribute("data-date")) - new Date(a.getAttribute("data-date"));
+                        case "date-asc":
+                            return new Date(a.getAttribute("data-date")) - new Date(b.getAttribute("data-date"));
+                        case "price-desc":
+                            return parseFloat(b.getAttribute("data-price")) - parseFloat(a.getAttribute("data-price"));
+                        case "price-asc":
+                            return parseFloat(a.getAttribute("data-price")) - parseFloat(b.getAttribute("data-price"));
+                        default:
+                            return 0;
+                    }
+                });
+
+                // Clear and re-append sorted rows
+                tbody.innerHTML = "";
+                rowsArray.forEach(row => tbody.appendChild(row));
+                filterEvents(); // Reapply filters after sorting
+            }
+
+            function showToast(message, type) {
+                // Simple toast notification
+                const toast = document.createElement('div');
+                toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                toast.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+                toast.innerHTML = `
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                document.body.appendChild(toast);
+
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 3000);
+            }
+        });
     </script>
 }

@@ -5,100 +5,763 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-5" style="max-width: 500px;">
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-body p-4">
-            <h3 class="text-center mb-4 fw-bold">Create Account</h3>
+<!-- Add SweetAlert2 for notifications -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
 
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger">@ViewBag.Error</div>
+    .register-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 40px 20px;
+    }
+
+        .register-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.05"><polygon points="0,100 1000,0 1000,100"></polygon></svg>');
+            background-size: cover;
+        }
+
+    .register-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+        overflow: hidden;
+        animation: slideUp 0.8s ease-out;
+        max-width: 550px;
+        width: 100%;
+    }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .register-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+        .register-header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 2px;
+        }
+
+    .register-icon {
+        width: 90px;
+        height: 90px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.5rem;
+        backdrop-filter: blur(10px);
+        animation: bounceIn 1s ease-out;
+    }
+
+    @@keyframes bounceIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        70% {
+            transform: scale(0.9);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+    }
+
+        .form-label i {
+            margin-right: 8px;
+            color: #667eea;
+            width: 16px;
+            text-align: center;
+        }
+
+    .form-control, .myselect {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #fff;
+        width: 100%;
+    }
+
+    .myselect {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+
+        .form-control:focus, .myselect:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-control:hover, .myselect:hover {
+            border-color: #adb5bd;
+        }
+
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        transition: color 0.3s ease;
+        z-index: 2;
+    }
+
+        .password-toggle:hover {
+            color: #667eea;
+        }
+
+    .btn-register {
+        background: var(--success-gradient);
+        border: none;
+        border-radius: 12px;
+        padding: 14px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .btn-register::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-register:hover::before {
+            left: 100%;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+    .login-link {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+            .login-link a:hover {
+                color: #764ba2;
+                text-decoration: underline;
             }
 
-            @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "needs-validation" }))
-            {
-                @Html.AntiForgeryToken()
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
 
-                <div class="form-group mb-3">
-                    <asp:Label for="FullName" class="form-label" runat="server">Full Name</asp:Label>
-                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter your full name", required = "required" })
-                    @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
-                </div>
+    .floating-element {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 8s ease-in-out infinite;
+    }
 
-                <div class="form-group mb-3">
-                    <asp:Label for="Phone" class="form-label" runat="server">Phone Number</asp:Label>
-                    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "Enter your phone number", type = "tel", pattern = "[0-9]{10}", title = "Enter a valid 10-digit phone number", required = "required" })
-                    @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger" })
-                </div>
+        .floating-element:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
 
-                <div class="form-group mb-3">
-                    <asp:Label for="Gender" class="form-label" runat="server">Gender</asp:Label>
-                    @Html.DropDownListFor(m => m.Gender,
-                        new List<SelectListItem> {
-                            new SelectListItem { Value = "" , Text = "Select your Gender" },
-                            new SelectListItem { Value = "Male" , Text = "Male" },
-                            new SelectListItem { Value = "Female" , Text = "Female" },
-                            new SelectListItem { Value = "Other" , Text = "Prefer not to say" }
-                        },
-                        new { @class = "myselect" })
-                    @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "text-danger" })
-                </div>
+        .floating-element:nth-child(2) {
+            width: 70px;
+            height: 70px;
+            top: 70%;
+            left: 85%;
+            animation-delay: 2s;
+        }
 
-                <div class="form-group mb-3">
-                    <asp:Label for="DateOfBirth" class="form-label" runat="server">Date Of Birth</asp:Label>
-                    @Html.TextBoxFor(m => m.DateOfBirth, new { @class = "form-control", type = "date", required = "required" })
-                    @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger" })
-                </div>
+        .floating-element:nth-child(3) {
+            width: 50px;
+            height: 50px;
+            top: 40%;
+            left: 90%;
+            animation-delay: 4s;
+        }
 
-                <div class="form-group mb-3">
-                    <asp:Label for="Address" class="form-label" runat="server">Address</asp:Label>
-                    @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "Enter your address", required = "required" })
-                    @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger" })
-                </div>
+        .floating-element:nth-child(4) {
+            width: 80px;
+            height: 80px;
+            top: 85%;
+            left: 10%;
+            animation-delay: 1s;
+        }
 
-                <div class="form-group mb-3">
-                    <asp:Label for="Email" class="form-label" runat="server">Email Address</asp:Label>
-                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter your email", type = "email", required = "required" })
-                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
-                </div>
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0) rotate(0deg);
+        }
 
-                <div class="form-group mb-3">
-                    <asp:Label for="PasswordHash" class="form-label" runat="server">Password</asp:Label>
-                    @Html.PasswordFor(m => m.PasswordHash, new { @class = "form-control", placeholder = "Enter your password", required = "required", minlength = "6" })
-                    @Html.ValidationMessageFor(m => m.PasswordHash, "", new { @class = "text-danger" })
-                </div>
+        50% {
+            transform: translateY(-25px) rotate(15deg);
+        }
+    }
 
-                <div class="form-group mb-3">
-                    <asp:Label for="ConfirmPassword" class="form-label" runat="server">Confirm Password</asp:Label>
-                    <input id="ConfirmPassword" type="password" name="ConfirmPassword" class="form-control" placeholder="Re-enter your password" required minlength="6" />
-                </div>
+    .alert {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 15px;
+        margin-bottom: 1.5rem;
+        animation: slideIn 0.5s ease-out;
+    }
 
-                <div class="d-grid mb-3">
-                    <button type="submit" class="btn btn-success btn-block">Register</button>
-                </div>
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border-left: 4px solid #dc3545;
+    }
 
-                <div class="text-center">
-                    <small>
-                        Already have an account?
-                        <a href="@Url.Action("Login", "Account")" class="text-decoration-none fw-semibold">Login here</a>
-                    </small>
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 15px;
+    }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+    .password-strength {
+        margin-top: 0.25rem;
+        height: 4px;
+        border-radius: 2px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        width: 0%;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .strength-weak {
+        background: #dc3545;
+        width: 33%;
+    }
+
+    .strength-medium {
+        background: #ffc107;
+        width: 66%;
+    }
+
+    .strength-strong {
+        background: #198754;
+        width: 100%;
+    }
+
+    .password-requirements {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    .requirement {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2px;
+    }
+
+        .requirement i {
+            margin-right: 5px;
+            font-size: 0.7rem;
+        }
+
+        .requirement.met {
+            color: #198754;
+        }
+
+        .requirement.unmet {
+            color: #6c757d;
+        }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .register-container {
+            padding: 20px 15px;
+        }
+
+        .register-card {
+            margin: 0;
+        }
+
+        .form-row {
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .register-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .register-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 2rem;
+        }
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .progress-step {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6c757d;
+        position: relative;
+        z-index: 2;
+    }
+
+        .progress-step.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+    .progress-line {
+        position: absolute;
+        top: 50%;
+        left: 50px;
+        right: 50px;
+        height: 2px;
+        background: #e9ecef;
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+</style>
+
+<div class="register-container">
+    <!-- Floating background elements -->
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card register-card">
+                    <div class="register-header">
+                        <div class="register-icon">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                        <h3 class="mb-2 fw-bold">Join EventSphere</h3>
+                        <p class="mb-0 opacity-75">Create your account and start exploring amazing events</p>
+                    </div>
+
+                    <div class="card-body p-4">
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger animate__animated animate__shakeX">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>@ViewBag.Error
+                            </div>
+                        }
+
+                        @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "needs-validation", id = "registerForm" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-group">
+                                <label for="FullName" class="form-label">
+                                    <i class="bi bi-person-fill"></i>Full Name
+                                </label>
+                                @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter your full name", required = "required" })
+                                @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="Phone" class="form-label">
+                                        <i class="bi bi-telephone-fill"></i>Phone Number
+                                    </label>
+                                    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "07X XXX XXXX", type = "tel", pattern = "[0-9]{10}", title = "Enter a valid 10-digit phone number", required = "required" })
+                                    @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="DateOfBirth" class="form-label">
+                                        <i class="bi bi-calendar-event"></i>Date of Birth
+                                    </label>
+                                    @Html.TextBoxFor(m => m.DateOfBirth, new { @class = "form-control", type = "date", required = "required", max = DateTime.Now.ToString("yyyy-MM-dd") })
+                                    @Html.ValidationMessageFor(m => m.DateOfBirth, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Gender" class="form-label">
+                                    <i class="bi bi-gender-ambiguous"></i>Gender
+                                </label>
+                                @Html.DropDownListFor(m => m.Gender,
+                                    new List<SelectListItem> {
+                                        new SelectListItem { Value = "" , Text = "Select your Gender" },
+                                        new SelectListItem { Value = "Male" , Text = "Male" },
+                                        new SelectListItem { Value = "Female" , Text = "Female" },
+                                        new SelectListItem { Value = "Other" , Text = "Prefer not to say" }
+                                    },
+                                    new { @class = "myselect" })
+                                @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Role" class="form-label">
+                                    <i class="bi bi-person-badge-fill"></i>Account Type
+                                </label>
+                                @Html.DropDownListFor(m => m.Role,
+                                    new List<SelectListItem> {
+                                        new SelectListItem { Value = "", Text = "Select your Role" },
+                                        new SelectListItem { Value = "Customer", Text = "Customer" },
+                                        new SelectListItem { Value = "Organizer", Text = "Organizer" }
+                                    },
+                                    new { @class = "myselect", required = "required" })
+                                @Html.ValidationMessageFor(m => m.Role, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Address" class="form-label">
+                                    <i class="bi bi-geo-alt-fill"></i>Address
+                                </label>
+                                @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "Enter your complete address", required = "required" })
+                                @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Email" class="form-label">
+                                    <i class="bi bi-envelope-fill"></i>Email Address
+                                </label>
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter your email address", type = "email", required = "required" })
+                                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label for="PasswordHash" class="form-label">
+                                    <i class="bi bi-lock-fill"></i>Password
+                                </label>
+                                @Html.PasswordFor(m => m.PasswordHash, new { @class = "form-control", placeholder = "Create a strong password", required = "required", minlength = "6", id = "PasswordHash" })
+                                <button type="button" class="password-toggle" id="togglePassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <div class="password-strength">
+                                    <div class="password-strength-bar" id="passwordStrength"></div>
+                                </div>
+                                <div class="password-requirements" id="passwordRequirements">
+                                    <div class="requirement unmet" id="lengthReq">
+                                        <i class="bi bi-circle"></i> At least 6 characters
+                                    </div>
+                                    <div class="requirement unmet" id="strengthReq">
+                                        <i class="bi bi-circle"></i> Strong password
+                                    </div>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.PasswordHash, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ConfirmPassword" class="form-label">
+                                    <i class="bi bi-lock-fill"></i>Confirm Password
+                                </label>
+                                <input id="ConfirmPassword" type="password" name="ConfirmPassword" class="form-control" placeholder="Re-enter your password" required minlength="6" />
+                                <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <div class="text-danger" id="confirmPasswordError"></div>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-register" id="registerButton">
+                                    <i class="bi bi-person-plus-fill me-2"></i>Create Account
+                                </button>
+                            </div>
+                        }
+
+                        <div class="login-link">
+                            <small>
+                                Already have an account?
+                                <a href="@Url.Action("Login", "Account")" class="fw-semibold">Sign in here</a>
+                            </small>
+                        </div>
+                    </div>
                 </div>
-            }
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @section scripts {
     <script>
-        // Client-side password match validation
-        document.querySelector("form").addEventListener("submit", function (e) {
-            const pass = document.getElementById("PasswordHash").value;
-            const confirm = document.getElementById("ConfirmPassword").value;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle functionality
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('PasswordHash');
+            const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+            const confirmPasswordInput = document.getElementById('ConfirmPassword');
 
-            if (pass !== confirm) {
-                e.preventDefault();
-                alert("Passwords do not match. Please try again.");
-            }
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+            });
+
+            toggleConfirmPassword.addEventListener('click', function() {
+                const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPasswordInput.setAttribute('type', type);
+                this.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+            });
+
+            // Password strength indicator
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                const strengthBar = document.getElementById('passwordStrength');
+                const lengthReq = document.getElementById('lengthReq');
+                const strengthReq = document.getElementById('strengthReq');
+
+                // Check length requirement
+                if (password.length >= 6) {
+                    lengthReq.classList.remove('unmet');
+                    lengthReq.classList.add('met');
+                    lengthReq.innerHTML = '<i class="bi bi-check-circle-fill"></i> At least 6 characters';
+                } else {
+                    lengthReq.classList.remove('met');
+                    lengthReq.classList.add('unmet');
+                    lengthReq.innerHTML = '<i class="bi bi-circle"></i> At least 6 characters';
+                }
+
+                // Calculate password strength
+                let strength = 0;
+                if (password.length >= 8) strength++;
+                if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+                if (password.match(/\d/)) strength++;
+                if (password.match(/[^a-zA-Z\d]/)) strength++;
+
+                // Update strength bar and requirement
+                strengthBar.className = 'password-strength-bar';
+                if (password.length === 0) {
+                    strengthBar.style.width = '0%';
+                    strengthReq.classList.remove('met');
+                    strengthReq.classList.add('unmet');
+                    strengthReq.innerHTML = '<i class="bi bi-circle"></i> Strong password';
+                } else if (strength <= 2) {
+                    strengthBar.classList.add('strength-weak');
+                    strengthReq.classList.remove('met');
+                    strengthReq.classList.add('unmet');
+                    strengthReq.innerHTML = '<i class="bi bi-circle"></i> Weak password';
+                } else if (strength === 3) {
+                    strengthBar.classList.add('strength-medium');
+                    strengthReq.classList.remove('met');
+                    strengthReq.classList.add('unmet');
+                    strengthReq.innerHTML = '<i class="bi bi-circle"></i> Medium strength';
+                } else {
+                    strengthBar.classList.add('strength-strong');
+                    strengthReq.classList.remove('unmet');
+                    strengthReq.classList.add('met');
+                    strengthReq.innerHTML = '<i class="bi bi-check-circle-fill"></i> Strong password';
+                }
+            });
+
+            // Real-time password confirmation check
+            confirmPasswordInput.addEventListener('input', function() {
+                const password = document.getElementById('PasswordHash').value;
+                const confirm = this.value;
+                const errorElement = document.getElementById('confirmPasswordError');
+
+                if (confirm.length > 0 && password !== confirm) {
+                    errorElement.textContent = 'Passwords do not match';
+                    this.style.borderColor = '#dc3545';
+                } else {
+                    errorElement.textContent = '';
+                    this.style.borderColor = password === confirm ? '#198754' : '#e9ecef';
+                }
+            });
+
+            // Form submission handling
+            const registerForm = document.getElementById('registerForm');
+            const registerButton = document.getElementById('registerButton');
+
+            registerForm.addEventListener('submit', function(e) {
+                const password = document.getElementById('PasswordHash').value;
+                const confirm = document.getElementById('ConfirmPassword').value;
+
+                // Check if passwords match
+                if (password !== confirm) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Password Mismatch',
+                        text: 'The passwords you entered do not match. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#667eea'
+                    });
+                    return;
+                }
+
+                // Check password strength
+                if (password.length < 6) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Weak Password',
+                        text: 'Please choose a password with at least 6 characters.',
+                        icon: 'warning',
+                        confirmButtonColor: '#667eea'
+                    });
+                    return;
+                }
+
+                // Show loading state
+                registerButton.innerHTML = '<i class="bi bi-arrow-repeat spinner me-2"></i>Creating Account...';
+                registerButton.disabled = true;
+
+                // Re-enable button after 5 seconds (in case of slow response)
+                setTimeout(() => {
+                    registerButton.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Create Account';
+                    registerButton.disabled = false;
+                }, 5000);
+            });
+
+            // Set max date for date of birth (18 years ago)
+            const dobInput = document.querySelector('input[type="date"]');
+            const today = new Date();
+            const maxDate = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
+            dobInput.setAttribute('max', maxDate.toISOString().split('T')[0]);
+
+            // Add input focus effects
+            const inputs = document.querySelectorAll('.form-control, .myselect');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.parentElement.classList.remove('focused');
+                    }
+                });
+            });
+
+            // Auto-focus first field
+            document.getElementById('FullName').focus();
         });
+
+        // Add spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+            .spinner {
+                animation: spin 1s linear infinite;
+            }
+            @@keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 }
