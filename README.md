@@ -122,6 +122,14 @@ git clone https://github.com/supunakalanka76/EventSphere-Online-Event-Ticketing-
 ## 📜 License
 #### This project is open-source and available under the MIT License.
 
-### ⭐ If you found this useful, please give the repository a star!
+<br/>
+
+## 🎓 Academic Integrity
+
+This project adheres to academic integrity guidelines and proper citation of all resources used during development.
+
+---
+
+**Note**: This is an academic project developed for educational purposes as part of the Advanced Software Engineering course at ESOFT Metro Campus.
 
 <p align="right"> - Last Update: 20.10.2025 - </p>
