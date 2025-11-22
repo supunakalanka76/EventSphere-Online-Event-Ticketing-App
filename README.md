@@ -130,6 +130,6 @@ This project adheres to academic integrity guidelines and proper citation of all
 
 ---
 
-**Note**: This is an academic project developed for educational purposes as part of the Advanced Software Engineering course at ESOFT Metro Campus.
+**Note**: This is an academic project developed for educational purposes as part of the Application Development course at ESOFT Metro Campus.
 
-<p align="right"> - Last Update: 20.10.2025 - </p>
+<p align="right"> - Last Update: 22.11.2025 - </p>
